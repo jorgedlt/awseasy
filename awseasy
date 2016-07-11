@@ -1,0 +1,279 @@
+#!/usr/bin/env bash
+
+#
+# awseasy - an AWS CLI assited scripts
+#
+
+# written by jorgedlt@gmail.com - 2016 Jun 28
+
+#.
+#. Shared Functions
+#.
+
+#  sameAs - Colorized out
+sameAs () {
+  echo "${GRAY} executing command: ${GREEN} $1 ${RESET}"
+}
+
+#  sameAs - Colorized out
+divText () {
+  echo "${GRAY} ==== ${BLUE} $1 ${GRAY} ==== ${RESET}"
+}
+
+#.
+#. AWS EC2 Commands
+#.
+
+#.  awsls - AWS EC2 -- List Nodes, long format - awsls
+awsls () {
+  sameAs "aws ec2 describe-instances --query complex-query-string "
+  aws ec2 describe-instances --query \
+  'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value[],InstanceId,State.Name,InstanceType,PrivateIpAddress,PublicIpAddress]' \
+  --output text | grep -v terminated | awk 'NR%2{printf $0" ";next;}1' | column -t | ccze -A
+}
+
+#.  awsdesc - AWS EC2 -- Detail JSON dump of instance
+awsdesc () {
+  sameAs "aws ec2 describe-instances --instance-ids InstanceId"
+  aws ec2 describe-instances --instance-ids $1 | json | ccze -A
+}
+
+#.  awsquick - AWS EC2 -- describe instances with key choosen parameters
+awsquick() {
+  sameAs "aws ec2 describe-instances --instance-ids InstanceId with GREP KLUDGE"
+  aws ec2 describe-instances --instance-ids $1 |
+    sed -e 's/^[ \t]*//' |
+    egrep 'ImageId|InstanceType|AvailabilityZone|KeyName|SubnetId|GroupName|GroupId'
+}
+
+#.  awswho - AWS EC2 -- Show which enviroment is active
+awswho() {
+  #sameAs " aws iam list-account-aliases --output text"
+  #aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+  echo -e "   " | tr -d '\n' ; aws iam list-account-aliases --output text | ccze -A
+  #date
+}
+
+#  awswho - for Scripts
+awswho-s() {
+  divText $(aws iam list-account-aliases --output text | tr 'a-z' 'A-Z' | awk '{print $2}' | ccze -A)
+}
+
+#.  awsswp - AWS -- Swap AUTH creds for AWS/CLI access
+awsswp () {
+
+if (( $# < 1 )); then
+  echo usage: Needs at least argument [dev, tst, stg, or prd -- also Jenkins or Legacy]
+  return
+fi
+
+case "$1" in
+          d|dev)
+              echo switching to AWS DEV
+              /bin/cp -f ~/.aws/creds.dev ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          s|stg|stage)
+              echo switching to AWS STAGE
+              /bin/cp -f ~/.aws/creds.stg ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          p|prd|prod)
+              echo switching to AWS PROD
+              /bin/cp -f ~/.aws/creds.prd ~/.aws/credentials
+              echo ${RED}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          t|tst|test)
+              echo switching to AWS TEST
+              /bin/cp -f ~/.aws/creds.tst ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          j|jkn|Jenkins)
+              echo switching to AWS JENKINS
+              /bin/cp -f ~/.aws/creds.jkn ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          l|leg|lcy|Legacy|sbd-da)
+              echo switching to AWS SBD-DA Legacy
+              /bin/cp -f ~/.aws/creds.lcy ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          *)
+              echo $"Usage: $0 At least one parameter must be provided"
+  esac
+}
+
+#.  awsstart - AWS EC2 -- Start an EC2 Instance
+awsstart() {
+
+   if (( $# < 1 )); then
+    echo usage: Needs at least one argument {instance ID#}
+    return
+   fi
+
+    sameAs "aws ec2 start-instances --instance-ids instance-id#"
+    aws ec2 start-instances --instance-ids $1
+}
+
+#.  awsstop - AWS EC2 -- Stop an EC2 Instance
+awsstop() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+  sameAs "aws ec2 stop-instances --instance-ids instance-id#"
+  aws ec2 stop-instances --instance-ids $1
+}
+
+#.  awskill - AWS EC2 -- Terminate an EC2 Instance
+awskill() {
+
+ if (( $# < 1 )); then
+   echo usage: Needs at least one argument {instance ID#}
+   return
+ fi
+#
+ read -p "Are you sure you want to continue? <y/N> " prompt
+ if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]
+ then
+   sameAs "aws ec2 terminate-instances --instance-ids instance-id#"
+   aws ec2 terminate-instances --instance-ids $1
+ else
+   return
+ fi
+}
+
+#.  awshelp - AWS CLI -- help screen
+awshelp () {
+  sameAs "cat /vagrant/awseasy | grep '^#\.'"
+  cat /vagrant/awseasy | grep '^#\.'
+}
+
+#.
+#. AWS SecurityGroup commands
+#.
+
+#.  awslsg - AWS EC2 -- List Nodes, short format with SecurityGroup
+awslsg () {
+  sameAs "aws ec2 describe-instances --query complex-query-string"
+  aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,PrivateIpAddress,PublicIpAddress,SecurityGroups]' \
+  --output text | grep -v terminated | awk 'NR%2{printf $0" ";next;}1' | column -t | ccze -A
+}
+
+#.  awssgdesc - AWS EC2 -- List Nodes, short format with SecurityGroup
+awssgdesc () {
+
+  sameAs "aws ec2 describe-security-groups --group-ids $1"
+  aws ec2 describe-security-groups --group-ids $1 | egrep 'ToPort|CidrIp'
+}
+
+#.
+#. AWS S3 commands
+#.
+
+#.  s3show - AWS CLI -- AWS/S3 list top level folders
+s3show () {
+
+  echo "${CYAN} executing command: ${GRAY} aws s3 ls ${RESET}"
+  aws s3 ls | ccze -A
+}
+
+#
+#.  s3push - AWS CLI -- AWS/S3 push local data to s3
+s3push () {
+
+  echo 's3cp is not fully functional yet'
+  echo please use : 'aws s3 cp local-sourcefile s3://target-s3bucket/'
+}
+
+#.  s3pull - AWS CLI -- AWS/S3 pull get info from s3
+s3pull () {
+
+  echo 's3cp is not fully functional yet'
+  echo please use : 'aws s3 cp s3://target-s3bucket/' local-destination
+}
+
+#.  s3make - AWS CLI -- AWS/S3 make/create new s3 bucket
+s3make () {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+  echo "${CYAN} executing command: ${GRAY} aws s3api create-bucket --bucket s3bucketName --region us-east-1 ${RESET}"
+  aws s3api create-bucket --bucket $1 --region us-east-1
+}
+
+#.  s3ls - AWS CLI -- AWS/S3 list files
+s3ls () {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+  echo "${CYAN} executing command: ${GRAY} aws s3 ls s3://s3bucketName ${BLUE}# also see s3deep${RESET}"
+  aws s3 ls s3://${1}
+}
+
+#.  s3deep - AWS CLI -- AWS/S3 list recursively
+s3deep () {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+  echo "${CYAN} executing command: ${GRAY} aws s3 ls s3://s3bucketName ${RED} --recursive ${BLUE}# also see s3deep${RESET}"
+  aws s3 ls s3://${1} --recursive
+}
+
+#.  awsupdate - AWS CLI -- update awscli and required packages
+awsupdate () {
+
+  echo -n "${RESET}${WHITE}"
+      read -r -p "Are you sure you want to update the AWS CLI environment? [y/N] " response
+  echo "${RESET}"
+
+  [[ $response =~ ^([yY][eE][sS]|[yY])$ ]] && {
+      echo "${CYAN} executing command: ${GRAY} sudo apt-get -y install figlet ccze ${RESET}"
+      sudo apt-get -y install figlet ccze
+
+      echo "${CYAN} executing command: ${GRAY} sudo pip install pjson awscli --upgrade ${RESET}"
+      sudo pip install pjson
+      sudo pip install awscli --upgrade
+
+      echo ${CYAN}Environment updated attempted, currently at${GREEN}
+        aws --version
+      echo -n ${RESET}
+  } || {
+    :
+    echo ${CYAN}Environment not updated${GREEN}
+      aws --version
+    echo -n ${RESET}
+  }
+
+}
+
+# other Commands -- Yet to come
+# aws iam list-users
