@@ -1,11 +1,7 @@
-# awseasy
-
-readme.md
-
 # AWSeasy
  aws easy - an AWS CLI assited scripts
 
- jorgedlt@gmail.com -- 2016 June 28 --
+ jorgedlt@gmail.com -- 2016 JUN 28 -- 2016 AUG 18
 
 #### -- add presentation video link - http://trentm.com/json/
 
@@ -54,14 +50,15 @@ these files are to follow this pattern
 file creds.X.dev
 
 	[CompanyX - DEV]
-	dev_AWS_ACCESS_KEY_ID=xxxxxxxxxxxxxxx
-	dev_AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	dev_AWS_ACCESS_KEY_ID=A1NJY8MX2AR5KFZOEIHQ
+	dev_AWS_SECRET_ACCESS_KEY=OSBEIEsgQyA1IFAgQiBaIFYgQSBRIEUgSCBHIDYg
+
 
 file creds.X.prd
 
 	[CompanyX - PROD]
-	AMAZON_ACCESS_KEY_ID=xxxxxxxxxxxxxxx
-	AMAZON_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	AMAZON_ACCESS_KEY_ID=AQULF98MIN1WPVXYOG62
+	AMAZON_SECRET_ACCESS_KEY=NSBDIEggQSBTIFYgRiAwIDcgUSBLIEQgSiBMIFI3
 
 permission should be set -rw------- as per AWS norms.
 
@@ -69,6 +66,8 @@ permission should be set -rw------- as per AWS norms.
 
 for now the script will have to be edited to account for other enviroment
 - future feature this will be configure via a sepearate yaml file
+
+![](https://dl.dropboxusercontent.com/u/8941138/GitHub%20Screen%20Images/Screen%20Shot%202016-08-18%20at%204.04.29%20PM.png)
 
 ----
 
