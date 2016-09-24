@@ -1,0 +1,57 @@
+ Name,Memory,Compute Units (ECU),vCPUs,Storage,Linux On Demand cost,Linux Reserved cost
+===========,===========,===========,===========,===========,===========,===========
+ t2.nano,0.5 GB,Burstable,1 vCPUs,0 GB (EBS only),$0.006 hourly,$0.005 hourly
+ t2.micro,1.0 GB,Burstable,1 vCPUs,0 GB (EBS only),$0.013 hourly,$0.009 hourly
+ t2.small,2.0 GB,Burstable,1 vCPUs,0 GB (EBS only),$0.026 hourly,$0.018 hourly
+ t2.medium,4.0 GB,Burstable,2 vCPUs,0 GB (EBS only),$0.052 hourly,$0.036 hourly
+ t2.large,8.0 GB,Burstable,2 vCPUs,0 GB (EBS only),$0.104 hourly,$0.072 hourly
+ g2.8xlarge,60.0 GB,104 units,32 vCPUs,240.0 GB (2 * 120.0 GB SSD),$2.600 hourly,$1.896 hourly
+ r3.large,15.25 GB,6.5 units,2 vCPUs,32.0 GB SSD,$0.166 hourly,$0.105 hourly
+ r3.8xlarge,244.0 GB,104 units,32 vCPUs,640.0 GB (2 * 320.0 GB SSD),$2.660 hourly,$1.672 hourly
+ i2.8xlarge,244.0 GB,104 units,32 vCPUs,6400.0 GB (8 * 800.0 GB SSD),$6.820 hourly,$3.392 hourly
+ hi1.4xlarge,60.5 GB,35 units,16 vCPUs,2048.0 GB (2 * 1024.0 GB SSD),$3.100 hourly,$1.698 hourly
+ hs1.8xlarge,117.0 GB,35 units,16 vCPUs,48000.0 GB (24 * 2000.0 GB),$4.600 hourly,$2.574 hourly
+ m3.medium,3.75 GB,3 units,1 vCPUs,4.0 GB SSD,$0.067 hourly,$0.048 hourly
+ m3.large,7.5 GB,6.5 units,2 vCPUs,32.0 GB SSD,$0.133 hourly,$0.095 hourly
+ c3.large,3.75 GB,7 units,2 vCPUs,32.0 GB (2 * 16.0 GB SSD),$0.105 hourly,$0.073 hourly
+ c3.8xlarge,60.0 GB,108 units,32 vCPUs,640.0 GB (2 * 320.0 GB SSD),$1.680 hourly,$1.168 hourly
+ m1.small,1.7 GB,1 units,1 vCPUs,160.0 GB,$0.044 hourly,$0.028 hourly
+ m1.medium,3.75 GB,2 units,1 vCPUs,410.0 GB,$0.087 hourly,$0.056 hourly
+ c1.medium,1.7 GB,5 units,2 vCPUs,350.0 GB,$0.130 hourly,$0.091 hourly
+ m2.xlarge,17.1 GB,6.5 units,2 vCPUs,420.0 GB,$0.245 hourly,$0.111 hourly
+ t1.micro,0.613 GB,Burstable,1 vCPUs,0 GB (EBS only),$0.020 hourly,$0.014 hourly
+ cr1.8xlarge,244.0 GB,88 units,32 vCPUs,240.0 GB (2 * 120.0 GB SSD),$3.500 hourly,$1.689 hourly
+ m4.large,8.0 GB,6.5 units,2 vCPUs,0 GB (EBS only),$0.120 hourly,$0.083 hourly
+ c4.large,3.75 GB,8 units,2 vCPUs,0 GB (EBS only),$0.105 hourly,$0.078 hourly
+ r3.xlarge,30.5 GB,13 units,4 vCPUs,80.0 GB SSD,$0.333 hourly,$0.209 hourly
+ i2.xlarge,30.5 GB,14 units,4 vCPUs,800.0 GB SSD,$0.853 hourly,$0.424 hourly
+ m3.xlarge,15.0 GB,13 units,4 vCPUs,80.0 GB (2 * 40.0 GB SSD),$0.266 hourly,$0.190 hourly
+ c3.xlarge,7.5 GB,14 units,4 vCPUs,80.0 GB (2 * 40.0 GB SSD),$0.210 hourly,$0.146 hourly
+ m1.large,7.5 GB,4 units,2 vCPUs,840.0 GB (2 * 420.0 GB),$0.175 hourly,$0.112 hourly
+ m2.2xlarge,34.2 GB,13 units,4 vCPUs,850.0 GB,$0.490 hourly,$0.222 hourly
+ m4.xlarge,16.0 GB,13 units,4 vCPUs,0 GB (EBS only),$0.239 hourly,$0.164 hourly
+ c4.xlarge,7.5 GB,16 units,4 vCPUs,0 GB (EBS only),$0.209 hourly,$0.155 hourly
+ d2.xlarge,30.5 GB,14 units,4 vCPUs,6000.0 GB (3 * 2000.0 GB),$0.690 hourly,$0.402 hourly
+ m4.2xlarge,32.0 GB,26 units,8 vCPUs,0 GB (EBS only),$0.479 hourly,$0.329 hourly
+ c4.2xlarge,15.0 GB,31 units,8 vCPUs,0 GB (EBS only),$0.419 hourly,$0.311 hourly
+ g2.2xlarge,15.0 GB,26 units,8 vCPUs,60.0 GB SSD,$0.650 hourly,$0.474 hourly
+ r3.2xlarge,61.0 GB,26 units,8 vCPUs,160.0 GB SSD,$0.665 hourly,$0.418 hourly
+ i2.2xlarge,61.0 GB,27 units,8 vCPUs,1600.0 GB (2 * 800.0 GB SSD),$1.705 hourly,$0.848 hourly
+ d2.2xlarge,61.0 GB,28 units,8 vCPUs,12000.0 GB (6 * 2000.0 GB),$1.380 hourly,$0.804 hourly
+ m3.2xlarge,30.0 GB,26 units,8 vCPUs,160.0 GB (2 * 80.0 GB SSD),$0.532 hourly,$0.380 hourly
+ c3.2xlarge,15.0 GB,28 units,8 vCPUs,160.0 GB (2 * 80.0 GB SSD),$0.420 hourly,$0.292 hourly
+ m1.xlarge,15.0 GB,8 units,4 vCPUs,1680.0 GB (4 * 420.0 GB),$0.350 hourly,$0.224 hourly
+ c1.xlarge,7.0 GB,20 units,8 vCPUs,1680.0 GB (4 * 420.0 GB),$0.520 hourly,$0.364 hourly
+ m2.4xlarge,68.4 GB,26 units,8 vCPUs,1680.0 GB (2 * 840.0 GB),$0.980 hourly,$0.444 hourly
+ m4.4xlarge,64.0 GB,53.5 units,16 vCPUs,0 GB (EBS only),$0.958 hourly,$0.658 hourly
+ c4.4xlarge,30.0 GB,62 units,16 vCPUs,0 GB (EBS only),$0.838 hourly,$0.621 hourly
+ r3.4xlarge,122.0 GB,52 units,16 vCPUs,320.0 GB SSD,$1.330 hourly,$0.836 hourly
+ i2.4xlarge,122.0 GB,53 units,16 vCPUs,3200.0 GB (4 * 800.0 GB SSD),$3.410 hourly,$1.696 hourly
+ d2.4xlarge,122.0 GB,56 units,16 vCPUs,24000.0 GB (12 * 2000.0 GB),$2.760 hourly,$1.608 hourly
+ c3.4xlarge,30.0 GB,55 units,16 vCPUs,320.0 GB (2 * 160.0 GB SSD),$0.840 hourly,$0.584 hourly
+ m4.10xlarge,160.0 GB,124.5 units,40 vCPUs,0 GB (EBS only),$2.394 hourly,$1.645 hourly
+ c4.8xlarge,60.0 GB,132 units,36 vCPUs,0 GB (EBS only),$1.675 hourly,$1.242 hourly
+ d2.8xlarge,244.0 GB,116 units,36 vCPUs,48000.0 GB (24 * 2000.0 GB),$5.520 hourly,$3.216 hourly
+ x1.32xlarge,1952.0 GB,349 units,128 vCPUs,3840.0 GB (2 * 1920.0 GB SSD),$13.338 hourly,$9.158 hourly
+ #
+ ,,,-- source, http://www.ec2instances.info/,  --date, 24 SEP 2016
