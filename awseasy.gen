@@ -1,0 +1,48 @@
+# awseasy.gen
+
+#.
+#. General Commands
+#.
+
+#.  ec2type - List current ec2 list - as reference
+ec2type() {
+  cat ~/.awseasy/ec2.type.csv | sed -e 's/,,/, ,/g' | column -s, -t | less -#5 -N -S | ccze -A
+}
+
+#.  awseasy-version - Display Current Version
+awseasy-version() {
+  echo AWSEASY VERSION:
+  cat ~/.awseasy/awseasy.ver | ccze -A
+}
+
+#.  awshelp - AWS CLI -- help screen
+awshelp() {
+  sameAs "cat ~/.awseasy/awseasy | grep '^#\.'"
+  cat ~/.awseasy/awseasy* | grep -v old | grep '^#\.'
+}
+
+#.  awsupdate - AWS CLI -- update awscli and required packages
+awsupdate() {
+  echo -n "${RESET}${WHITE}"
+      read -r -p "Are you sure you want to update the AWS CLI environment? [y/N] " response
+  echo "${RESET}"
+
+  [[ $response =~ ^([yY][eE][sS]|[yY])$ ]] && {
+      echo "${CYAN} executing command: ${GRAY} sudo apt-get -y install figlet ccze ${RESET}"
+      sudo apt-get -y install figlet ccze
+
+      echo "${CYAN} executing command: ${GRAY} sudo pip install pjson awscli --upgrade ${RESET}"
+      pip install --upgrade pip
+      sudo pip install pjson
+      sudo pip install awscli --upgrade
+
+      echo ${CYAN}Environment updated attempted, currently at${GREEN}
+        aws --version
+      echo -n ${RESET}
+  } || {
+    :
+    echo ${CYAN}Environment not updated${GREEN}
+      aws --version
+    echo -n ${RESET}
+  }
+}

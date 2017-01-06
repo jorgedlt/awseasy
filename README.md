@@ -41,34 +41,102 @@ In favor of the ssh env pass technique
 
 ----
 
-####. AWS EC2 Commands
+### Install Notes -  
 
- awsls - AWS EC2 -- List Nodes, long format - awsls (ignores SLAVES)
- awslsall - AWS EC2 -- List Nodes, long format - awsls
+My method is 
 
- awsdesc - AWS EC2 -- Detail JSON dump of instance
- awsbrief - AWS EC2 -- describe instances with key choosen parameters (formerly awsquick)
- awswho - AWS EC2 -- Show which enviroment is active
- awsswp - AWS -- Swap AUTH creds for AWS/CLI access
- awsstart - AWS EC2 -- Start an EC2 Instance
- awsstop - AWS EC2 -- Stop an EC2 Instance
- awskill - AWS EC2 -- Terminate an EC2 Instance
- awshelp - AWS CLI -- help screen
+	normal gi clone
+		rm -rf .awseasy/ && git clone https://usedid@bitbucket.org/sbdDigitalAccelerator/devops.awseasy.git
+	
+then a minor in place install
 
-####. AWS SecurityGroup commands
+	cd devops.awseasy/ && git log --format=fuller | head -4 > /tmp/awseasy.ver && cd
+	mv devops.awseasy/ .awseasy && mv /tmp/awseasy.ver .awseasy
+	source .awseasy/awseasy  # or logout and log back in
 
- awslsg - AWS EC2 -- List Nodes, short format with SecurityGroup
- awssgdesc - AWS EC2 -- List Nodes, short format with SecurityGroup
+making sure that   source .awseasy/awseasy is in your .bashrc, mine looks like this;
 
-####. AWS S3 commands
+	 # Please do not modify the last few lines, they offer additional features for awseasy
+	[ -z $AWS_ACCESS_KEY_ID ] && [ -z $AWS_SECRET_ACCESS_KEY ] || source .awseasy/awseasy
 
- s3show - AWS CLI -- AWS/S3 list top level folders
- s3push - AWS CLI -- AWS/S3 push local data to s3
- s3pull - AWS CLI -- AWS/S3 pull get info from s3
- s3make - AWS CLI -- AWS/S3 make/create new s3 bucket
- s3ls - AWS CLI -- AWS/S3 list files
- s3deep - AWS CLI -- AWS/S3 list recursively
- awsupdate - AWS CLI -- update awscli and required packages
+
+----
+
+### AWS SecurityGroup commands
+
+  sgls - AWS EC2 -- List SecurityGroup (Brief)
+  
+  sglsall - AWS EC2 -- List SecurityGroup with INBOUND & OUTBOUND rules
+  
+  sgstat - AWS EC2 -- Desc specific SecurityGroup with INBOUND & OUTBOUND rules
+  
+  sqscanip - AWS EC2 -- List all IPs in a common sorted and count pool, regardless of protocol or port
+
+  sgauthaddi -- ADD authorize security group ingress
+  
+  sgauthdropi -- DROP authorize security group ingress
+  
+  sgauthaddo -- ADD authorize security group egress
+  
+  sgauthdropo -- DROP authorize security group egress
+
+### AWS EC2 Commands
+
+  awsls - AWS EC2 -- List Nodes, long format - awsls
+  
+  awslsall - aws ls ALL -- having some formating issues with JENKINS-SLAVES
+  
+  awsdesc - AWS EC2 -- Detail JSON dump of instance
+  
+  awsbrief - AWS EC2 -- breifly describe instances with key chosen parameters
+  
+  awswho - AWS EC2 -- Show which enviroment is active
+  
+  awsstart - AWS EC2 -- Start an EC2 Instance
+  
+  awsstop - AWS EC2 -- Stop an EC2 Instance
+  
+  awskill - AWS EC2 -- Terminate an EC2 Instance
+
+### AWS ELB commands
+
+  elbls -- List ELBs
+  
+  elbstat -- AWS ELB Brief Description (Status)
+  
+  elbjoin -- ELB - Joins (connects) instance to ELB
+  
+  elbdump -- ELB - Dumps (disconnects) instance to ELB
+
+
+### General Commands
+
+  awsupdate - AWS CLI -- update awscli and required packages
+
+  ec2type - List current ec2 list - as reference
+  
+  awseasy-version - List current ec2 list - as reference
+  
+  awshelp - AWS CLI -- help screen
+
+### Network
+
+  awsshowip - AWS CLI -- AWS VPC Show all private IPs active on subnet (QUICK)
+  
+  awsshowenc - AWS CLI -- AWS Shows ENC (Ethernet Interface) based list
+  
+
+### AWS S3 commands
+
+  s3push - AWS CLI -- AWS/S3 push local data to s3
+  
+  s3pull - AWS CLI -- AWS/S3 pull get info from s3
+  
+  s3make - AWS CLI -- AWS/S3 make/create new s3 bucket
+  
+  s3ls - AWS CLI -- AWS/S3 list files
+  
+  s3deep - AWS CLI -- AWS/S3 list recursively
 
 ----
 

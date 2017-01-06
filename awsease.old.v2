@@ -1,0 +1,632 @@
+#!/usr/bin/env bash
+
+# awseasy - an AWS CLI assited scripts
+#
+# written by jorgedlt@gmail.com - 2016 Jun 28
+
+#  sameAs - Colorized out
+sameAs () {
+  echo "${GRAY} executing command: ${GREEN} $1 ${RESET}"
+}
+
+#  sameAs - Colorized out
+divText () {
+  echo "${GRAY} ==== ${BLUE} $1 ${GRAY} ==== ${RESET}"
+}
+
+#  descDUMP - Colorized out
+descDUMP () {
+  echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}] $3: [ ${YELLOW}$4 ${GRAY}]"
+}
+
+#.
+#. AWS EC2 Commands
+#.
+
+#.  awsls - AWS EC2 -- List Nodes, long format - awsls
+awsls () {
+  sameAs "aws ec2 describe-instances --query complex-query-string "
+  aws ec2 describe-instances --query \
+  'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value[],InstanceId,State.Name,InstanceType,PrivateIpAddress,PublicIpAddress]' \
+  --output text | egrep -v 'terminated|JENKINS-SLAVE' | awk 'NR%2{printf $0" ";next;}1' | column -t | ccze -A
+}
+
+#.  awslsall - aws ls ALL -- having some formating issues with JENKINS-SLAVES
+awslsall () {
+sameAs "similar to aws ec2 describe-instances, but is slower and deals with missing TAGS better"
+
+export awslist=$(aws ec2 describe-instances | grep InstanceId | cut -d':' -f2 | tr -d '"| |,')
+for iID in $awslist; do
+     awsdump=$( aws ec2 describe-instances --instance-ids $iID --output text )
+
+     iSTATE=$(echo "$awsdump" | grep STATE |  awk '{print $3}' | cut -d':' -f2 | tr -d ' ' )
+     iTYPE=$(echo "$awsdump" | grep INSTANCES |  awk '{print $9}')
+     iIPADDR=$(echo "$awsdump" | grep PRIVATEIPADDRESSES |  awk '{print $4}' )
+     pIPADDR=$(echo "$awsdump" | grep ASSOCIATION |  awk '{print $4}' | tr ' ' '\012' | head -1 )
+
+      [[ "$iSTATE" == 'stopped' ]] && {
+        iSTATE="${GRAY}stopped${RESET}"
+        iTYPE="${GRAY}${iTYPE}${RESET}"
+        iIPADDR="${GRAY}X.X.X.X${RESET}"
+        pIPADDR="${GRAY}X.X.X.X${RESET}"
+      } || {
+        iSTATE="${GREEN}running${RESET}"
+      }
+
+      [[ "$iSTATE" == 'terminated' ]] && {
+        iTYPE="${GRAY}terminated${RESET}"
+        iIPADDR="${GRAY}X.X.X.X${RESET}"
+        pIPADDR="${GRAY}X.X.X.X${RESET}"
+      }
+
+      [[ "$iIPADDR" =~ "^ec*|^ip*" ]] && { iIPADDR=$(echo "$iIPADDR" | cut -d'-' -f2,3,4,5 | tr '-' '.' ) ; }
+
+      [[ "$pIPADDR" == '' ]] && { pIPADDR="${GRAY}NONE\t${RESET}" ; }
+
+     iNAME=$(echo "$awsdump" | grep 'TAGS.\+Name' |  egrep -v 'AppName'| tail -1 | awk '{print $3}' )
+
+     [[ $iNAME  == '' ]] && { iNAME="${RED}NoNameTagFound${RESET}" ; }
+
+     echo -e "${MAGENTA}$iID${RESET} \t$iSTATE \t$iTYPE\t${CYAN}$iIPADDR${RESET} \t${YELLOW}$pIPADDR${RESET} \t$iNAME"
+done
+}
+
+#.  awsdesc - AWS EC2 -- Detail JSON dump of instance
+awsdesc () {
+  sameAs "aws ec2 describe-instances --instance-ids InstanceId"
+  aws ec2 describe-instances --instance-ids $1 | pjson | ccze -A
+}
+
+#.  awsbrief - AWS EC2 -- breifly describe instances with key chosen parameters
+awsbrief() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+   AWSdesc=$( aws ec2 describe-instances --instance-ids $1 --output text )
+#
+     InstncNAME=$( echo "$AWSdesc" | grep 'TAGS.\+Name'  | awk '{print $3}' )
+     InstncID=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $8}' )
+     ImageId=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $7}' )
+     InstncTYPE=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $9}' )
+     NetIFACE=$( echo "$AWSdesc" | grep NETWORKINTERFACES |  tr -s '\t' | tr ' \t' '\012' | grep eni )
+     NetMAC=$( echo "$AWSdesc" | grep NETWORKINTERFACES |  tr -s '\t' | tr '\t' '\012' | grep ':' )
+     NetSUB=$( echo "$AWSdesc" | grep NETWORKINTERFACES |  tr -s '\t' | tr '\t' '\012' | grep subnet )
+     NetVPC=$( echo "$AWSdesc" | grep NETWORKINTERFACES |  tr -s '\t' | tr '\t' '\012' | grep vpc )
+     PrivateIP=$( echo "$AWSdesc" | grep PRIVATEIPADDRESSES | awk '{print $4}' )
+     PublicIP=$( echo "$AWSdesc" | grep ASSOCIATION | awk '{print $4}' | head -1 )
+     InstncKEY=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $10}' )
+     InstncSTATE=$( echo "$AWSdesc" | grep STATE | awk '{print $3}' )
+     LaunchDATE=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $11}' )
+     SecGROUP=$( echo "$AWSdesc" | grep SECURITYGROUPS | awk '{print $2}' )
+     sgNAME=$( echo "$AWSdesc" | grep SECURITYGROUPS | awk '{print $3}' )
+     AvailZONE=$( echo "$AWSdesc" | grep PLACEMENT | awk '{print $2}' )
+  #
+     descDUMP InstanceName $InstncNAME InstanceID $InstncID
+     descDUMP TYPE $InstncTYPE ImageId $ImageId
+     descDUMP PrivateIP $PrivateIP PublicIP $PublicIP
+     descDUMP SubNet $NetSUB VPC $NetVPC
+     descDUMP NetIFACE $NetIFACE NetMAC $NetMAC
+     descDUMP STATE $InstncSTATE DATE $LaunchDATE
+     descDUMP sg $SecGROUP sgNAME $sgNAME
+     descDUMP KEY $InstncKEY AZ $AvailZONE
+}
+
+#.  awswho - AWS EC2 -- Show which enviroment is active
+awswho() {
+  #sameAs " aws iam list-account-aliases --output text"
+  #aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+  echo -e "   " | tr -d '\n' ; aws iam list-account-aliases --output text | ccze -A
+  #date
+}
+
+#  awswho - for Scripts
+awswho-s() {
+  divText $(aws iam list-account-aliases --output text | tr 'a-z' 'A-Z' | awk '{print $2}' | ccze -A)
+}
+
+#.  awsstart - AWS EC2 -- Start an EC2 Instance
+awsstart() {
+   if (( $# < 1 )); then
+    echo usage: Needs at least one argument {instance ID#}
+    return
+   fi
+
+    sameAs "aws ec2 start-instances --instance-ids instance-id#"
+    aws ec2 start-instances --instance-ids $1
+}
+
+#.  awsstop - AWS EC2 -- Stop an EC2 Instance
+awsstop() {
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+  sameAs "aws ec2 stop-instances --instance-ids instance-id#"
+  aws ec2 stop-instances --instance-ids $1
+}
+
+#.  awskill - AWS EC2 -- Terminate an EC2 Instance
+awskill() {
+ if (( $# < 1 )); then
+   echo usage: Needs at least one argument {instance ID#}
+   return
+ fi
+#
+ read -p "Are you sure you want to continue? <y/N> " prompt
+ if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]
+ then
+   sameAs "aws ec2 terminate-instances --instance-ids instance-id#"
+   aws ec2 terminate-instances --instance-ids $1
+ else
+   return
+ fi
+}
+
+#.
+#.  ec2type - List current ec2 list - as reference
+awshelp() {
+  cat ~/.awseasy/ec2.type.csv | sed -e 's/,,/, ,/g' | column -s, -t | less -#5 -N -S | ccze -A
+}
+
+#.  awshelp - AWS CLI -- help screen
+awshelp() {
+  sameAs "cat ~/.awseasy/awseasy | grep '^#\.'"
+  cat ~/.awseasy/awseasy | grep '^#\.'
+}
+
+#.
+#. AWS SecurityGroup commands
+#.
+
+#.  sgls - AWS EC2 -- List SecurityGroup (Brief)
+sgls() {
+
+sgDESC=$( aws ec2 describe-security-groups --output text )
+sgLIST=$( echo "$sgDESC" | grep SECURITYGROUPS )
+
+for sg in $(echo "$sgLIST" | sed -e 's/sg-/\nsg-/' | grep ^sg | awk {'print $1'} | sort | uniq ); do
+sgTAG='null'
+
+sgDESC=$(aws ec2 describe-security-groups --group-ids ${sg} --output text)
+sgNAME=$(echo "${sgDESC}" | sed -e 's/sg-/\nsg-/' | grep SECURITYGROUPS | sed 's/SECURITYGROUPS/Security Group/g' | tr ' ' '.' | tr -d ' ' | cut -c16- )
+sgTAG=$(echo "${sgDESC}" | grep 'TAGS.\+Name' | awk '{print $3}'  )
+
+echo "TAG [${YELLOW} ${sgTAG} ${WHITE}] SG [${YELLOW} ${sg} ${WHITE}] ${WHITE}Security Group [${YELLOW}   ${sgNAME}${WHITE}]"
+    echo ${WHITE}
+done
+}
+
+#.  sglsall - AWS EC2 -- List SecurityGroup with INBOUND & OUTBOUND rules
+sglsall() {
+
+sgDESC=$( aws ec2 describe-security-groups --output text )
+sgLIST=$( echo "$sgDESC" | grep SECURITYGROUPS )
+
+for sg in $(echo "$sgLIST" | sed -e 's/sg-/\nsg-/' | grep ^sg | awk {'print $1'} | sort | uniq ); do
+sgTAG='null'
+
+sgDESC=$(aws ec2 describe-security-groups --group-ids ${sg} --output text)
+sgNAME=$(echo "${sgDESC}" | sed -e 's/sg-/\nsg-/' | grep SECURITYGROUPS | sed 's/SECURITYGROUPS/Security Group/g' | tr ' ' '.' | tr -d ' ' | cut -c16- )
+sgTAG=$(echo "${sgDESC}" | grep 'TAGS.\+Name' | awk '{print $3}'  )
+
+echo "${WHITE}Security Group [${YELLOW}    ${sgNAME}${WHITE}] TAG [${YELLOW} ${sgTAG} ${WHITE}] SG [${YELLOW} ${sg} ${WHITE}]"
+
+#
+    for i in 0 1 2 3 4 5 6 7 8 9 ; do
+
+      #
+      inbound=$(aws ec2 describe-security-groups --group-ids  ${sg} | jq ".SecurityGroups[0] .IpPermissions[$i]" )
+
+        [[ $inbound = 'null' ]] && break
+
+            FromPort=$(echo "${inbound}" | grep 'FromPort' | cut -d':' -f2 | tr -dc '0-9' )
+            CidrIp=$(echo "${inbound}" | grep 'CidrIp' | cut -d':' -f2 | tr -d '"| ' | tr '\012' ' ')
+            IpProtocol=$(echo "${inbound}" | grep 'IpProtocol' | cut -d':' -f2 | tr -d '"| |,|:')
+
+            echo "${MAGENTA}INBOUND: ${GREEN}Open to [${YELLOW} $IpProtocol ${GREEN}] port [${YELLOW} $FromPort ${GREEN}] from these IP Address(es);"
+            echo "   ${RED}$CidrIp"
+            echo
+    done
+    #
+    outbound=$(aws ec2 describe-security-groups --group-ids ${sg} | jq '.SecurityGroups[0] .IpPermissionsEgress[0]')
+
+    [[ $outbound = 'null' ]] && break
+
+        ToPort=$(echo "${outbound}" | grep 'ToPort' | cut -d':' -f2 | tr -dc '0-9' )
+        CidrIp=$(echo "${outbound}" | grep 'CidrIp' | cut -d':' -f2 | tr -d '"| ' | tr '\012' ' ')
+
+        IpProtocol=$(echo "${outbound}" | grep 'IpProtocol' | cut -d':' -f2 | tr -d '"| |,|:')
+        [[ "$IpProtocol" -eq -1 ]] && { IpProtocol='all-protocals' ; ToPort='all-ports' ; }
+
+          echo "${MAGENTA}OUTBOUND: ${GREEN}Open to [${YELLOW} $IpProtocol ${GREEN}] port [${YELLOW} $ToPort ${GREEN}] to these IP Address(es);"
+          echo "   ${RED}$CidrIp"
+          echo
+
+    echo ${WHITE}
+done
+}
+
+#.  sgstat - AWS EC2 -- Desc specific SecurityGroup with INBOUND & OUTBOUND rules
+sgstat() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+sgDESC=$(aws ec2 describe-security-groups --group-ids ${1} --output text)
+sgNAME=$(echo "${sgDESC}" | sed -e 's/sg-/\nsg-/' | grep SECURITYGROUPS | sed 's/SECURITYGROUPS/Security Group/g' | tr ' ' '.' | tr -d ' ' | cut -c16- )
+sgTAG=$(echo "${sgDESC}" | grep 'TAGS.\+Name' | awk '{print $3}'  )
+
+echo "${WHITE}Security Group [${YELLOW}    ${sgNAME}${WHITE}] TAG [${YELLOW} ${sgTAG} ${WHITE}] SG [${YELLOW} ${1} ${WHITE}]"
+
+#
+    for i in 0 1 2 3 4 5 6 7 8 9 ; do
+
+      #
+      inbound=$(aws ec2 describe-security-groups --group-ids  ${1} | jq ".SecurityGroups[0] .IpPermissions[$i]" )
+
+        [[ $inbound = 'null' ]] && break
+
+            FromPort=$(echo "${inbound}" | grep 'FromPort' | cut -d':' -f2 | tr -dc '0-9' )
+            CidrIp=$(echo "${inbound}" | grep 'CidrIp' | cut -d':' -f2 | tr -d '"| ' | tr '\012' ' ')
+            IpProtocol=$(echo "${inbound}" | grep 'IpProtocol' | cut -d':' -f2 | tr -d '"| |,|:')
+
+            echo "${MAGENTA}INBOUND: ${GREEN}Open to [${YELLOW} $IpProtocol ${GREEN}] port [${YELLOW} $FromPort ${GREEN}] from these IP Address(es);"
+            echo "   ${RED}$CidrIp"
+            echo
+    done
+    #
+    outbound=$(aws ec2 describe-security-groups --group-ids ${1} | jq '.SecurityGroups[0] .IpPermissionsEgress[0]')
+
+    [[ $outbound = 'null' ]] && break
+
+        ToPort=$(echo "${outbound}" | grep 'ToPort' | cut -d':' -f2 | tr -dc '0-9' )
+        CidrIp=$(echo "${outbound}" | grep 'CidrIp' | cut -d':' -f2 | tr -d '"| ' | tr '\012' ' ')
+
+        IpProtocol=$(echo "${outbound}" | grep 'IpProtocol' | cut -d':' -f2 | tr -d '"| |,|:')
+        [[ "$IpProtocol" -eq -1 ]] && { IpProtocol='all-protocals' ; ToPort='all-ports' ; }
+
+          echo "${MAGENTA}OUTBOUND: ${GREEN}Open to [${YELLOW} $IpProtocol ${GREEN}] port [${YELLOW} $ToPort ${GREEN}] to these IP Address(es);"
+          echo "   ${RED}$CidrIp"
+          echo
+}
+
+#.  sqscanip - AWS EC2 -- List all IPs in a common sorted and count pool, regardless of protocol or port
+sqscanip() {
+
+sgDESC=$( aws ec2 describe-security-groups --output text )
+sgLIST=$( echo "$sgDESC" | grep SECURITYGROUPS )
+
+for sg in $(echo "$sgLIST" | sed -e 's/sg-/\nsg-/' | grep ^sg | awk {'print $1'} | sort | uniq ); do
+sgTAG='null'
+
+sgDESC=$(aws ec2 describe-security-groups --group-ids ${sg} --output text)
+
+echo "${WHITE}Scanning security-groups [${YELLOW} ${sg} ${WHITE}]"
+
+    for i in 0 1 2 3 4 5 6 7 8 9 ; do
+      inbound=$(aws ec2 describe-security-groups --group-ids  ${sg} | jq ".SecurityGroups[0] .IpPermissions[$i]" )
+        [[ $inbound = 'null' ]] && break
+            CidrIp=$(echo "${inbound}" | grep 'CidrIp' | cut -d':' -f2 | tr -d '"| ' | tr '\012' ' ')
+            echo "$CidrIp" >> inbound.ip
+    done
+
+    outbound=$(aws ec2 describe-security-groups --group-ids ${sg} | jq '.SecurityGroups[0] .IpPermissionsEgress[0]')
+    [[ $outbound = 'null' ]] && break
+        CidrIp=$(echo "${outbound}" | grep 'CidrIp' | cut -d':' -f2 | tr -d '"| ' | tr '\012' ' ')
+            echo "$CidrIp" >> outbound.ip
+    echo ${WHITE}
+done
+#
+echo INBOUND IP address rules in effect
+ cat inbound.ip | tr ' ' '\012' | grep -v '^$' | sort -t . -k 1,1n -k 2,2n -k 3,3n -k 4,4n  | uniq -c
+
+echo OUTBOUND IP address in use
+ cat outbound.ip | tr ' ' '\012' | grep -v '^$' | sort -t . -k 1,1n -k 2,2n -k 3,3n -k 4,4n  | uniq -c
+
+ rm -f inbound.ip outbound.ip
+}
+
+#.
+#.  sgauthaddi -- ADD authorize security group ingress
+sgauthaddi() {
+
+if (( $# <4 )); then
+ echo usage: Needs at least four arguments;
+ echo "   sgauthaddi SGgroupID protocol port cidr"
+ echo "   example; sgauthaddi 'sg-33d02057' tcp '22' '103.251.142.95/32'"
+ echo " "
+ echo " if unsure try; sgstat SGgroupID"
+ return
+fi
+
+sameAs   "aws ec2 authorize-security-group-ingress  --group-id $1 --protocol $2 --port $3 --cidr $4"
+  aws ec2 authorize-security-group-ingress  --group-id $1 --protocol $2 --port $3 --cidr $4
+  sgstat $1 | grep $1
+}
+
+#.  sgauthdropi -- DROP authorize security group ingress
+sgauthdropi() {
+
+if (( $# < 4 )); then
+ echo usage: Needs at least four arguments;
+ echo "   sgauthdropi SGgroupID protocol port cidr"
+ echo "   example; sgauthdrop 'sg-33d02057' tcp '22' '103.251.142.95/32'"
+ echo " "
+ echo " if unsure try; sgstat SGgroupID"
+ return
+fi
+
+sameAs   "aws ec2 revoke-security-group-ingress  --group-id $1 --protocol $2 --port $3 --cidr $4"
+  aws ec2 revoke-security-group-ingress --group-id $1 --protocol $2 --port $3 --cidr $4
+  sgstat $1 | grep $1
+}
+
+###
+
+#.  sgauthaddo -- ADD authorize security group egress
+sgauthaddo() {
+
+if (( $# <4 )); then
+ echo usage: Needs at least four arguments;
+ echo "   sgauthaddo SGgroupID protocol port cidr"
+ echo "   example; sgauthaddo 'sg-33d02057' tcp '22' '103.251.142.95/32'"
+ echo " "
+ echo " if unsure try; sgstat SGgroupID"
+ return
+fi
+
+sameAs   "aws ec2 authorize-security-group-egress  --group-id $1 --protocol $2 --port $3 --cidr $4"
+  aws ec2 authorize-security-group-egress  --group-id $1 --protocol $2 --port $3 --cidr $4
+  sgstat $1 | grep $1
+}
+
+#.  sgauthdropo -- DROP authorize security group egress
+sgauthdropo() {
+
+if (( $# < 4 )); then
+ echo usage: Needs at least four arguments;
+ echo "   sgauthdropo SGgroupID protocol port cidr"
+ echo "   example; sgauthdropo 'sg-33d02057' tcp '22' '103.251.142.95/32'"
+ echo " "
+ echo " if unsure try; sgstat SGgroupID"
+ return
+fi
+
+sameAs   "aws ec2 revoke-security-group-egress  --group-id $1 --protocol $2 --port $3 --cidr $4"
+  aws ec2 revoke-security-group-egress --group-id $1 --protocol $2 --port $3 --cidr $4
+  sgstat $1 | grep $1
+}
+
+#.
+#. AWS ELB commands
+#.
+
+#.  elbls -- List ELBs
+elbls() {
+    aws elb describe-load-balancers | egrep -w 'LoadBalancerName|Scheme'
+}
+ 
+
+#.  elbstat -- AWS ELB Brief Description (Status)
+elbstat() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+    elbDUMP=$( aws elb describe-load-balancers --load-balancer-name ${1} )
+    elbTEXT=$( aws elb describe-load-balancers --load-balancer-name ${1} --output text )
+    elbHEALTH=$(  aws elb describe-instance-health --load-balancer-name  ${1} --output text )
+
+      elbNAME=$(echo "$elbDUMP" | grep LoadBalancerName | sed 's/^ \+//g' | tr -d '"|,')
+      elbSCHM=$(echo "$elbDUMP" | grep Scheme | cut -d':' -f2 | tr -d ' |"|,' )
+      elbSCGR=$(echo "$elbTEXT" | grep SECURITYGROUPS | awk '{print $2}')
+      elbSBNT=$(echo "$elbTEXT" | grep SUBNETS | awk '{print $2}')
+      elbAVZN=$(echo "$elbTEXT" | grep AVAILABILITYZONES | awk '{print $2}')
+      elbINST=$(echo "$elbHEALTH" | grep INSTANCESTATES)
+      elbLIST=$(echo "$elbTEXT" | grep LISTENER)
+
+      echo
+      echo  "NAME [${GREEN} $elbNAME ${RESET}] Scheme [${YELLOW} $elbSCHM ${RESET}]"
+      echo
+      echo  "   AZ [ $elbAVZN ] SG [ $elbSCGR ] NET [ $elbSBNT ]"
+      echo
+      echo  "$elbINST"
+      echo
+      echo  "$elbLIST"
+}
+
+#.  elbjoin -- ELB - Joins (connects) instance to ELB
+elbjoin() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+    aws elb register-instances-with-load-balancer --load-balancer-name my-load-balancer --instances $1
+}
+ 
+
+#.  elbdump -- ELB - Dumps (disconnects) instance to ELB
+elbdump() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+   aws elb deregister-instances-from-load-balancer --load-balancer-name my-load-balancer --instances $1
+}
+
+#.
+#. AWS S3 commands
+#.
+
+#.  s3show - AWS CLI -- AWS/S3 list top level folders
+s3show() {
+
+  echo "${CYAN} executing command: ${GRAY} aws s3 ls ${RESET}"
+  aws s3 ls | cut -d' ' -f3 | ccze -A
+}
+
+#
+#.  s3push - AWS CLI -- AWS/S3 push local data to s3
+s3push() {
+
+  echo 's3cp is not fully functional yet'
+  echo please use : 'aws s3 cp local-sourcefile s3://target-s3bucket/'
+}
+
+#.  s3pull - AWS CLI -- AWS/S3 pull get info from s3
+s3pull() {
+
+  echo 's3cp is not fully functional yet'
+  echo please use : 'aws s3 cp s3://target-s3bucket/' local-destination
+}
+
+#.  s3make - AWS CLI -- AWS/S3 make/create new s3 bucket
+s3make() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+  echo "${CYAN} executing command: ${GRAY} aws s3api create-bucket --bucket s3bucketName --region us-east-1 ${RESET}"
+  aws s3api create-bucket --bucket $1 --region us-east-1
+}
+
+#.  s3ls - AWS CLI -- AWS/S3 list files
+s3ls() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+  echo "${CYAN} executing command: ${GRAY} aws s3 ls s3://s3bucketName ${BLUE}# also see s3deep${RESET}"
+  aws s3 ls s3://${1}
+}
+
+#.  s3deep - AWS CLI -- AWS/S3 list recursively
+s3deep() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+  echo "${CYAN} executing command: ${GRAY} aws s3 ls s3://s3bucketName ${RED} --recursive ${BLUE}# also see s3deep${RESET}"
+  aws s3 ls s3://${1} --recursive
+}
+
+#.
+#. Network
+#.
+
+#.  awsshowip - AWS CLI -- AWS VPC Show all private IPs active on subnet (QUICK)
+awsshowip() {
+
+ aws ec2 describe-network-interfaces | grep PrivateIpAddress | cut -d':' -f2 |
+     tr -d '"|[' | egrep '^ 10.|^ 17.|^ 19.' | sort | uniq |
+     sort -t . -k 1,1n -k 2,2n -k 3,3n -k 4,4n | ccze -A
+}
+
+#.  awsshowenc - AWS CLI -- AWS Shows ENC (Ethernet Interface) based list
+awsshowenc() {
+
+eniLIST=$(aws ec2 describe-network-interfaces | grep NetworkInterfaceId |
+  cut -d':' -f2 | tr -d '"|:|,| ' | sort | uniq )
+
+for eni in $eniLIST; do
+      # echo "$eni"
+      eniDATA=$(aws ec2 describe-network-interfaces --network-interface-ids "$eni" --output text)
+
+      eniDEVICE=$( echo "$eniDATA" | grep ATTACHMENT | awk '{print $6}' )
+      eniDESC=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $3}' )
+
+      PrivateIP=$( echo "$eniDATA" | grep PRIVATEIPADDRESSES | awk '{print $4}' )
+      macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $5}' )
+      PublicIP=$( echo "$eniDATA" | grep ASSOCIATION | awk '{print $4}' | head -1 )
+
+      assocFLAG=$( echo "$eniDATA" | grep ASSOCIATION)
+      [[ $assocFLAG == '' ]] && {
+            macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $6}' )
+            eniDESC='EC2'
+       }
+
+       [[ $(echo $macADDR | cut -d'.' -f3) == 'internal' ]] && {
+            macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $3}' )
+            eniDESC='EC2'
+       }
+
+       [[ $(echo $macADDR | cut -d':' -f1) == 'ENI' ]] && {
+            macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $8}' )
+            eniDESC='ASG'
+            eniDEVICE='amazon-gw?'
+       }
+
+       [[ $eniDEVICE == 'amazon-rds' ]] && {
+            macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $4}' )
+            eniDESC='RDS'
+       }
+
+       [[ $macADDR == 'interface' ]] && {
+            macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $6}' )
+            eniDESC='EC2'
+       }
+
+       [[ $macADDR == 'NAT' ]] && {
+            macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $8}' )
+            eniDESC='EC2'
+       }
+
+       [[ $macADDR == '979912621417' ]] && {
+            macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $3}' )
+            eniDESC='EC2'
+       }
+
+       [[ $PublicIP == '' ]] && PublicIP='00.00.00.00'
+
+     echo -e "$eni \t$macADDR \t$PrivateIP \t$PublicIP \t$eniDESC \t$eniDEVICE" | ccze -A
+done
+}
+
+#.
+#. General Commands
+#.
+#.  awsupdate - AWS CLI -- update awscli and required packages
+awsupdate() {
+
+  echo -n "${RESET}${WHITE}"
+      read -r -p "Are you sure you want to update the AWS CLI environment? [y/N] " response
+  echo "${RESET}"
+
+  [[ $response =~ ^([yY][eE][sS]|[yY])$ ]] && {
+      echo "${CYAN} executing command: ${GRAY} sudo apt-get -y install figlet ccze ${RESET}"
+      sudo apt-get -y install figlet ccze
+
+      echo "${CYAN} executing command: ${GRAY} sudo pip install pjson awscli --upgrade ${RESET}"
+      pip install --upgrade pip
+      sudo pip install pjson
+      sudo pip install awscli --upgrade
+
+      echo ${CYAN}Environment updated attempted, currently at${GREEN}
+        aws --version
+      echo -n ${RESET}
+  } || {
+    :
+    echo ${CYAN}Environment not updated${GREEN}
+      aws --version
+    echo -n ${RESET}
+  }
+}
+
+# fin

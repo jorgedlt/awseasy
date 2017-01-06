@@ -1,0 +1,124 @@
+# awseasy.elb
+
+#.
+#. AWS ELB commands
+#.
+
+#.  elbls -- AWS ELB List
+elbls() {
+
+elbLOOP=$(aws elb describe-load-balancers | egrep -w 'LoadBalancerName' | cut -d':' -f2 | tr -d '"| |,')
+echo
+
+for elb in $elbLOOP; do
+    elbDUMP=$( aws elb describe-load-balancers --load-balancer-name "${elb}" )
+    elbTEXT=$( aws elb describe-load-balancers --load-balancer-name "${elb}" --output text )
+    elbTAGS=$( aws elb describe-tags --load-balancer-name "${elb}" --output text)
+
+    elbATT=$(aws elb describe-load-balancer-attributes --load-balancer-name "${elb}" --output text)
+    
+      elbNAME=$(echo "$elbDUMP" | grep LoadBalancerName | sed 's/^ \+//g' | tr -d '"|,' | cut -d':' -f2 )
+      elbSCHM=$(echo "$elbDUMP" | grep Scheme | cut -d':' -f2 | tr -d ' |"|,' )
+      elbSCGR=$(echo "$elbTEXT" | grep SECURITYGROUPS | awk '{print $2}' )
+      elbSBNT=$(echo "$elbTEXT" | grep SUBNETS | awk '{print $2}')
+      elbAVZN=$(echo "$elbTEXT" | grep AVAILABILITYZONES | awk '{print $2}' )
+
+      elbINST=$(echo "$elbHEALTH" | grep INSTANCESTATES)
+      elbLIST=$(echo "$elbTEXT" | grep LISTENER | cut -c1-27 )
+      tagNAME=$( echo "$elbTAGS" | grep TAGS | grep Name | awk '{print $3}' )
+
+      LogEnable=$( echo "$elbATT" | grep ACCESSLOG | awk '{print $3}' )
+      S3BucketName=$( echo "$elbATT" | grep ACCESSLOG | awk '{print $4}' )
+
+      echo  "NAME [${GREEN} $tagNAME ${RESET}]"
+      echo  "  FORMAL [${GREEN} $elbNAME ${RESET}] Scheme [${YELLOW} $elbSCHM ${RESET}]"
+      echo  "  S3BucketName [${YELLOW} $S3BucketName ${RESET}] Log Enable [${YELLOW} $LogEnable ${RESET}] "
+      echo
+done         
+}
+
+#.  elbstat -- AWS ELB Status and Detail Description 
+elbstat() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {ELB FORMAL}
+ return
+fi
+
+    elbDUMP=$( aws elb describe-load-balancers --load-balancer-name ${1} )
+    elbTEXT=$( aws elb describe-load-balancers --load-balancer-name ${1} --output text )
+    elbTAGS=$(aws elb describe-tags --load-balancer-name ${1} --output text)
+    elbHEALTH=$(  aws elb describe-instance-health --load-balancer-name  ${1} --output text )
+
+      elbNAME=$(echo "$elbDUMP" | grep LoadBalancerName | sed 's/^ \+//g' | tr -d '"|,' | cut -d':' -f2 )
+      elbSCHM=$(echo "$elbDUMP" | grep Scheme | cut -d':' -f2 | tr -d ' |"|,' )
+      elbSCGR=$(echo "$elbTEXT" | grep SECURITYGROUPS | awk '{print $2}' )
+      elbSBNT=$(echo "$elbTEXT" | grep SUBNETS | awk '{print $2}')
+      elbAVZN=$(echo "$elbTEXT" | grep AVAILABILITYZONES | awk '{print $2}' )
+
+      elbINST=$(echo "$elbHEALTH" | grep INSTANCESTATES)
+      elbLIST=$(echo "$elbTEXT" | grep LISTENER | cut -c1-27 )
+      dnsNAME=$(echo "$elbTEXT" | grep LOADBALANCERDESCRIPTIONS | awk '{print $2}' )
+      publicIP=$(dig "$dnsNAME" | grep -A3 ';;.ANSWER.SECTION' | grep -v ANSWER | awk '{print $5}' )
+      tagNAME=$( echo "$elbTAGS" | grep TAGS | grep Name | awk '{print $3}' )
+
+      hTARGET=$(echo "$elbTEXT" | grep HEALTHCHECK | awk '{print $4}' )
+      hTIMEOUT=$(echo "$elbTEXT" | grep HEALTHCHECK | awk '{print $5}' )
+      hINTERVAL=$(echo "$elbTEXT" | grep HEALTHCHECK | awk '{print $3}' )
+      hBADTH=$(echo "$elbTEXT" | grep HEALTHCHECK | awk '{print $6}' )
+      hGOODT=$(echo "$elbTEXT" | grep HEALTHCHECK | awk '{print $2}' )
+
+      echo
+      echo  "  NAME [${GREEN} $tagNAME ${RESET}]"
+      echo
+      echo  "FORMAL [${GREEN} $elbNAME ${RESET}] Scheme [${YELLOW} $elbSCHM ${RESET}]"
+      echo  "    AZ [${YELLOW} $elbAVZN ${RESET}] SG [${YELLOW} $elbSCGR ${RESET}] NET [${YELLOW} $elbSBNT ${RESET}]"
+      echo
+      echo  "DNS Name [${YELLOW} $dnsNAME ${RESET}]"
+      echo
+      echo  "HEALTH  target [${YELLOW} $hTARGET ${RESET}] timeout [${YELLOW} $hTIMEOUT ${RESET}] interval [${YELLOW} $hINTERVAL ${RESET}] "
+      echo  "        Unhealthy threshold [${YELLOW} $hBADTH ${RESET}] Healthy threshold [${YELLOW} $hGOODT ${RESET}] "
+      echo
+
+      for e in $( echo "$elbINST" | awk '{print $3}' | sort | uniq )     ; do
+        eINSTid="$e"
+        eINSTstat=$(echo "$elbINST" | grep $eINSTid | awk '{print $5}' )
+        eINSTname=$(aws ec2 describe-instances --instance-ids $eINSTid  --output text |
+          grep TAGS | grep Name | awk '{print $3}' | tr -d ' ')
+
+          echo EC2 [${YELLOW} $eINSTid ${RESET}] NAME [${YELLOW} $eINSTname ${RESET}] stat [${GREEN} $eINSTstat ${RESET}]
+      done
+      
+      echo
+      echo  "$elbLIST"
+      echo
+      echo  "Public IP Information "
+      echo  ${CYAN} $publicIP  ${RESET}
+      echo            
+}
+
+# future feature - enable S3 logging and monitor them
+# aws elb describe-load-balancers --load-balancer-name DIYZ-DEV-PublicEL-UY41LPYK11KS --output text
+
+#.  elbjoin -- ELB - Joins (connects) instance to ELB
+elbjoin() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+    aws elb register-instances-with-load-balancer --load-balancer-name my-load-balancer --instances $1
+}
+ 
+
+#.  elbdump -- ELB - Dumps (disconnects) instance to ELB
+elbdump() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+   aws elb deregister-instances-from-load-balancer --load-balancer-name my-load-balancer --instances $1
+}

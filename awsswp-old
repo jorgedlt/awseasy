@@ -1,0 +1,64 @@
+#. awsswp - AWS -- Swap AUTH creds for AWS/CLI access
+
+#. awsswp - Swap AUTH creds for AWS/CLI access -- was depricated
+
+awsswp () {
+
+if (( $# < 1 )); then
+  echo usage: Needs at least argument [dev, tst, stg, or prd -- also Jenkins or Legacy]
+  return
+fi
+
+case "$1" in
+          d|dev)
+              echo switching to AWS DEV
+              /bin/cp -f ~/.aws/creds.dev ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          s|stg|stage)
+              echo switching to AWS STAGE
+              /bin/cp -f ~/.aws/creds.stg ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          p|prd|prod)
+              echo switching to AWS PROD
+              /bin/cp -f ~/.aws/creds.prd ~/.aws/credentials
+              echo ${RED}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          t|tst|test)
+              echo switching to AWS TEST
+              /bin/cp -f ~/.aws/creds.tst ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          j|jkn|Jenkins)
+              echo switching to AWS JENKINS
+              /bin/cp -f ~/.aws/creds.jkn ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          l|leg|lcy|Legacy|sbd-da)
+              echo switching to AWS SBD-DA Legacy
+              /bin/cp -f ~/.aws/creds.lcy ~/.aws/credentials
+              echo ${GRAY}
+              aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+              echo ${RESET}
+              ;;
+
+          *)
+              echo $"Usage: $0 At least one parameter must be provided"
+  esac
+}

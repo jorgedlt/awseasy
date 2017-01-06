@@ -1,0 +1,63 @@
+# awseasy.s3c
+
+#.
+#. AWS S3 commands
+#.
+
+#.  s3show - AWS CLI -- AWS/S3 list top level folders
+s3show() {
+
+  echo "${CYAN} executing command: ${GRAY} aws s3 ls ${RESET}"
+  aws s3 ls | cut -d' ' -f3 | ccze -A
+}
+
+#
+#.  s3push - AWS CLI -- AWS/S3 push local data to s3
+s3push() {
+
+  echo 's3cp is not fully functional yet'
+  echo please use : 'aws s3 cp local-sourcefile s3://target-s3bucket/'
+}
+
+#.  s3pull - AWS CLI -- AWS/S3 pull get info from s3
+s3pull() {
+
+  echo 's3cp is not fully functional yet'
+  echo please use : 'aws s3 cp s3://target-s3bucket/' local-destination
+}
+
+#.  s3make - AWS CLI -- AWS/S3 make/create new s3 bucket
+s3make() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+  echo "${CYAN} executing command: ${GRAY} aws s3api create-bucket --bucket s3bucketName --region us-east-1 ${RESET}"
+  aws s3api create-bucket --bucket $1 --region us-east-1
+}
+
+#.  s3ls - AWS CLI -- AWS/S3 list files
+s3ls() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+  echo "${CYAN} executing command: ${GRAY} aws s3 ls s3://s3bucketName ${BLUE}# also see s3deep${RESET}"
+  aws s3 ls s3://${1}
+}
+
+#.  s3deep - AWS CLI -- AWS/S3 list recursively
+s3deep() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+  echo "${CYAN} executing command: ${GRAY} aws s3 ls s3://s3bucketName ${RED} --recursive ${BLUE}# also see s3deep${RESET}"
+  aws s3 ls s3://${1} --recursive
+}

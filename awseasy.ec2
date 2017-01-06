@@ -1,0 +1,144 @@
+# awseasy.ec2
+
+#.
+#. AWS EC2 Commands
+#.
+
+#.  awsls - AWS EC2 -- List Nodes, long format - awsls (Ullah's Version)
+awsls () {
+  aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' | grep '^i-' | column -t | ccze -A  
+}
+
+#.  awslsall - aws ls ALL -- having some formating issues with JENKINS-SLAVES
+awslsall () {
+sameAs "similar to aws ec2 describe-instances, but is slower and deals with missing TAGS better"
+
+export awslist=$(aws ec2 describe-instances | grep InstanceId | cut -d':' -f2 | tr -d '"| |,')
+for iID in $awslist; do
+     awsdump=$( aws ec2 describe-instances --instance-ids $iID --output text )
+
+     iSTATE=$(echo "$awsdump" | grep STATE |  awk '{print $3}' | cut -d':' -f2 | tr -d ' ' )
+     iTYPE=$(echo "$awsdump" | grep INSTANCES |  awk '{print $9}')
+     iIPADDR=$(echo "$awsdump" | grep PRIVATEIPADDRESSES |  awk '{print $4}' )
+     pIPADDR=$(echo "$awsdump" | grep ASSOCIATION |  awk '{print $4}' | tr ' ' '\012' | head -1 )
+
+      [[ "$iSTATE" == 'stopped' ]] && {
+        iSTATE="${GRAY}stopped${RESET}"
+        iTYPE="${GRAY}${iTYPE}${RESET}"
+        iIPADDR="${GRAY}X.X.X.X${RESET}"
+        pIPADDR="${GRAY}X.X.X.X${RESET}"
+      } || {
+        iSTATE="${GREEN}running${RESET}"
+      }
+
+      [[ "$iSTATE" == 'terminated' ]] && {
+        iTYPE="${GRAY}terminated${RESET}"
+        iIPADDR="${GRAY}X.X.X.X${RESET}"
+        pIPADDR="${GRAY}X.X.X.X${RESET}"
+      }
+
+      [[ "$iIPADDR" =~ "^ec*|^ip*" ]] && { iIPADDR=$(echo "$iIPADDR" | cut -d'-' -f2,3,4,5 | tr '-' '.' ) ; }
+
+      [[ "$pIPADDR" == '' ]] && { pIPADDR="${GRAY}NONE\t${RESET}" ; }
+
+     iNAME=$(echo "$awsdump" | grep 'TAGS.\+Name' |  egrep -v 'AppName'| tail -1 | awk '{print $3}' )
+
+     [[ $iNAME  == '' ]] && { iNAME="${RED}NoNameTagFound${RESET}" ; }
+
+     echo -e "${MAGENTA}$iID${RESET} \t$iSTATE \t$iTYPE\t${CYAN}$iIPADDR${RESET} \t${YELLOW}$pIPADDR${RESET} \t$iNAME"
+done
+}
+
+#.  awsdesc - AWS EC2 -- Detail JSON dump of instance
+awsdesc () {
+  sameAs "aws ec2 describe-instances --instance-ids InstanceId"
+  aws ec2 describe-instances --instance-ids $1 | pjson | ccze -A
+}
+
+#.  awsbrief - AWS EC2 -- breifly describe instances with key chosen parameters
+awsbrief() {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+
+   AWSdesc=$( aws ec2 describe-instances --instance-ids $1 --output text )
+#
+     InstncNAME=$( echo "$AWSdesc" | grep 'TAGS.\+Name'  | awk '{print $3}' )
+     InstncID=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $8}' )
+     ImageId=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $7}' )
+     InstncTYPE=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $9}' )
+     NetIFACE=$( echo "$AWSdesc" | grep NETWORKINTERFACES |  tr -s '\t' | tr ' \t' '\012' | grep eni )
+     NetMAC=$( echo "$AWSdesc" | grep NETWORKINTERFACES |  tr -s '\t' | tr '\t' '\012' | grep ':' )
+     NetSUB=$( echo "$AWSdesc" | grep NETWORKINTERFACES |  tr -s '\t' | tr '\t' '\012' | grep subnet )
+     NetVPC=$( echo "$AWSdesc" | grep NETWORKINTERFACES |  tr -s '\t' | tr '\t' '\012' | grep vpc )
+     PrivateIP=$( echo "$AWSdesc" | grep PRIVATEIPADDRESSES | awk '{print $4}' )
+     PublicIP=$( echo "$AWSdesc" | grep ASSOCIATION | awk '{print $4}' | head -1 )
+     InstncKEY=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $10}' )
+     InstncSTATE=$( echo "$AWSdesc" | grep STATE | awk '{print $3}' )
+     LaunchDATE=$( echo "$AWSdesc" | grep INSTANCES | awk '{print $11}' )
+     SecGROUP=$( echo "$AWSdesc" | grep SECURITYGROUPS | awk '{print $2}' )
+     sgNAME=$( echo "$AWSdesc" | grep SECURITYGROUPS | awk '{print $3}' )
+     AvailZONE=$( echo "$AWSdesc" | grep PLACEMENT | awk '{print $2}' )
+  #
+     descDUMP InstanceName $InstncNAME InstanceID $InstncID
+     descDUMP TYPE $InstncTYPE ImageId $ImageId
+     descDUMP PrivateIP $PrivateIP PublicIP $PublicIP
+     descDUMP SubNet $NetSUB VPC $NetVPC
+     descDUMP NetIFACE $NetIFACE NetMAC $NetMAC
+     descDUMP STATE $InstncSTATE DATE $LaunchDATE
+     descDUMP sg $SecGROUP sgNAME $sgNAME
+     descDUMP KEY $InstncKEY AZ $AvailZONE
+}
+
+#.  awswho - AWS EC2 -- Show which enviroment is active
+awswho() {
+  #sameAs " aws iam list-account-aliases --output text"
+  #aws iam list-account-aliases --output text | awk '{print $2}' | figlet
+  echo -e "   " | tr -d '\n' ; aws iam list-account-aliases --output text | ccze -A
+  #date
+}
+
+#  awswho - for Scripts
+awswho-s() {
+  divText $(aws iam list-account-aliases --output text | tr 'a-z' 'A-Z' | awk '{print $2}' | ccze -A)
+}
+
+#.  awsstart - AWS EC2 -- Start an EC2 Instance
+awsstart() {
+   if (( $# < 1 )); then
+    echo usage: Needs at least one argument {instance ID#}
+    return
+   fi
+
+    sameAs "aws ec2 start-instances --instance-ids instance-id#"
+    aws ec2 start-instances --instance-ids $1
+}
+
+#.  awsstop - AWS EC2 -- Stop an EC2 Instance
+awsstop() {
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {instance ID#}
+ return
+fi
+  sameAs "aws ec2 stop-instances --instance-ids instance-id#"
+  aws ec2 stop-instances --instance-ids $1
+}
+
+#.  awskill - AWS EC2 -- Terminate an EC2 Instance
+awskill() {
+ if (( $# < 1 )); then
+   echo usage: Needs at least one argument {instance ID#}
+   return
+ fi
+#
+ read -p "Are you sure you want to continue? <y/N> " prompt
+ if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]
+ then
+   sameAs "aws ec2 terminate-instances --instance-ids instance-id#"
+   aws ec2 terminate-instances --instance-ids $1
+ else
+   return
+ fi
+}
