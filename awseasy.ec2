@@ -137,7 +137,7 @@ awskill() {
  if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]
  then
    sameAs "aws ec2 terminate-instances --instance-ids instance-id#"
-   aws ec2 terminate-instances --instance-ids $1
+   aws ec2 terminate-instances --instance-ids $@
  else
    return
  fi
