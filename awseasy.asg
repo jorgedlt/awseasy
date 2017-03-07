@@ -118,8 +118,8 @@ echo "${WHITE}Security Group [${YELLOW}    ${sgNAME}${WHITE}] TAG [${YELLOW} ${s
           echo
 }
 
-#.  sqscanip - AWS EC2 -- List all IPs in a common sorted and count pool, regardless of protocol or port
-sqscanip() {
+#.  sgscanip - AWS EC2 -- List all IPs in a common sorted and count pool, regardless of protocol or port
+sgscanip() {
 
 sgDESC=$( aws ec2 describe-security-groups --output text )
 sgLIST=$( echo "$sgDESC" | grep SECURITYGROUPS )
