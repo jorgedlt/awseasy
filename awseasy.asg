@@ -73,6 +73,7 @@ done
 }
 #
 
+#.  sgscanall - similar to sglsall - AWS EC2 -- Scans all SecurityGroups for INBOUND & OUTBOUND rules
 sgscanall ()
 {
     sgDESC=$( aws ec2 describe-security-groups --output text );
