@@ -22,6 +22,7 @@ echo "TAG [${YELLOW} ${sgTAG} ${WHITE}] SG [${YELLOW} ${sg} ${WHITE}] ${WHITE}Se
 done
 }
 
+#.  sglsall - AWS EC2 -- Scans all SecurityGroups for INBOUND & OUTBOUND rules
 sglsall() {
 
  sgDESC=$( aws ec2 describe-security-groups --output text )
