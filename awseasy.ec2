@@ -116,6 +116,7 @@ awsclone ()
   echo "  --image-id ${_ImageId} \\"
   echo "  --key-name ${_KeyName} \\"
   echo "  --security-group-ids ${_GroupId} \\"
+  echo "  --subnet-id ${_SubnetId} \\";
   echo "  --instance-type ${_InstanceType} \\"
 
   [ ! "$_PublicIP" ] && {
@@ -130,7 +131,7 @@ awsclone ()
             :              # Do Nothing
     }
 
-  echo "  --placement AvailabilityZone=us-east-1b \\"
+  echo "  --placement AvailabilityZone=${_AvailabilityZone}\\";
   echo "  --query 'Instances[0].InstanceId'"
 
   echo "==="
