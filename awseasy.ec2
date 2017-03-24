@@ -1,4 +1,4 @@
-# awseasy.ec2
+wseasy.ec2
 
 #.
 #. AWS EC2 Commands
@@ -13,26 +13,6 @@ awsls () {
 awsdesc () {
   sameAs "aws ec2 describe-instances --instance-ids InstanceId"
   aws ec2 describe-instances --instance-ids $1 | pjson | ccze -A
-}
-
-#.  awstag - AWS EC2 and other exotic AWS beast can be renamed. ex. awstag InstanceId 'InstanceTag'
-awstag () {
-
-if (( $# < 1 )); then
-   echo usage: Needs at least one argument {instance ID#}
- return
- fi
-
- InstanceId=${1}
- InstanceTag=${2}
-
-   echo Before
-   aws ec2 describe-instances --instance-ids ${InstanceId} --query 'Reservations[*].Instances[*].[InstanceId,State.Name,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' | grep '^i-' | column -t | ccze -A
-
-   aws ec2 create-tags --resources ${InstanceId} --tags Key=Name,Value="${InstanceTag}"
-   echo After
-   aws ec2 describe-instances --instance-ids ${InstanceId} --query 'Reservations[*].Instances[*].[InstanceId,State.Name,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' | grep '^i-' | column -t | ccze -A
-
 }
 
 # utility function for awsbrief
@@ -116,6 +96,7 @@ awsclone ()
   echo "  --image-id ${_ImageId} \\"
   echo "  --key-name ${_KeyName} \\"
   echo "  --security-group-ids ${_GroupId} \\"
+  echo "  --subnet-id ${_SubnetId} \\";
   echo "  --instance-type ${_InstanceType} \\"
 
   [ ! "$_PublicIP" ] && {
@@ -130,7 +111,7 @@ awsclone ()
             :              # Do Nothing
     }
 
-  echo "  --placement AvailabilityZone=us-east-1b \\"
+  echo "  --placement AvailabilityZone=${_AvailabilityZone}\\";
   echo "  --query 'Instances[0].InstanceId'"
 
   echo "==="
