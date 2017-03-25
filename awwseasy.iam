@@ -1,0 +1,11 @@
+
+# awwseasy.iam
+
+#.
+#. AWS IAM Commands
+#.
+
+#.  awsls - AWS EC2 -- List Nodes, long format - awsls (Ullah's Version)
+iamls () {
+   aws iam list-users --output table
+}
