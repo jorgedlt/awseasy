@@ -1,9 +1,6 @@
 
 # to do 
 
-aws iam list-users --output table
-
-
 ### future-features !!! authorize and revoke cidr to security groups
 
 #
