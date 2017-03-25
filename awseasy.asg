@@ -22,6 +22,7 @@ echo "TAG [${YELLOW} ${sgTAG} ${WHITE}] SG [${YELLOW} ${sg} ${WHITE}] ${WHITE}Se
 done
 }
 
+#.  sglsall - AWS EC2 -- Scans all SecurityGroups for INBOUND & OUTBOUND rules
 sglsall() {
 
  sgDESC=$( aws ec2 describe-security-groups --output text )
@@ -71,6 +72,32 @@ for sg in $( echo "$sgLIST" | grep .sg | cut -d$'\t' -f3 | sort | uniq ); do
 done
 }
 #
+
+#.  sgscanall - similar to sglsall - AWS EC2 -- Scans all SecurityGroups for INBOUND & OUTBOUND rules
+sgscanall ()
+{
+    sgDESC=$( aws ec2 describe-security-groups --output text );
+    sgLIST=$( echo "$sgDESC" | grep SECURITYGROUPS );
+    for sg in $(echo "$sgLIST" | sed -e 's/sg-/\nsg-/' | grep ^sg | awk {'print $1'} | sort | uniq );
+    do
+        sgTAG='null';
+        sgDESC=$(aws ec2 describe-security-groups --group-ids ${sg} --output text);
+        echo "${WHITE}Scanning security-groups [${YELLOW} ${sg} ${WHITE}]";
+         for i in 0 1 2 3 4 5 6 7 8 9;
+         do
+             inbound=$(aws ec2 describe-security-groups --group-ids  ${sg} | jq ".SecurityGroups[0] .IpPermissions[$i]" );
+             [[ $inbound = 'null' ]] && break;
+             CidrIp=$(echo "${inbound}" | grep 'CidrIp' | cut -d':' -f2 | tr -d '"| ' | tr '\012' ' ');
+             echo inbound : "$CidrIp"
+         done;
+
+         outbound=$(aws ec2 describe-security-groups --group-ids ${sg} | jq '.SecurityGroups[0] .IpPermissionsEgress[0]');
+         [[ $outbound = 'null' ]] && break;
+         CidrIp=$(echo "${outbound}" | grep 'CidrIp' | cut -d':' -f2 | tr -d '"| ' | tr '\012' ' ');
+         echo outbound : "$CidrIp"
+         echo ${WHITE};
+     done;
+ }
 
 #.  sgstat - AWS EC2 -- Desc specific SecurityGroup with INBOUND & OUTBOUND rules
 sgstat() {
