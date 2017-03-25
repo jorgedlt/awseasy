@@ -144,7 +144,7 @@ awsstart() {
    fi
 
     sameAs "aws ec2 start-instances --instance-ids instance-id#"
-    aws ec2 start-instances --instance-ids $1
+    aws ec2 start-instances --instance-ids $@
 }
 
 #.  awsstop - AWS EC2 -- Stop an EC2 Instance
@@ -154,7 +154,7 @@ if (( $# < 1 )); then
  return
 fi
   sameAs "aws ec2 stop-instances --instance-ids instance-id#"
-  aws ec2 stop-instances --instance-ids $1
+  aws ec2 stop-instances --instance-ids $@
 }
 
 #.  awskill - AWS EC2 -- Terminate an EC2 Instance
