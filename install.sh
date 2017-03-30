@@ -9,6 +9,12 @@ exit
 
 # rsync -av --progress "$HOME/code/awseasy" "$HOME/.awseasy/" --exclude ".git"
 
+##
+
+# ~/code/awseasy$ /bin/cp -f $HOME/code/awseasy/* $HOME/.awseasy
+
+# ~/.awseasy$ rm -fr .git .DS* README.md contributors.txt future-features install.sh insync.sh
+
 echo; echo "${GREEN}"REPO Files "${YELLOW}"
 ls -la  "$HOME/code/awseasy/"
 
