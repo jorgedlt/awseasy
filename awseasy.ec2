@@ -4,25 +4,25 @@
 #. AWS EC2 Commands
 #.
 
-#.  awsls - AWS EC2 -- List Nodes, long format - awsls (Ullah's Version)
-awsls () {
+#.  ec2ls - AWS EC2 -- List Nodes, long format - awsls (Ullah's Version)
+ec2ls () {
   aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' | grep '^i-' | column -t | ccze -A
 }
 
-#.  awsdesc - AWS EC2 -- Detail JSON dump of instance
-awsdesc () {
+#.  ec2desc - AWS EC2 -- Detail JSON dump of instance
+ec2desc () {
   sameAs "aws ec2 describe-instances --instance-ids InstanceId"
   aws ec2 describe-instances --instance-ids $1 | pjson | ccze -A
 }
 
 # utility function for awsbrief
-ec2parse ()
+_ec2parse ()
 {
   echo "${1}" | grep ${2} | head -1 | cut -d':' -f2- | tr -d ' |,|"';
 }
 
-#.  awsstat - AWS EC2 -- breifly describe instances with key chosen parameters
-awsstat() {
+#.  ec2stat - AWS EC2 -- breifly describe instances with key chosen parameters
+ec2stat() {
 
       if (( $# < 1 )); then
          echo usage: Needs at least one argument {instance ID#}
@@ -32,25 +32,25 @@ awsstat() {
        AWSdesc=$(aws ec2 describe-instances --instance-ids $1);
 
 #
-      _VpcId=$(ec2parse "$AWSdesc" VpcId)
-      _InstanceNm=$(ec2parse "$AWSdesc" Value)
-      _InstanceId=$(ec2parse "$AWSdesc" InstanceId)
-      _InstanceType=$(ec2parse "$AWSdesc" InstanceType)
-      _NetworkInterfaceId=$(ec2parse "$AWSdesc" NetworkInterfaceId)
-      _MacAddress=$(ec2parse "$AWSdesc" MacAddress)
-      _SubnetId=$(ec2parse "$AWSdesc" SubnetId)
-      _PrivateIP=$(ec2parse "$AWSdesc" PrivateIpAddress)
+      _VpcId=$(_ec2parse "$AWSdesc" VpcId)
+      _InstanceNm=$(_ec2parse "$AWSdesc" Value)
+      _InstanceId=$(_ec2parse "$AWSdesc" InstanceId)
+      _InstanceType=$(_ec2parse "$AWSdesc" InstanceType)
+      _NetworkInterfaceId=$(_ec2parse "$AWSdesc" NetworkInterfaceId)
+      _MacAddress=$(_ec2parse "$AWSdesc" MacAddress)
+      _SubnetId=$(_ec2parse "$AWSdesc" SubnetId)
+      _PrivateIP=$(_ec2parse "$AWSdesc" PrivateIpAddress)
 
-      _PublicIp=$(ec2parse "$AWSdesc" PublicIpAddress)
+      _PublicIp=$(_ec2parse "$AWSdesc" PublicIpAddress)
 
-      _LaunchTime=$(ec2parse "$AWSdesc" LaunchTime)
-      _VpcId=$(ec2parse "$AWSdesc" VpcId)
-      _ImageId=$(ec2parse "$AWSdesc" ImageId)
-      _GroupIds=$(ec2parse "$AWSdesc" GroupId)
-      _KeyName=$(ec2parse "$AWSdesc" KeyName)
-      _AZone=$(ec2parse "$AWSdesc" AvailabilityZone)
-      _EC2State=$(ec2parse "$AWSdesc" running)
-      _GroupName=$(ec2parse "$AWSdesc" GroupName)
+      _LaunchTime=$(_ec2parse "$AWSdesc" LaunchTime)
+      _VpcId=$(_ec2parse "$AWSdesc" VpcId)
+      _ImageId=$(_ec2parse "$AWSdesc" ImageId)
+      _GroupIds=$(_ec2parse "$AWSdesc" GroupId)
+      _KeyName=$(_ec2parse "$AWSdesc" KeyName)
+      _AZone=$(_ec2parse "$AWSdesc" AvailabilityZone)
+      _EC2State=$(_ec2parse "$AWSdesc" running)
+      _GroupName=$(_ec2parse "$AWSdesc" GroupName)
 #
      descDUMP InstanceName $_InstanceNm InstanceID $_InstanceId;
      descDUMP TYPE $_InstanceType ImageId $_ImageId;
@@ -62,8 +62,8 @@ awsstat() {
      descDUMP KEY $_KeyName AZ $_AZone
 }
 
-#.  awsclone - AWS EC2 -- creates new clone EC2
-awsclone ()
+#.  ec2clone - AWS EC2 -- creates new clone EC2
+ec2clone ()
 {
  AWSdesc=$(aws ec2 describe-instances --instance-ids $1);
 
@@ -136,8 +136,8 @@ awswho-s() {
   divText $(aws iam list-account-aliases --output text | tr 'a-z' 'A-Z' | awk '{print $2}' | ccze -A)
 }
 
-#.  awsstart - AWS EC2 -- Start an EC2 Instance
-awsstart() {
+#.  ec2start - AWS EC2 -- Start an EC2 Instance
+ec2start() {
    if (( $# < 1 )); then
     echo usage: Needs at least one argument {instance ID#}
     return
@@ -147,8 +147,8 @@ awsstart() {
     aws ec2 start-instances --instance-ids $@
 }
 
-#.  awsstop - AWS EC2 -- Stop an EC2 Instance
-awsstop() {
+#.  ec2stop - AWS EC2 -- Stop an EC2 Instance
+ec2stop() {
 if (( $# < 1 )); then
  echo usage: Needs at least one argument {instance ID#}
  return
@@ -157,8 +157,8 @@ fi
   aws ec2 stop-instances --instance-ids $@
 }
 
-#.  awskill - AWS EC2 -- Terminate an EC2 Instance
-awskill() {
+#.  ec2kill - AWS EC2 -- Terminate an EC2 Instance
+ec2kill() {
  if (( $# < 1 )); then
    echo usage: Needs at least one argument {instance ID#}
    return
