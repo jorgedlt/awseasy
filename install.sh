@@ -4,7 +4,10 @@
 
 # my awseasy
 echo; echo "${GREEN}" ~/.awseasy/awseasy "${YELLOW}"
-rsync -av --progress "$HOME/code/awseasy" "$HOME/.awseasy/" --exclude ".git"
+echo rsync is broken
+exit
+
+# rsync -av --progress "$HOME/code/awseasy" "$HOME/.awseasy/" --exclude ".git"
 
 echo; echo "${GREEN}"REPO Files "${YELLOW}"
 ls -la  "$HOME/code/awseasy/"
