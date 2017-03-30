@@ -3,6 +3,36 @@
 
 ### future-features !!! authorize and revoke cidr to security groups
 
+add something to rotate through all AZ's 
+
+ie.. 
+
+ us-east-1
+ us-east-2
+ us-west-1
+ us-west-2
+...
+
+ for az in $(aws ec2 describe-regions | grep Endpoint | awk '{print $2}' \
+ | cut -d'.' -f2 | grep -v 'sa-east-1' | grep -v 'ca-east-1' ); do
+
+    export AWS_DEFAULT_REGION="$az"
+    echo ${RESET}
+
+    echo $az
+    echo "      with 4.3 - $(aws lambda list-functions | grep "Runtime" | grep -c nodejs4.3)"
+    echo "      not 4.3 - $(aws lambda list-functions | grep "Runtime" | grep -vc nodejs4.3)"
+    echo ${RESET}
+ done
+
+ ap-south-1
+      with 4.3 - 0
+      not 4.3 - 0
+eu-west-2
+      with 4.3 - 0
+      not 4.3 0
+ ....
+
 #
 authorize-security-group-ingress
 aws ec2 authorize-security-group-ingress --group-name MySecurityGroup --protocol tcp --port 22 --cidr 203.0.113.0/24
