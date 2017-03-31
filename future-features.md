@@ -1,9 +1,17 @@
 
-# to do 
+# to do
 
-### future-features !!! authorize and revoke cidr to security groups
+### on sgstat & shauthaddi/sgauthdropi I should 
 
-add something to rotate through all AZ's 
+An error occurred (InvalidGroupId.Malformed) when calling the DescribeSecurityGroups operation: 
+Invalid id: "i-0d9566a2e1c8fe35d" (expecting "sg-...")
+
+before line 7 add something to gracifully verify a valid sg (I tend to put instance ID by mistakes)
+
+--group-ids ${1} start
+
+
+### add something to rotate through all AZ's 
 
 ie.. 
 
