@@ -10,10 +10,22 @@ exit
 # rsync -av --progress "$HOME/code/awseasy" "$HOME/.awseasy/" --exclude ".git"
 
 ##
+# cd ~/code/awseasy
+/bin/cp -f \
+ ~/code/awseasy/code/awseasy/* \
+ $HOME/.awseasy
 
-# ~/code/awseasy$ /bin/cp -f $HOME/code/awseasy/* $HOME/.awseasy
+# cd ~/.awseasy
+rm -fr ~/.awseasy.git \
+       ~/.awseasy.DS* \
+       ~/.awseasy/README.md \
+       ~/.awseasy/contributors.txt \
+       ~/.awseasy/future-features \
+       ~/.awseasy/install.sh \
+       ~/.awseasy/insync.sh
 
-# ~/.awseasy$ rm -fr .git .DS* README.md contributors.txt future-features install.sh insync.sh
+# now that I got rid of .bash-functions within this repo as redodant, add something to the code of 
+# this script to ensure that the .bashrc and .bash-func.sh include ${COLORS} and other needed functions
 
 echo; echo "${GREEN}"REPO Files "${YELLOW}"
 ls -la  "$HOME/code/awseasy/"
