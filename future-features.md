@@ -19,8 +19,8 @@ ie..
  us-east-2
  us-west-1
  us-west-2
-...
 
+'''
  for az in $(aws ec2 describe-regions | grep Endpoint | awk '{print $2}' \
  | cut -d'.' -f2 | grep -v 'sa-east-1' | grep -v 'ca-east-1' ); do
 
@@ -39,4 +39,4 @@ ie..
 eu-west-2
       with 4.3 - 0
       not 4.3 0
- ....
+'''
