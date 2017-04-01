@@ -59,7 +59,6 @@ making sure that   source .awseasy/awseasy is in your .bashrc, mine looks like t
 	 # Please do not modify the last few lines, they offer additional features for awseasy
 	[ -z $AWS_ACCESS_KEY_ID ] && [ -z $AWS_SECRET_ACCESS_KEY ] || source .awseasy/awseasy
 
-
 ----
 
 ### AWS SecurityGroup commands
@@ -82,21 +81,21 @@ making sure that   source .awseasy/awseasy is in your .bashrc, mine looks like t
 
 ### AWS EC2 Commands
 
-  awsls - AWS EC2 -- List Nodes, long format - awsls
+  ec2ls   - AWS EC2 -- List Nodes, long format - (awsls) 
+    
+  ec2desc - AWS EC2 -- Detail JSON dump of instance
   
-  awslsall - aws ls ALL -- having some formating issues with JENKINS-SLAVES
+  ec2stat - AWS EC2 -- breifly describe instances with key chosen parameters
   
-  awsdesc - AWS EC2 -- Detail JSON dump of instance
+  ec2who  - AWS EC2 -- Show which enviroment is active
   
-  awsbrief - AWS EC2 -- breifly describe instances with key chosen parameters
+  ec2start - AWS EC2 -- Start an EC2 Instance
   
-  awswho - AWS EC2 -- Show which enviroment is active
+  ec2stop - AWS EC2 -- Stop an EC2 Instance
   
-  awsstart - AWS EC2 -- Start an EC2 Instance
+  ec2kill - AWS EC2 -- Terminate an EC2 Instance
   
-  awsstop - AWS EC2 -- Stop an EC2 Instance
-  
-  awskill - AWS EC2 -- Terminate an EC2 Instance
+  ec2tag  - AWS EC2 -- re-tag
 
 ### AWS ELB commands
 
@@ -107,7 +106,6 @@ making sure that   source .awseasy/awseasy is in your .bashrc, mine looks like t
   elbjoin -- ELB - Joins (connects) instance to ELB
   
   elbdump -- ELB - Dumps (disconnects) instance to ELB
-
 
 ### General Commands
 
@@ -125,7 +123,6 @@ making sure that   source .awseasy/awseasy is in your .bashrc, mine looks like t
   
   awsshowenc - AWS CLI -- AWS Shows ENC (Ethernet Interface) based list
   
-
 ### AWS S3 commands
 
   s3push - AWS CLI -- AWS/S3 push local data to s3
