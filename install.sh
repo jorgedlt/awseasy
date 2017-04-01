@@ -4,9 +4,8 @@
 
 # my awseasy
 echo; echo "${GREEN}" ~/.awseasy/awseasy "${YELLOW}"
-echo rsync is broken
-exit
 
+# rsync is broken
 # rsync -av --progress "$HOME/code/awseasy" "$HOME/.awseasy/" --exclude ".git"
 
 ##
