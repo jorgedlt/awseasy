@@ -11,7 +11,7 @@ echo; echo "${GREEN}" ~/.awseasy/awseasy "${YELLOW}"
 ##
 # cd ~/code/awseasy
 /bin/cp -f \
- ~/code/awseasy/code/awseasy/* \
+ ~/code/awseasy/* \
  $HOME/.awseasy
 
 # cd ~/.awseasy
