@@ -16,8 +16,8 @@ exit
  $HOME/.awseasy
 
 # cd ~/.awseasy
-rm -fr ~/.awseasy.git \
-       ~/.awseasy.DS* \
+rm -fr ~/.awseasy/.git \
+       ~/.awseasy/.DS* \
        ~/.awseasy/README.md \
        ~/.awseasy/contributors.txt \
        ~/.awseasy/future-features \
