@@ -73,24 +73,24 @@ ec2clone ()
  AWSdesc=$(aws ec2 describe-instances --instance-ids $1);
 
 # parse exsisting values
-  _VpcId=$(ec2parse "$AWSdesc" VpcId)
-  _ImageId=$(ec2parse "$AWSdesc" ImageId)
-  _InstanceType=$(ec2parse "$AWSdesc" InstanceType)
-  _SubnetId=$(ec2parse "$AWSdesc" SubnetId)
-  _KeyName=$(ec2parse "$AWSdesc" KeyName)
-  _AvailabilityZone=$(ec2parse "$AWSdesc" AvailabilityZone)
-  _GroupId=$(ec2parse "$AWSdesc" GroupId)
+  _VpcId=$(_ec2parse "$AWSdesc" VpcId)
+  _ImageId=$(_ec2parse "$AWSdesc" ImageId)
+  _InstanceType=$(_ec2parse "$AWSdesc" InstanceType)
+  _SubnetId=$(_ec2parse "$AWSdesc" SubnetId)
+  _KeyName=$(_ec2parse "$AWSdesc" KeyName)
+  _AvailabilityZone=$(_ec2parse "$AWSdesc" AvailabilityZone)
+  _GroupId=$(_ec2parse "$AWSdesc" GroupId)
 
   # special case - Powered EC2 - Provide Warning
-   _EC2State=$(ec2parse "$AWSdesc" running)
+   _EC2State=$(_ec2parse "$AWSdesc" running)
 
   # special case - Public IP address
-   _PublicIP=$(ec2parse "$AWSdesc" PublicIpAddress)
+   _PublicIP=$(_ec2parse "$AWSdesc" PublicIpAddress)
 
   # special case - Extra EBS Volume
-   _VolumeId=$(ec2parse "$AWSdesc" VolumeId)
+   _VolumeId=$(_ec2parse "$AWSdesc" VolumeId)
    VOLdesc=$(aws ec2 describe-volumes --volume-ids ${_VolumeId})
-   _Size=$(ec2parse "$VOLdesc" Size)
+   _Size=$(_ec2parse "$VOLdesc" Size)
 
  #
   echo " cut and paste following AWS CLI string to recreate a new EC2 "
