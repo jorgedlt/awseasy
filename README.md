@@ -41,26 +41,6 @@ In favor of the ssh env pass technique
 
 ----
 
-### Install Notes -  
-
-My method is 
-
-	normal gi clone
-		rm -rf .awseasy/ && git clone https://usedid@bitbucket.org/sbdDigitalAccelerator/devops.awseasy.git
-	
-then a minor in place install
-
-	cd devops.awseasy/ && git log --format=fuller | head -4 > /tmp/awseasy.ver && cd
-	mv devops.awseasy/ .awseasy && mv /tmp/awseasy.ver .awseasy
-	source .awseasy/awseasy  # or logout and log back in
-
-making sure that   source .awseasy/awseasy is in your .bashrc, mine looks like this;
-
-	 # Please do not modify the last few lines, they offer additional features for awseasy
-	[ -z $AWS_ACCESS_KEY_ID ] && [ -z $AWS_SECRET_ACCESS_KEY ] || source .awseasy/awseasy
-
-----
-
 ### AWS SecurityGroup commands
 
   sgls - AWS EC2 -- List SecurityGroup (Brief)
