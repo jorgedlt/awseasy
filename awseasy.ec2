@@ -14,6 +14,12 @@ awsls () {
   aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' | grep '^i-' | column -t | ccze -A
 }
 
+#  ec2tag - AWS EC2 -- EC2 retag - might work well with any resource (awstag)
+ec2tag () {
+
+  aws ec2 create-tags --resources "${1}" --tags Key=Name,Value="${2}"
+}
+
 #.  ec2desc - AWS EC2 -- Detail JSON dump of instance
 ec2desc () {
   sameAs "aws ec2 describe-instances --instance-ids InstanceId"
