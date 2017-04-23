@@ -40,3 +40,40 @@ eu-west-2
       with 4.3 - 0
       not 4.3 0
 '''
+
+### How to delete a VPC with --all-dependencies  
+
+## aws ec2 describe-subnets --filters Name=vpc-id,Values=<VPC-ID>
+
+aws ec2 describe-subnets --filters Name=vpc-id,Values=vpc-6a15ab03 |
+  egrep 'Value|SubnetId|AvailableIpAddressCount'
+
+    aws ec2 delete-subnet --subnet-id=subnet-4f017b73
+    aws ec2 delete-subnet --subnet-id=subnet-b003798c
+
+## aws ec2 describe-network-acls --filters Name=vpc-id,Values=<vpc-id>
+
+## aws ec2 describe-internet-gateways --filters Name=vpc-id,Values=<vpc-id>
+
+    aws ec2 detach-internet-gateway --internet-gateway-id=igw-1acc367c --vpc-id=vpc-cb5456ad
+
+    aws ec2 delete-internet-gateway --internet-gateway-id=igw-1acc367c
+
+## aws ec2 describe-route-tables --filters Name=vpc-id,Values=<vpc-id>
+
+ aws ec2 describe-route-tables
+ aws ec2 delete-route-table --route-table-id rtb-0ab0eb73
+
+ aws ec2 describe-security-groups
+
+ aws ec2 describe-security-groups --filters Name=vpc-id,Values=vpc-6a15ab03 |
+  egrep 'VpcId|GroupName|GroupId'
+
+also -  
+aws ec2 describe-security-groups --filters Name=vpc-id,Values=vpc-6a15ab03  --output table  
+
+aws ec2 delete-security-group --group-id sg-64bfe01b
+
+#### Finally !!
+aws ec2 delete-vpc --vpc-id=vpc-cb5456ad
+
