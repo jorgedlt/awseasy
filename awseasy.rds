@@ -38,7 +38,7 @@ echo RDS $1
        _RDSaz=$( _ec2parse "$RDSdesc" AvailabilityZone )
        _RDSmultiaz=$( _ec2parse "$RDSdesc" MultiAZ )
        _RDSstatus=$( _ec2parse "$RDSdesc" DBInstanceStatus )
-       _RDSname=$( _ec2parse "$RDSdesc" DBName )
+       _RDSname=$( _ec2parse "$RDSdesc" MasterUsername )
        _RDSsgsec=$( _ec2parse "$RDSdesc" VpcSecurityGroupId )
        _RDSPublic=$( _ec2parse "$RDSdesc" PubliclyAccessible )
        _RDSvpcid=$( _ec2parse "$RDSdesc" VpcId )
@@ -48,9 +48,9 @@ echo RDS $1
        descDUMP RDS $rdsID ResourceID $_RDSResource;
        descDUMP EndPoint $_RDSAddress Port $_RDSport;
        descDUMP AZ $_RDSaz MultiAZ $_RDSmultiaz;
-       descDUMP Status $_RDSstatus Name $_RDSname;
+       descDUMP Status $_RDSstatus User $_RDSname;
        descDUMP sgGrp $_RDSsgsec Encrypted $_RDSencrypt;
-       descDUMP VPC $_RDSsgsec Public $_RDSPublic;
+       descDUMP VPC $_RDSvpcid Public $_RDSPublic;
        echo
 }
 

@@ -4,21 +4,27 @@
 #. AWS RDS commands
 #.
 
-#.  lambdals - AWS lambda -- List lambda, short format
-lambdals () {
+#.  ldals - AWS lambda -- List lambda, short format
+ldals () {
 
 LDAlist=$( aws lambda list-functions | grep 'FunctionName' | cut -d':' -f2 | grep -v '\[\]' | tr -d ' |"|:|,' );
 
 for ldaID in $LDAlist; do
-     RDSdesc=$(aws rds list-functions --db-instance-identifier "${ldaID}")
+     LDAdesc=$(aws lambda get-function --function-name "${ldaID}")
 
-       _RDSengine=$( _ec2parse "$RDSdesc" Engine )
-       _RDSsize=$( _ec2parse "$RDSdesc" DBInstanceClass )
-       _RDSaz=$( _ec2parse "$RDSdesc" AvailabilityZone )
-       _RDSstatus=$( _ec2parse "$RDSdesc" Version )
+       _LDAfunc=$( _ec2parse "$LDAdesc" FunctionName )
+       _LDArun=$( _ec2parse "$LDAdesc" Runtime )
+       _LDAdesc=$( _ec2parse "$LDAdesc" Description )
+       _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
+
+       _LDAdesc=$( _ec2parse "$LDAdesc" Runtime )
+       _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
+
      #
-     descDUMP RDS $ldaID Engine $_RDSengine;
-     descDUMP Status $_RDSstatus AZ $_RDSaz;
+     descDUMP Lambda $ldaID Name $_LDAfunc;
+     descDUMP Last $_LDALastMod Desc $_LDAdesc;
+     descDUMP Version $_LDArun Desc $_LDAdesc;
+
      echo
 done
 }
