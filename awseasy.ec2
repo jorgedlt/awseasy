@@ -29,7 +29,7 @@ ec2desc () {
 # utility function for awsbrief
 _ec2parse ()
 {
-  echo "${1}" | grep ${2} | head -1 | cut -d':' -f2- | tr -d ' |,|"';
+  echo "${1}" | grep -w ${2} | head -1 | cut -d':' -f2- | tr -d ' |,|"';
 }
 
 #.  ec2stat - AWS EC2 -- breifly describe instances with key chosen parameters

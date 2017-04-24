@@ -1,0 +1,59 @@
+# awseasy.rds
+
+#.
+#. AWS RDS commands
+#.
+
+#.  rdsls - AWS RDS -- List RDS, short format
+rdsls () {
+
+RDSlist=$( aws rds describe-db-instances | grep 'DBInstanceIdentifier' | cut -d':' -f2 | grep -v '\[\]' | tr -d ' |"|:|,' );
+
+for rdsID in $RDSlist; do
+     RDSdesc=$(aws rds describe-db-instances --db-instance-identifier "${rdsID}")
+       _RDSengine=$( _ec2parse "$RDSdesc" Engine )
+       _RDSsize=$( _ec2parse "$RDSdesc" DBInstanceClass )
+       _RDSaz=$( _ec2parse "$RDSdesc" AvailabilityZone )
+       _RDSstatus=$( _ec2parse "$RDSdesc" DBInstanceStatus )
+     #
+     descDUMP RDS $rdsID Engine $_RDSengine;
+     descDUMP Status $_RDSstatus AZ $_RDSaz;
+     echo
+done
+}
+
+#.  rdsstat - AWS RDS --
+rdsstat() {
+if (( $# < 1 )); then
+   echo usage: Needs at least one argument {RDS ID}
+ return
+fi
+
+echo RDS $1
+     RDSdesc=$(aws rds describe-db-instances --db-instance-identifier "${rdsID}")
+       _RDSengine=$( _ec2parse "$RDSdesc" Engine )
+       _RDSeversion=$( _ec2parse "$RDSdesc" EngineVersion )
+       _RDSport=$( _ec2parse "$RDSdesc" Port )
+       _RDSAddress=$( _ec2parse "$RDSdesc" Address )
+       _RDSaz=$( _ec2parse "$RDSdesc" AvailabilityZone )
+       _RDSmultiaz=$( _ec2parse "$RDSdesc" MultiAZ )
+       _RDSstatus=$( _ec2parse "$RDSdesc" DBInstanceStatus )
+       _RDSname=$( _ec2parse "$RDSdesc" DBName )
+       _RDSsgsec=$( _ec2parse "$RDSdesc" VpcSecurityGroupId )
+       _RDSPublic=$( _ec2parse "$RDSdesc" PubliclyAccessible )
+       _RDSvpcid=$( _ec2parse "$RDSdesc" VpcId )
+       _RDSencrypt=$( _ec2parse "$RDSdesc" StorageEncrypted )
+       _RDSResource=$( _ec2parse "$RDSdesc" DbiResourceId )
+       #
+       descDUMP RDS $rdsID ResourceID $_RDSResource;
+       descDUMP EndPoint $_RDSAddress Port $_RDSport;
+       descDUMP AZ $_RDSaz MultiAZ $_RDSmultiaz;
+       descDUMP Status $_RDSstatus Name $_RDSname;
+       descDUMP sgGrp $_RDSsgsec Encrypted $_RDSencrypt;
+       descDUMP VPC $_RDSsgsec Public $_RDSPublic;
+       echo
+}
+
+#.  rdsmake - AWS RDS -- feature coming soon
+#.  rdskill - AWS RDS -- feature coming soon
+#.  rdsclone - AWS RDS -- feature coming soon

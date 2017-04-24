@@ -19,9 +19,17 @@ descDUMP () {
   echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}] $3: [ ${YELLOW}$4 ${GRAY}]"
 }
 
+#  awstag - AWS -- Any AWS Element re-tag
+awstag () {
+
+  aws ec2 create-tags --resources "${1}" --tags Key=Name,Value="${2}"
+}
+
 source ~/.awseasy/awseasy.ec2
 source ~/.awseasy/awseasy.iam
 source ~/.awseasy/awseasy.vpc
+source ~/.awseasy/awseasy.rds
+source ~/.awseasy/awseasy.lda
 source ~/.awseasy/awseasy.net
 source ~/.awseasy/awseasy.asg
 source ~/.awseasy/awseasy.elb
