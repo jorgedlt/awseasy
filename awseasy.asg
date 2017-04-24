@@ -4,7 +4,7 @@
 #. AWS SecurityGroup commands
 #.
 
-#.  sgls - AWS EC2 -- List SecurityGroup (Brief)
+#.  sgls - AWS NET -- List SecurityGroup (Brief)
 sgls() {
 
  sgDESC=$( aws ec2 describe-security-groups --output text )
@@ -13,12 +13,43 @@ sgls() {
 for sg in $( echo "$sgLIST" | grep .sg | cut -d$'\t' -f3 | sort | uniq ); do
 sgTAG='null'
 
-sgDESC=$( aws ec2 describe-security-groups --group-ids ${sg} --output text )
-sgNAME=$( echo "${sgDESC}" | sed -e 's/sg-/\nsg-/' | grep SECURITYGROUPS | sed 's/SECURITYGROUPS/Security Group/g' | tr ' ' '.' | tr -d ' ' | cut -c16- )
-sgTAG=$( echo "${sgDESC}" | grep 'TAGS.\+Name' | awk '{print $3}' )
+sgJSON=$( aws ec2 describe-security-groups --group-ids ${sg} )
 
-echo "TAG [${YELLOW} ${sgTAG} ${WHITE}] SG [${YELLOW} ${sg} ${WHITE}] ${WHITE}Security Group [${YELLOW}   ${sgNAME}${WHITE}]"
-    echo ${WHITE}
+       _sgVPC=$( _ec2parse "$sgJSON" VpcId )
+       _sgTAG=$( _ec2parse "$sgJSON" GroupName )
+       _sgNAME=$( _ec2parse "$sgJSON" Description )
+
+# aws ec2 describe-security-groups --group-ids sg-08403b71 --output text
+
+    descDUMP 'Security Group' $sg 'SG Name' $_sgNAME;
+    descDUMP TAG $_sgTAG VPC $_sgVPC;
+    echo
+
+done
+}
+
+#.  sgvpc - AWS NET -- List SecurityGroup (as per VPC)
+sgvpc() {
+
+if (( $# < 1 )); then
+   echo usage: Needs at least one argument {VPC ID#}
+ return
+fi
+
+sgDESC=$( aws ec2 describe-security-groups --filter Name=vpc-id,Values=${1} --output text )
+sgLIST=$( echo "$sgDESC" | grep SECURITYGROUPS )
+
+for sg in $( echo "$sgLIST" | grep .sg | cut -d$'\t' -f3 | sort | uniq ); do
+  sgTAG='null'
+  sgJSON=$( aws ec2 describe-security-groups --group-ids ${sg} )
+
+    _sgVPC=$( _ec2parse "$sgJSON" VpcId )
+    _sgTAG=$( _ec2parse "$sgJSON" GroupName )
+    _sgNAME=$( _ec2parse "$sgJSON" Description )
+
+    descDUMP 'Security Group' $sg 'SG Name' $_sgNAME;
+    descDUMP TAG $_sgTAG VPC $_sgVPC;
+    echo
 done
 }
 

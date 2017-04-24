@@ -1,0 +1,76 @@
+# awseasy.vpc
+
+#.
+#. AWS VPC Commands
+#.
+
+#.  vpcls - AWS EC2 -- list VPCs -- No Inputs
+vpcls() {
+ VPClist=$(aws ec2 describe-vpcs | grep 'VpcId' | cut -d':' -f2 | tr -d ' |"|:|,');
+ for vpcID in $VPClist; do
+      VPCdesc=$(aws ec2 describe-vpcs --vpc-ids "${vpcID}")
+        _VPCid=$(_ec2parse "$VPCdesc" VpcId)
+        _Cidr=$(_ec2parse "$VPCdesc" CidrBlock)
+        _VPCname=$(_ec2parse "$VPCdesc" Value)
+        _VPCstate=$(_ec2parse "$VPCdesc" State)
+      #
+      descDUMP VPCid $_VPCid VPCname $_VPCname;
+      descDUMP CidrBlock $_Cidr State $_VPCstate;
+      echo ' '
+ done
+}
+
+#.  vpcstat - AWS EC2 -- details VPCs -- vpc ID
+vpcstat() {
+if (( $# < 1 )); then
+   echo usage: Needs at least one argument {VPC ID#}
+ return
+fi
+
+echo VPC $1
+for vpcID in $1; do
+
+    # describe-internet-gateways
+    IGWlist=$( aws ec2 describe-internet-gateways --output text | grep -B1 -A1 $vpcID )
+
+    # aws ec2 describe-internet-gateways --output text | grep -B1 -A1 vpc-1fa67e7b
+
+    IGWid=$(echo "$IGWlist" | grep INTERNETGATEWAYS | awk '{print $2}')
+    IGWnm=$(echo "$IGWlist" | grep TAGS | awk '{print $3}')
+
+    descDUMP 'iGW ID' $IGWid 'iGW Name' $IGWnm;
+    echo
+
+    # describe-route-tables
+    RTRlist=$( aws ec2 describe-internet-gateways --output text | grep -B1 -A1 $vpcID )
+
+    # aws ec2   describe-route-tables --filters Name=vpc-id,Values=vpc-e5580f80
+
+    # describe-subnets
+        NETlist=$( aws ec2 describe-subnets --filters Name=vpc-id,Values="${vpcID}" |  grep 'SubnetId' | cut -d':' -f2 | tr -d ' |"|:|,' )
+
+        for netID in $NETlist; do
+          NETdesc=$( aws ec2 describe-subnets --subnet-ids "${netID}" )
+
+          _NETcidr=$( _ec2parse "$NETdesc" CidrBlock )
+          _NETname=$( _ec2parse "$NETdesc" Value )
+          _NETstate=$( _ec2parse "$NETdesc" State )
+          _NETcount=$( _ec2parse "$NETdesc" AvailableIpAddressCount )
+          _NETpublic=$( _ec2parse "$NETdesc" MapPublicIpOnLaunch )
+          _NETzone=$( _ec2parse "$NETdesc" AvailabilityZone )
+          _NETDefault=$( _ec2parse "$NETdesc" DefaultForAz )
+          #
+          descDUMP netID $netID VPCname $_NETname;
+          descDUMP CIDR $_NETcidr State $_NETstate;
+          descDUMP IPavail $_NETcount AZ $_NETzone;
+          descDUMP Public $_NETpublic  Default $_NETDefault;
+          echo
+          done
+
+          # describe-security-groups
+          echo - use sgls and sgvpc to list security-groups, and sgstat form details
+
+          # describe EC2 / RDS / other
+
+          done
+}

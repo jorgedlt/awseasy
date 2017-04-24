@@ -21,6 +21,7 @@ descDUMP () {
 
 source ~/.awseasy/awseasy.ec2
 source ~/.awseasy/awseasy.iam
+source ~/.awseasy/awseasy.vpc
 source ~/.awseasy/awseasy.net
 source ~/.awseasy/awseasy.asg
 source ~/.awseasy/awseasy.elb
