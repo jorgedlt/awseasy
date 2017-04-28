@@ -29,7 +29,9 @@ if (( $# < 1 )); then
  return
 fi
 
-echo RDS $1
+rdsID=$1
+
+echo RDS $rdsID
      RDSdesc=$(aws rds describe-db-instances --db-instance-identifier "${rdsID}")
        _RDSengine=$( _ec2parse "$RDSdesc" Engine )
        _RDSeversion=$( _ec2parse "$RDSdesc" EngineVersion )
