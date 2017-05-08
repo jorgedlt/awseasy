@@ -74,3 +74,24 @@ for vpcID in $1; do
 
           done
 }
+
+#.  vpcscan - AWS VPC Scanner -- Scan All AWS Account Regions for VPCs
+vpcscan () {
+  awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq )
+
+for thisregion in $awsREGIONS
+do
+  echo ${RESET}$thisregion
+  export AWS_DEFAULT_REGION=$thisregion
+
+  EventsTR=$(vpcls)
+
+  [ -z "$EventsTR" ] && {
+    : # echo "no EC2s found this region $thisregion"
+    } || {
+    echo "  some EC2 found this region $thisregion"
+      vpcls
+    echo =====================================================================
+   }
+done
+}

@@ -32,7 +32,7 @@ _ec2parse ()
   echo "${1}" | grep -w ${2} | head -1 | cut -d':' -f2- | tr -d ' |,|"';
 }
 
-#.  ec2stat - AWS EC2 -- breifly describe instances with key chosen parameters
+#.  ec2stat - AWS EC2 -- briefly describe instances with key chosen parameters
 ec2stat() {
 
       if (( $# < 1 )); then
@@ -72,6 +72,30 @@ ec2stat() {
      descDUMP sg $_GroupIds sgNAME $_GroupName;
      descDUMP KEY $_KeyName AZ $_AZone
 }
+
+
+#.  ec2scan - AWS EC2 -- Scan all Regions for EC2s running or stopped
+ec2scan () {
+  awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq )
+
+for thisregion in $awsREGIONS
+do
+  echo ${RESET}$thisregion
+  export AWS_DEFAULT_REGION=$thisregion
+
+  EventsTR=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "')
+
+  [ -z "$EventsTR" ] && {
+    : # echo "no EC2s found this region $thisregion"
+    } || {
+    echo "  some EC2 found this region $thisregion"
+    ec2ls
+    echo =====================================================================
+   }
+done
+}
+#
+
 
 #.  ec2clone - AWS EC2 -- creates new clone EC2
 ec2clone ()
@@ -134,7 +158,8 @@ ec2clone ()
     }
 }
 
-#.  awswho - AWS EC2 -- Show which enviroment is active
+#.  awswho - AWS EC2 -- Show which environment is active
+
 awswho() {
   #sameAs " aws iam list-account-aliases --output text"
   #aws iam list-account-aliases --output text | awk '{print $2}' | figlet
