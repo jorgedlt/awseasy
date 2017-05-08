@@ -87,9 +87,9 @@ do
   EventsTR=$(vpcls)
 
   [ -z "$EventsTR" ] && {
-    : # echo "no EC2s found this region $thisregion"
+    : # echo "no VPCs found this region $thisregion"
     } || {
-    echo "  some EC2 found this region $thisregion"
+    echo "  some VPCs found this region $thisregion"
       vpcls
     echo =====================================================================
    }
