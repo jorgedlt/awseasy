@@ -1,11 +1,11 @@
-# awseasy.rds
+# awseasy.lda
 
 #.
-#. AWS RDS commands
+#. AWS Lambda commands
 #.
 
-#.  ldals - AWS lambda -- List lambda, short format
-ldals () {
+#.  lambdals - AWS lambda -- List lambda, short format
+lambdals () {
 
 LDAlist=$( aws lambda list-functions | grep 'FunctionName' | cut -d':' -f2 | grep -v '\[\]' | tr -d ' |"|:|,' );
 
@@ -16,21 +16,19 @@ for ldaID in $LDAlist; do
        _LDArun=$( _ec2parse "$LDAdesc" Runtime )
        _LDAdesc=$( _ec2parse "$LDAdesc" Description )
        _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
-
        _LDAdesc=$( _ec2parse "$LDAdesc" Runtime )
        _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
-
      #
-     descDUMP Lambda $ldaID Name $_LDAfunc;
-     descDUMP Last $_LDALastMod Desc $_LDAdesc;
-     descDUMP Version $_LDArun Desc $_LDAdesc;
+      descDUMP Lambda $ldaID Name $_LDAfunc;
+      descDUMP Last $_LDALastMod Desc $_LDAdesc;
+      descDUMP Version $_LDArun Desc $_LDAdesc;
 
-     echo
+      echo
 done
 }
 
-# #.  ldastat - AWS RDS --
-# ldastat() {
+# #.  lambdastat - AWS lambda Detail Status -- NOT WORKING !!
+# lambdastat() {
 # if (( $# < 1 )); then
 #    echo usage: Needs at least one argument {RDS ID}
 #  return
@@ -61,6 +59,21 @@ done
 #        echo
 # }
 
-#.  rdsmake - AWS RDS -- feature coming soon
-#.  rdskill - AWS RDS -- feature coming soon
-#.  rdsclone - AWS RDS -- feature coming soon
+#.  lambdadump - AWS lambda -- lambda DUMP json
+lambdadump () {
+
+    if (( $# < 1 )); then
+      echo usage: Needs at least one argument {RDS ID}
+      return
+    fi
+
+echo LAMBDA $1
+
+    aws lambda get-function --function-name "${ldaID}" | jq .
+    echo
+
+}
+
+#.  lambdamake  - AWS RDS -- feature coming soon
+#.  lambdakill  - AWS RDS -- feature coming soon
+#.  lambdaclone - AWS RDS -- feature coming soon
