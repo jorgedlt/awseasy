@@ -19,11 +19,107 @@ descDUMP () {
   echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}] $3: [ ${YELLOW}$4 ${GRAY}]"
 }
 
+#  descDUMP - Colorized out
+singlewide () {
+  echo "    ${GRAY}$1: [ ${GREEN}$2 ${GRAY}]"
+}
+
+#  descDUMP - Colorized out
+doublewide () {
+  echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}] $3: [ ${YELLOW}$4 ${GRAY}]"
+}
+
 #  awstag - AWS -- Any AWS Element re-tag
 awstag () {
 
   aws ec2 create-tags --resources "${1}" --tags Key=Name,Value="${2}"
 }
+
+# needs to be in its own file
+
+#.  cfls - AWS Cloud Front -- List Cloud Front distributions
+cfls ()
+{
+    CFlist=$( aws cloudfront list-distributions | grep -w 'Id' | egrep -v '\.|-' | cut -d':' -f2 | tr -d ' |"|:|,' );
+    for CFid in $CFlist;
+    do
+        CFdesc=$( aws cloudfront get-distribution --id "${CFid}" );
+
+         _CFstatus=$(_ec2parse "$CFdesc" Status);
+         _CFdomain=$(_ec2parse "$CFdesc" DomainName);
+         _CFtarget=$(_ec2parse "$CFdesc" TargetOriginId);
+
+         descDUMP 'Cloud Front id' $CFid Status $_CFstatus;
+         descDUMP  DomainName $_CFdomain Target $_CFtarget;
+
+         echo ' ';
+     done
+ }
+#
+
+
+#.  cfstat - AWS Cloud Front -- Status Cloud Front distributions
+cfstat ()
+{
+if (( $# < 1 )); then
+   echo usage: Needs at least one argument {Cloud Front ID}
+ return
+ fi
+
+CFid=$1
+#
+echo Cloud Front $CFid BETA
+         CFdesc=$( aws cloudfront get-distribution --id "${CFid}" );
+
+         _CFstatus=$(_ec2parse "$CFdesc" Status);
+         _CFdomain=$(_ec2parse "$CFdesc" DomainName);
+         _CFtarget=$(_ec2parse "$CFdesc" TargetOriginId);
+         _CFetag=$(_ec2parse "$CFdesc" ETag);
+         _CFcomment=$(_ec2parse "$CFdesc" Comment);
+         _CFbucket=$(_ec2parse "$CFdesc" Bucket);
+         _CFtprefix=$(_ec2parse "$CFdesc" prefix);
+
+         _CFminttl=$(_ec2parse "$CFdesc" MinTTL);
+         _CFmaxttl=$(_ec2parse "$CFdesc" MaxTTL);
+
+
+         CFAllowedMethods=$( echo "$CFdesc" \
+          | jq  .Distribution.DistributionConfig.DefaultCacheBehavior.AllowedMethods.Items \
+          | tr '\012' ' ' | tr -s ' ' )
+
+         CFCachedMethods=$( echo "$CFdesc" \
+          | jq  .Distribution.DistributionConfig.DefaultCacheBehavior.AllowedMethods.CachedMethods.Items \
+          | tr '\012' ' ' | tr -s ' ' )
+
+         descDUMP 'Cloud Front id' $CFid Status $_CFstatus;
+         descDUMP  DomainName $_CFdomain Target $_CFtarget;
+         descDUMP  Etag $_CFetag Comment $_CFcomment;
+         descDUMP  'S3 Bucket' $_CFbucket prefix $_CFtprefix;
+         descDUMP  MinTTL $_CFminttl MaxTTL $_CFmaxttl;
+
+echo
+         singlewide AllowedMethods "$CFAllowedMethods"
+         singlewide CachedMethods "$CFCachedMethods"
+
+         echo ' ';
+ }
+#
+
+#.  cfdump - AWS Cloud Front -- Dump Cloud Front distributions JSON
+cfdump ()
+{
+if (( $# < 1 )); then
+   echo usage: Needs at least one argument {Cloud Front ID}
+ return
+ fi
+
+CFid=$1
+#
+echo Cloud Front $CFid BETA
+         aws cloudfront get-distribution --id "${CFid}" | jq .
+         echo ' ';
+ }
+#
 
 source ~/.awseasy/awseasy.ec2
 source ~/.awseasy/awseasy.iam

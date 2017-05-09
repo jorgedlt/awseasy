@@ -4,11 +4,6 @@
 #. General Commands
 #.
 
-#.  ec2type - List current ec2 list - as reference
-ec2type() {
-  cat ~/.awseasy/ec2.type.csv | sed -e 's/,,/, ,/g' | column -s, -t | less -#5 -N -S | ccze -A
-}
-
 #.  awseasy-version - Display Current Version
 awseasy-version() {
   echo AWSEASY VERSION:

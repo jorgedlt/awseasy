@@ -95,3 +95,16 @@ do
    }
 done
 }
+
+#.  vpcdump - AWS VPC -- Dump VPC JSON
+vpcdump() {
+if (( $# < 1 )); then
+   echo usage: Needs at least one argument {VPC ID#}
+ return
+fi
+
+echo VPC $1
+  aws ec2 describe-vpcs --vpc-ids $1 | jq .
+  echo
+
+}

@@ -5,7 +5,7 @@
 #. AWS IAM Commands
 #.
 
-#.  iamls - AWS IAM -- List Users (Table format)
+#.  iamls - AWS IAM -- List Users
 iamls () {
-   aws iam list-users --output table
+   aws iam list-users --output json | jq .
 }

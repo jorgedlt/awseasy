@@ -73,6 +73,17 @@ ec2stat() {
      descDUMP KEY $_KeyName AZ $_AZone
 }
 
+#.  ec2dump - AWS EC2 -- dump EC2 JSON
+ec2dump() {
+
+     if (( $# < 1 )); then
+        echo usage: Needs at least one argument {instance ID#}
+        return
+     fi
+
+     aws ec2 describe-instances --instance-ids $1 | jq .
+     echo
+}
 
 #.  ec2scan - AWS EC2 -- Scan all Regions for EC2s running or stopped
 ec2scan () {
@@ -208,4 +219,9 @@ ec2kill() {
  else
    return
  fi
+}
+
+#.  ec2type - List current ec2 list - as reference
+ec2type() {
+  cat ~/.awseasy/ec2.type.csv | sed -e 's/,,/, ,/g' | column -s, -t | less -#5 -N -S | ccze -A
 }

@@ -16,7 +16,7 @@ for elb in $elbLOOP; do
     elbTAGS=$( aws elb describe-tags --load-balancer-name "${elb}" --output text)
 
     elbATT=$(aws elb describe-load-balancer-attributes --load-balancer-name "${elb}" --output text)
-    
+
       elbNAME=$(echo "$elbDUMP" | grep LoadBalancerName | sed 's/^ \+//g' | tr -d '"|,' | cut -d':' -f2 )
       elbSCHM=$(echo "$elbDUMP" | grep Scheme | cut -d':' -f2 | tr -d ' |"|,' )
       elbSCGR=$(echo "$elbTEXT" | grep SECURITYGROUPS | awk '{print $2}' )
@@ -34,10 +34,10 @@ for elb in $elbLOOP; do
       echo  "  FORMAL [${GREEN} $elbNAME ${RESET}] Scheme [${YELLOW} $elbSCHM ${RESET}]"
       echo  "  S3BucketName [${YELLOW} $S3BucketName ${RESET}] Log Enable [${YELLOW} $LogEnable ${RESET}] "
       echo
-done         
+done
 }
 
-#.  elbstat -- AWS ELB Status and Detail Description 
+#.  elbstat -- AWS ELB Status and Detail Description
 elbstat() {
 
 if (( $# < 1 )); then
@@ -88,13 +88,25 @@ fi
 
           echo EC2 [${YELLOW} $eINSTid ${RESET}] NAME [${YELLOW} $eINSTname ${RESET}] stat [${GREEN} $eINSTstat ${RESET}]
       done
-      
+
       echo
       echo  "$elbLIST"
       echo
       echo  "Public IP Information "
       echo  ${CYAN} $publicIP  ${RESET}
-      echo            
+      echo
+}
+
+#.  elbdump -- AWS ELB -- Dump JSON
+elbdump() {
+
+    if (( $# < 1 )); then
+        echo usage: Needs at least one argument {ELB FORMAL}
+        return
+    fi
+
+    aws elb describe-load-balancers --load-balancer-name ${1} | jq .
+    echo
 }
 
 # future feature - enable S3 logging and monitor them
@@ -110,7 +122,7 @@ fi
 
     aws elb register-instances-with-load-balancer --load-balancer-name my-load-balancer --instances $1
 }
- 
+
 
 #.  elbdump -- ELB - Dumps (disconnects) instance to ELB
 elbdump() {

@@ -22,7 +22,7 @@ for rdsID in $RDSlist; do
 done
 }
 
-#.  rdsstat - AWS RDS --
+#.  rdsstat - AWS RDS -- Show details of RDS
 rdsstat() {
 if (( $# < 1 )); then
    echo usage: Needs at least one argument {RDS ID}
@@ -55,6 +55,42 @@ echo RDS $rdsID
        descDUMP VPC $_RDSvpcid Public $_RDSPublic;
        echo
 }
+
+#.  rdsdump - AWS RDS -- Dump RDS JSON
+rdsdump() {
+if (( $# < 1 )); then
+   echo usage: Needs at least one argument {RDS ID}
+ return
+fi
+
+rdsID=$1
+
+echo RDS $rdsID
+       aws rds describe-db-instances --db-instance-identifier "${rdsID}" | jq .
+       echo
+}
+
+#.  rdsscan - AWS RDS -- Scan for RDS instance across AWS regions
+rdsscan () {
+  awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq )
+
+for thisregion in $awsREGIONS
+do
+  echo ${RESET}$thisregion
+  export AWS_DEFAULT_REGION=$thisregion
+
+  EventsTR=$( aws rds describe-db-instances | grep 'DBInstanceIdentifier' )
+
+  [ -z "$EventsTR" ] && {
+    : # echo "no EC2s found this region $thisregion"
+    } || {
+    echo "  some EC2 found this region $thisregion"
+      rdsls
+    echo =====================================================================
+   }
+done
+}
+#
 
 #.  rdsmake - AWS RDS -- feature coming soon
 #.  rdskill - AWS RDS -- feature coming soon
