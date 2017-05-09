@@ -19,14 +19,14 @@ descDUMP () {
   echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}] $3: [ ${YELLOW}$4 ${GRAY}]"
 }
 
-#  descDUMP - Colorized out
+#  descDUMP - Colorized out - 1x out and no square brackets
 singlewide () {
-  echo "    ${GRAY}$1: [ ${GREEN}$2 ${GRAY}]"
+  echo "    ${GRAY}$1: ${GREEN}$2 ${GRAY}"
 }
 
-#  descDUMP - Colorized out
+#  descDUMP - Colorized out - similar to descDUMP but GREEN
 doublewide () {
-  echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}] $3: [ ${YELLOW}$4 ${GRAY}]"
+  echo "    ${GRAY}$1: [ ${GREEN}$2 ${GRAY}] $3: [ ${GREEN}$4 ${GRAY}]"
 }
 
 #  awstag - AWS -- Any AWS Element re-tag
@@ -78,10 +78,8 @@ echo Cloud Front $CFid BETA
          _CFcomment=$(_ec2parse "$CFdesc" Comment);
          _CFbucket=$(_ec2parse "$CFdesc" Bucket);
          _CFtprefix=$(_ec2parse "$CFdesc" prefix);
-
          _CFminttl=$(_ec2parse "$CFdesc" MinTTL);
          _CFmaxttl=$(_ec2parse "$CFdesc" MaxTTL);
-
 
          CFAllowedMethods=$( echo "$CFdesc" \
           | jq  .Distribution.DistributionConfig.DefaultCacheBehavior.AllowedMethods.Items \
@@ -91,15 +89,25 @@ echo Cloud Front $CFid BETA
           | jq  .Distribution.DistributionConfig.DefaultCacheBehavior.AllowedMethods.CachedMethods.Items \
           | tr '\012' ' ' | tr -s ' ' )
 
+         CFForwardedValues=$( echo "$CFdesc" \
+          | jq  .Distribution.DistributionConfig.DefaultCacheBehavior.ForwardedValues.Headers.Items \
+          | tr '\012' ' ' | tr -s ' ' )
+
+         # CFOriginSslProtocols=$( echo "$CFdesc" \
+         # | jq  .Distribution.DistributionConfig.Origins.Items.0.CustomOriginConfig.OriginSslProtocols.Items \
+         # | tr '\012' ' ' | tr -s ' ' )
+
          descDUMP 'Cloud Front id' $CFid Status $_CFstatus;
          descDUMP  DomainName $_CFdomain Target $_CFtarget;
          descDUMP  Etag $_CFetag Comment $_CFcomment;
          descDUMP  'S3 Bucket' $_CFbucket prefix $_CFtprefix;
          descDUMP  MinTTL $_CFminttl MaxTTL $_CFmaxttl;
 
-echo
+         echo
+         singlewide ForwardedValues "$CFForwardedValues"
          singlewide AllowedMethods "$CFAllowedMethods"
          singlewide CachedMethods "$CFCachedMethods"
+         # singlewide 'SSL Protocols' "$CFOriginSslProtocols"
 
          echo ' ';
  }
