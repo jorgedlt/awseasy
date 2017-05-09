@@ -4,7 +4,7 @@
 #. AWS SecurityGroup commands
 #.
 
-#.  sgls - AWS NET -- List SecurityGroup (Brief)
+#.  sgls - AWS SecurityGroup -- List SecurityGroup (Brief)
 sgls() {
 
  sgDESC=$( aws ec2 describe-security-groups --output text )
@@ -28,7 +28,7 @@ sgJSON=$( aws ec2 describe-security-groups --group-ids ${sg} )
 done
 }
 
-#.  sgvpc - AWS NET -- List SecurityGroup (as per VPC)
+#.  sgvpc - AWS SecurityGroup -- List SecurityGroup (as per VPC)
 sgvpc() {
 
 if (( $# < 1 )); then
@@ -53,7 +53,7 @@ for sg in $( echo "$sgLIST" | grep .sg | cut -d$'\t' -f3 | sort | uniq ); do
 done
 }
 
-#.  sglsall - AWS EC2 -- Scans all SecurityGroups for INBOUND & OUTBOUND rules
+#.  sglsall - AWS SecurityGroup -- Scans all SecurityGroups for INBOUND & OUTBOUND rules
 sglsall() {
 
  sgDESC=$( aws ec2 describe-security-groups --output text )
@@ -130,7 +130,7 @@ sgscanall ()
      done;
  }
 
-#.  sgstat - AWS EC2 -- Desc specific SecurityGroup with INBOUND & OUTBOUND rules
+#.  sgstat - AWS SecurityGroup -- Desc specific SecurityGroup with INBOUND & OUTBOUND rules
 sgstat() {
 
 if (( $# < 1 )); then
@@ -176,7 +176,19 @@ echo "${WHITE}Security Group [${YELLOW}    ${sgNAME}${WHITE}] TAG [${YELLOW} ${s
           echo
 }
 
-#.  sgscanip - AWS EC2 -- List all IPs in a common sorted and count pool, regardless of protocol or port
+#.  sgdump - AWS SecurityGroup -- DUMP SecurityGroup JSON
+sgdump() {
+
+    if (( $# < 1 )); then
+      echo usage: Needs at least one argument {instance ID#}
+      return
+    fi
+
+    aws ec2 describe-security-groups --group-ids ${1} --output json | jq .
+    echo
+}
+
+#.  sgscanip - AWS SecurityGroup -- List all IPs in a common sorted and count pool, regardless of protocol or port
 sgscanip() {
 
 sgDESC=$( aws ec2 describe-security-groups --output text )
