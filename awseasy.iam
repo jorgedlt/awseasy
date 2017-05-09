@@ -9,3 +9,5 @@
 iamls () {
    aws iam list-users --output json | jq .
 }
+
+#.  iamls - is not complete - please see -- atom /Users/jld0517/Documents/DailyNotes/DailyNotes-161107-aws-cli-user-groups.txt
