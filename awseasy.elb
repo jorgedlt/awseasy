@@ -112,7 +112,7 @@ elbdump() {
 # future feature - enable S3 logging and monitor them
 # aws elb describe-load-balancers --load-balancer-name DIYZ-DEV-PublicEL-UY41LPYK11KS --output text
 
-#.  elbjoin -- ELB - Joins (connects) instance to ELB
+#.  elbjoin -- AWS ELB - Joins (connects) instance to ELB
 elbjoin() {
 
 if (( $# < 1 )); then
@@ -124,7 +124,7 @@ fi
 }
 
 
-#.  elbdump -- ELB - Dumps (disconnects) instance to ELB
+#.  elbdump -- AWS ELB - Dumps (disconnects) instance to ELB
 elbdump() {
 
 if (( $# < 1 )); then

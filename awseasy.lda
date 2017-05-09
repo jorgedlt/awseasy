@@ -4,7 +4,7 @@
 #. AWS Lambda commands
 #.
 
-#.  lambdals - AWS lambda -- List lambda, short format
+#.  lambdals - AWS LAMBDA -- List lambda, short format
 lambdals () {
 
 LDAlist=$( aws lambda list-functions | grep 'FunctionName' | cut -d':' -f2 | grep -v '\[\]' | tr -d ' |"|:|,' );
@@ -27,7 +27,7 @@ for ldaID in $LDAlist; do
 done
 }
 
-#.  lambdastat - AWS lambda -- Stat lambda, Long format
+#.  lambdastat - AWS LAMBDA -- Stat lambda, Long format
 lambdastat () {
 
 ldaID=$1
@@ -52,7 +52,7 @@ echo lambda $ldaID
        echo
 }
 
-#.  lambdadump - AWS lambda -- lambda DUMP json
+#.  lambdadump - AWS LAMBDA -- lambda DUMP json
 lambdadump () {
 
     if (( $# < 1 )); then
@@ -66,11 +66,11 @@ echo LAMBDA $1
     echo
 }
 
-#.  lambdamake  - AWS RDS -- feature coming soon
-#.  lambdakill  - AWS RDS -- feature coming soon
-#.  lambdaclone - AWS RDS -- feature coming soon
+#.  lambdamake  - AWS LAMBDA -- feature coming soon
+#.  lambdakill  - AWS LAMBDA -- feature coming soon
+#.  lambdaclone - AWS LAMBDA -- feature coming soon
 
-#.  lambdascan - AWS EC2 -- Scan all Regions for EC2s running or stopped
+#.  lambdascan - AWS LAMBDA -- Scan all Regions for EC2s running or stopped
 lambdascan () {
   awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq )
 

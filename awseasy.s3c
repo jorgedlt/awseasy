@@ -4,7 +4,7 @@
 #. AWS S3 commands
 #.
 
-#.  s3ls - AWS CLI -- AWS/S3 list files
+#.  s3ls - AWS S3 -- AWS/S3 list files
 s3ls() {
 
 #if (( $# < 1 )); then
@@ -23,7 +23,7 @@ s3ls() {
   echo
 }
 
-#.  s3deep - AWS CLI -- AWS/S3 list recursively
+#.  s3deep - AWS S3 -- AWS/S3 list recursively
 s3deep() {
 
 if (( $# < 1 )); then
@@ -49,14 +49,14 @@ s3push() {
   echo please use : 'aws s3 cp local-sourcefile s3://target-s3bucket/'
 }
 
-#.  s3pull - AWS CLI -- AWS/S3 pull get info from s3
+#.  s3pull - AWS S3 -- AWS/S3 pull get info from s3
 s3pull() {
 
   echo 's3cp is not fully functional yet'
   echo please use : 'aws s3 cp s3://target-s3bucket/' local-destination
 }
 
-#.  s3make - AWS CLI -- AWS/S3 make/create new s3 bucket
+#.  s3make - AWS S3 -- AWS/S3 make/create new s3 bucket
 s3make() {
 
 if (( $# < 1 )); then

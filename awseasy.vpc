@@ -4,7 +4,7 @@
 #. AWS VPC Commands
 #.
 
-#.  vpcls - AWS EC2 -- list VPCs -- No Inputs
+#.  vpcls - AWS VPC -- list VPCs -- No Inputs
 vpcls() {
  VPClist=$(aws ec2 describe-vpcs | grep 'VpcId' | cut -d':' -f2 | tr -d ' |"|:|,');
  for vpcID in $VPClist; do
@@ -20,7 +20,7 @@ vpcls() {
  done
 }
 
-#.  vpcstat - AWS EC2 -- details VPCs -- vpc ID
+#.  vpcstat - AWS VPC -- details VPCs -- vpc ID
 vpcstat() {
 if (( $# < 1 )); then
    echo usage: Needs at least one argument {VPC ID#}
