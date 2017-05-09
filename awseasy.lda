@@ -27,37 +27,30 @@ for ldaID in $LDAlist; do
 done
 }
 
-# #.  lambdastat - AWS lambda Detail Status -- NOT WORKING !!
-# lambdastat() {
-# if (( $# < 1 )); then
-#    echo usage: Needs at least one argument {RDS ID}
-#  return
-# fi
-#
-# echo RDS $1
-#      RDSdesc=$(aws rds describe-db-instances --db-instance-identifier "${rdsID}")
-#        _RDSengine=$( _ec2parse "$RDSdesc" Engine )
-#        _RDSeversion=$( _ec2parse "$RDSdesc" EngineVersion )
-#        _RDSport=$( _ec2parse "$RDSdesc" Port )
-#        _RDSAddress=$( _ec2parse "$RDSdesc" Address )
-#        _RDSaz=$( _ec2parse "$RDSdesc" AvailabilityZone )
-#        _RDSmultiaz=$( _ec2parse "$RDSdesc" MultiAZ )
-#        _RDSstatus=$( _ec2parse "$RDSdesc" DBInstanceStatus )
-#        _RDSname=$( _ec2parse "$RDSdesc" DBName )
-#        _RDSsgsec=$( _ec2parse "$RDSdesc" VpcSecurityGroupId )
-#        _RDSPublic=$( _ec2parse "$RDSdesc" PubliclyAccessible )
-#        _RDSvpcid=$( _ec2parse "$RDSdesc" VpcId )
-#        _RDSencrypt=$( _ec2parse "$RDSdesc" StorageEncrypted )
-#        _RDSResource=$( _ec2parse "$RDSdesc" DbiResourceId )
-#        #
-#        descDUMP RDS $rdsID ResourceID $_RDSResource;
-#        descDUMP EndPoint $_RDSAddress Port $_RDSport;
-#        descDUMP AZ $_RDSaz MultiAZ $_RDSmultiaz;
-#        descDUMP Status $_RDSstatus Name $_RDSname;
-#        descDUMP sgGrp $_RDSsgsec Encrypted $_RDSencrypt;
-#        descDUMP VPC $_RDSsgsec Public $_RDSPublic;
-#        echo
-# }
+#.  lambdastat - AWS lambda -- Stat lambda, Long format
+lambdastat () {
+
+ldaID=$1
+echo lambda $ldaID
+
+     LDAdesc=$(aws lambda get-function --function-name "${ldaID}")
+
+       _LDAfunc=$( _ec2parse "$LDAdesc" FunctionName )
+       _LDArun=$( _ec2parse "$LDAdesc" Runtime )
+       _LDAdesc=$( _ec2parse "$LDAdesc" Description )
+       _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
+       _LDAdesc=$( _ec2parse "$LDAdesc" Runtime )
+       _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
+       _LDAmemsize=$( _ec2parse "$LDAdesc" MemorySize )
+       _LDAcodesize=$( _ec2parse "$LDAdesc" CodeSize )
+
+      #
+       descDUMP Lambda $ldaID Name $_LDAfunc;
+       descDUMP Last $_LDALastMod Last $_LDALastMod;
+       descDUMP Version $_LDArun Desc $_LDAdesc;
+       descDUMP MEMsize $_LDAmemsize CodeSize $_LDAcodesize;
+       echo
+}
 
 #.  lambdadump - AWS lambda -- lambda DUMP json
 lambdadump () {
