@@ -5,9 +5,189 @@
 #. AWS IAM Commands
 #.
 
-#.  iamls - AWS IAM -- List Users
-iamls () {
-   aws iam list-users --output json | jq .
-}
 
 #.  iamls - is not complete - please see -- atom /Users/jld0517/Documents/DailyNotes/DailyNotes-161107-aws-cli-user-groups.txt
+# - also GDRIVE - "Steps to CLI create a AWS User" & "iam user proto funcs"
+
+
+#.  iamls - AWS IAM -- List Users
+# iamls -- List AWS IAM users
+iamls ()
+{
+  aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq
+}
+#
+
+#.  iamstat - AWS IAM -- Some details on per user
+# iamstat -- Display details on given user
+iamstat ()
+{
+  aws iam get-user --user-name $1 2> /dev/null  # check user is valid
+  [ $? -ne 0 ] && { echo "$1 : Not a valid user" ; } || {
+
+  echo 'groups'
+        aws iam list-groups-for-user --user-name $1 | grep 'GroupName'
+  }
+}
+
+#.  iamreport - AWS IAM -- Comprehensive report for all users for a given account, with other details being region specific
+iamreport()
+{
+  myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
+  myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
+  myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
+
+  echo "Account: [ $myACCNTID ] Alias: [ $myACCOUNT ] Region: [ $myREGION ]"; echo
+
+  echo == [ root ] ============================
+  aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c
+  echo
+
+  AWSusers=$(aws iam list-users --output json | grep UserName | cut -d':' -f2 | tr -d ' |"|,' | sort | uniq)
+  for u in $AWSusers; do
+    echo == [ $u ] ============================
+
+    #echo "PASSWORDLASTUSED:"
+      aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
+    echo
+    echo "RECENT-ACTIONS-LAST-7-DAYS:"
+      aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | tr -s ' '
+    echo
+    echo "ACCESS-KEYS:"
+      aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
+    echo "MFA-DEVICES:"
+      aws iam list-mfa-devices --user-name $u | egrep "SerialNumber|EnableDate"
+    echo "GROUPS:"
+      aws iam list-groups-for-user --user-name $u | grep "GroupName"
+    echo
+done
+}
+
+# A good way to generate a PDF from text // brew install enscript && brew install pstopdf
+# iamreport | enscript -o - | pstopdf -i -o ~/Desktop/iamreport.pdf ## create as PDF
+
+#.  iamuser - AWS IAM -- Similar to iamreport, but on a per user basis
+iamuser()
+{
+  myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
+  myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
+  myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
+
+  echo "Account: [ $myACCNTID ] Alias: [ $myACCOUNT ] Region: [ $myREGION ]"; echo
+  #
+    export u=$1
+
+    echo == [ $u ] ============================
+
+    #echo "PASSWORDLASTUSED:"
+      aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
+    echo
+    echo "RECENT-ACTIONS-LAST-7-DAYS:"
+      aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | tr -s ' '
+    echo
+    echo "ACCESS-KEYS:"
+      aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
+    echo "MFA-DEVICES:"
+      aws iam list-mfa-devices --user-name $u | egrep "SerialNumber|EnableDate"
+    echo "GROUPS:"
+      aws iam list-groups-for-user --user-name $u | grep "GroupName"
+    echo
+}
+
+# with or without ccze -A
+
+#.  iamlsdo - AWS IAM -- Show user region related events (last 7 days)
+iamlsdo ()
+{
+    aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${1} \
+    | grep EventName | sort | uniq -c
+}
+#
+
+#.  iamsummary - AWS IAM -- get-account-summary
+iamsummary ()
+{
+    aws iam get-account-summary | jq .
+}
+
+#.  iampolicy - AWS IAM -- account-password-policy
+iampolicy ()
+{
+    aws iam get-account-password-policy | jq .
+}
+
+# iamuakey [active/inactive]
+# iamuapass [reset]
+# iamuamfa [deactivate]
+
+# create a group
+# delete a group
+# place a user into a group
+# remove a user from a group
+
+# reset passwd # remove mfa
+
+#.  iamuadd - AWS IAM -- create a user -- BETA
+iamuadd ()
+{
+  if (( $# < 1 )); then
+    echo usage: Needs at least one argument {instance ID#};
+    return;
+  fi;
+
+  aws iam create-user --user-name $1
+}
+#
+
+#.  iamudel - AWS IAM -- delete a user -- BETA
+iamudel ()
+{
+
+if (( $# < 1 )); then
+  echo usage: Needs at least one argument {instance ID#};
+  return;
+fi;
+
+thisUSER=$1
+
+# access-key list & select then delete - active/deactive is a diff issue
+  #
+  #  thisKEY=$(aws iam list-access-keys --user-name $thisUSER)
+  #  aws iam delete-access-key --access-key-id $thisKEY --user-name $thisUSER
+  #
+
+# signing-certificates list & select then delete
+  #
+  #  thisCERT=$(aws iam list-signing-certificates --user-name $thisUSER)
+  #  aws iam delete-signing-certificate --certificate-id $thisCERT --user-name $thisUSER
+  #
+
+# login-profile - delete
+  #
+  #  thisPROF=$(aws iam get-login-profile --user-name $thisUSER)
+  #  aws iam delete-login-profile --certificate-id $thisPROF --user-name $thisUSER
+  #
+
+# mfa-devices list & select then delete
+  #
+  #  thisMFA=$(aws iam list-mfa-devices --user-name $thisUSER)
+  #  aws iam deactivate-mfa-device --certificate-id $thisMFA --user-name $thisUSER
+  #
+
+# user-policies list & select then detach (loop through)
+
+# login-profile - delete
+  #
+  #  thisPROF=$(aws iam get-login-profile --user-name $thisUSER)
+  #  aws iam delete-login-profile --certificate-id $thisPROF ---serial-number arn:aws:iam::176599830383:mfa/i_p_coleman
+
+# from-group list & select then remove (loop through) groups
+  #
+  # aws iam list-groups-for-user --user-name $thisUSER
+  #
+  # aws iam remove-user-from-group
+
+# finally
+    aws iam delete-user --user-name $thisUSER
+}
+#
