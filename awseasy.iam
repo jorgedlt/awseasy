@@ -98,7 +98,7 @@ iamsummary ()
     aws iam get-account-summary | jq .
 }
 
-#.  iamsummary - AWS IAM -- Display password policy
+#.  iampolicy - AWS IAM -- Display password policy
 iampolicy ()
 {
     aws iam get-account-password-policy | jq .
@@ -115,9 +115,9 @@ iamuadd ()
   aws iam create-user --user-name $1
 }
 
-#. iamuakey  [active/inactive] -- coming soon
-#. iamuapass [reset]           -- coming soon
-#. iamuamfa  [deactivate]      -- coming soon
+#.  iamuakey  - AWS IAM -- [active/inactive] -- coming soon
+#.  iamuapass - AWS IAM -- [reset]           -- coming soon
+#.  iamuamfa  - AWS IAM -- [deactivate]      -- coming soon
 
 #.  iamudel - AWS IAM -- Delete an AWS IAM user, along with all affiliation
 iamudel ()
