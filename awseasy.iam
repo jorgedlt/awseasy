@@ -218,68 +218,36 @@ iampolstat ()
 #
     aws iam get-policy --policy-arn ${1} | jq .
 }
-# detail of policy -- aws iam get-policy --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl | jq .
-
-# Lists all the managed policies that are available
-# policy list [READONLY, ]    -- aws iam list-policies --max-items 2
+#. detail of policy -- aws iam get-policy --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl | jq .
+#. Lists all the managed policies that are available
+#. policy list [READONLY, ]    -- aws iam list-policies --max-items 2
 #
-#               -- aws iam list-policies | grep PolicyName | grep FullAccess
-#               -- aws iam list-policies | grep PolicyName
-
+#.               -- aws iam list-policies | grep PolicyName | grep FullAccess
+#.
 #.              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
-#.              # AmazonAPIGa
-#
+#.
 #.              aws iam list-attached-group-policies --group-name UI_UX_S3_Only
-#.              {
-#.                  "AttachedPolicies": [
-#.                      {
-#.                          "PolicyName": "AmazonS3FullAccess",
+#.
 #.                          "PolicyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-#.                      },
-#.                      {
-#.                          "PolicyName": "IAMReadOnlyAccess-201509161017",
 #.                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
-#.                      }
-#.                  ]
-#.              }
 #.
 #.              aws iam list-attached-group-policies --group-name dev_group
-#.              {
-#.                  "AttachedPolicies": [
-#.                      {
-#.                          "PolicyName": "PreventProdAccess",
+#.
 #.                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
-#.                      },
-#.                      {
-#.                          "PolicyName": "ManageOwnMFA",
 #.                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
-#.                      },
-#.                      {
-#.                          "PolicyName": "IAMReadOnlyAccess-201509161017",
 #.                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
-#.                      },
-#.                      {
-#.                          "PolicyName": "PowerUserAccess-NoMarketplaceControl",
 #.                          "PolicyArn": "arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl"
-#.                      },
-#.                      {
-#.                          "PolicyName": "PreventIAMOnTrueAdmins",
 #.                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
-#.                      }
-#.                  ]
-#.              }
-
-
-# group list users -- aws iam get-group --group-name MyTestGroup | jq .
-
-# group add user -- aws iam add-user-to-group --user-name MyTestUser1 --group-name MyTestGroup2
-
-# group rem user -- aws iam remove-user-from-group --user-name Bob --group-name Admins
-
+#.
+#. group list users -- aws iam get-group --group-name MyTestGroup | jq .
+#.
+#. group add user -- aws iam add-user-to-group --user-name MyTestUser1 --group-name MyTestGroup2
+#.
+#. group rem user -- aws iam remove-user-from-group --user-name Bob --group-name Admins
+#.
 
 # AWS Tasks that Require Account Root User
 # http://docs.aws.amazon.com/general/latest/gr/aws_tasks-that-require-root.html
-
 
 # MFAs
 
@@ -291,33 +259,23 @@ iampolstat ()
 
 #  resync-mfa-device  -- aws iam resync-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 987654
 
-
 # ACCESS KEYs
-
 # accesskey list for a given user
-
 # accesskey add for a given user
-
 # accesskey ACT/deACT for a given user
-
 # accesskey del for a given user
 
      #.  iamuakey  - AWS IAM -- [active/inactive] -- coming soon
-
 
 # PASSWORDs
 
 #.  iamuapass - AWS IAM -- [reset]           -- coming soon
 
-
 # POLICYs
-
 
 # SIGN-CERTs
 
-
 # PROFILEs
-
 
 # MISC
 
@@ -326,8 +284,6 @@ iampolstat ()
 # Wait until a particular condition is satisfied.
 
 # aws iam user-exists --user-name MyTestUser1 # kinda works ??
-
-
 
 ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . #
 
