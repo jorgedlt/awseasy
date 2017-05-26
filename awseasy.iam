@@ -22,7 +22,7 @@ iamstat ()
   }
 }
 
-#.  iamstat - AWS IAM -- Account wide scan of users, groups and affiliation
+#.  iamreport - AWS IAM -- Account wide scan of users, groups and affiliation
 iamreport()
 {
   myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
