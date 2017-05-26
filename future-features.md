@@ -1,6 +1,19 @@
 
 # to do
 
+## add version info for lambda
+
+see notes from 25MAY2017
+
+## add apiGW
+
+add at least apigwls
+  - concat api url based on serial number plus known.region.aws.domain.com
+
+## tweak cfls and cfstat
+
+to include DomainName for cf and actual like API URL
+
 ## on sgstat & shauthaddi/sgauthdropi I should
 
 An error occurred (InvalidGroupId.Malformed) when calling the DescribeSecurityGroups operation:
