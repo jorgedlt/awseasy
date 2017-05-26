@@ -176,7 +176,6 @@ iamgrplsp ()
 }
 
 # group add policy -- aws iam attach-group-policy --group-name Finance --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
-#                     aws iam attach-group-policy --group-name MyTestGroup2 --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl
 
 #.  iamgrpaddp - AWS IAM -- group ADD policy
 iamgrpaddp ()
@@ -189,10 +188,8 @@ iamgrpaddp ()
     aws iam attach-group-policy --group-name ${1} --policy-arn ${2}
 }
 
-# group del policy -- aws iam delete-group-policy --group-name MyGroup --policy-name ExamplePolicy
-#                  -- aws iam delete-group-policy --group-name MyGroup --policy-name ExamplePolicy
-#                  -- aws iam detach-group-policy --group-name MyGroup --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
-#                  -- aws iam attach-group-policy --group-name MyGroup --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl
+#. group del policy -- aws iam delete-group-policy --group-name MyGroup --policy-name ExamplePolicy
+#.                  -- aws iam detach-group-policy --group-name MyGroup --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 
 #.   iamgrpdelp - AWS IAM -- group DELETE policy
 iamgrpdelp ()
@@ -202,13 +199,13 @@ if (( $# < 2 )); then
  return;
 fi;
 #
- aws iam attach-group-policy --group-name ${1} --policy-arn ${2}
+ aws iam delete-group-policy --group-name ${1} --policy-arn ${2}
 }
 
+# -- aws iam attach-group-policy --group-name Testers --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 # -- aws iam detach-group-policy --group-name Testers --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 
-
-#.   iampolstat - AWS IAM -- group DELETE policy
+#.   iampolstat - AWS IAM -- get details on policy
 iampolstat ()
 {
   if (( $# < 1 )); then
@@ -218,6 +215,7 @@ iampolstat ()
 #
     aws iam get-policy --policy-arn ${1} | jq .
 }
+
 #. detail of policy -- aws iam get-policy --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl | jq .
 #. Lists all the managed policies that are available
 #. policy list [READONLY, ]    -- aws iam list-policies --max-items 2
