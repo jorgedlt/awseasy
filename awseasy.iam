@@ -109,32 +109,7 @@ iampolicy ()
 
 #. USERs
 
-#.  iamgrpls - AWS IAM -- Display list of groups for a given user
-iamgrplsu ()
-{
-if (( $# < 1 )); then
-  echo usage: Needs at least one argument { Group2Create};
-  return;
-fi;
-#
-   aws iam list-groups-for-user --user-name ${1} | jq .
-}
-
-#.  iamgrplsu - AWS IAM -- Display list of users for a given group
-iamgrpls ()
-{
-if (( $# < 1 )); then
-  echo usage: Needs at least one argument { Group2Display};
-  return;
-fi;
-#
-   aws iam get-group --group-name ${1} | jq .
-}
-
-# list-users-for-group  -- aws iam get-group --group-name MyTestGroup2
-
-
-#.  iamuadd - AWS IAM -- Add an AWS IAM user
+#.  iamuadd  - AWS IAM -- Add an AWS IAM user
 iamuadd ()
 {
   if (( $# < 1 )); then
@@ -145,7 +120,7 @@ iamuadd ()
   aws iam create-user --user-name $1 | jq .
 }
 
-#.  iamudel - AWS IAM -- Delete an AWS IAM user, along with all affiliation
+#.  iamudel  - AWS IAM -- Delete an AWS IAM user, along with all affiliation
 iamudel ()
 {
 
@@ -213,9 +188,35 @@ thisUSER=$1
     aws iam delete-user --user-name $thisUSER
 }
 
+#.
+#.  iamgrpls - AWS IAM -- Display list of groups for a given user
+iamgrplsu ()
+{
+if (( $# < 1 )); then
+  echo usage: Needs at least one argument { Group2Create};
+  return;
+fi;
+#
+   aws iam list-groups-for-user --user-name ${1} | jq .
+}
+
+#.  iamgrplsu - AWS IAM -- Display list of users for a given group
+iamgrpls ()
+{
+if (( $# < 1 )); then
+  echo usage: Needs at least one argument { Group2Display};
+  return;
+fi;
+#
+   aws iam get-group --group-name ${1} | jq .
+}
+
+# list-users-for-group  -- aws iam get-group --group-name MyTestGroup2
+
+#.
 #. GROUPs
 
-#.  iamgrpls - AWS IAM -- Display list of account groups
+#.  iamgrpls  - AWS IAM -- Display list of account groups
 iamgrpls ()
 {
     aws iam list-groups | jq .
