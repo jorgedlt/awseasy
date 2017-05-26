@@ -131,9 +131,9 @@ fi;
 thisUSER=$1
 
 # access-key
-  thisKEY=$(aws iam list-access-keys --user-name $thisUSER |
-       grep AccessKeyId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
-  [ $thisKEY ] && {
+  thisKEY=$(aws iam list-access-keys --user-name $thisUSER \
+       | grep AccessKeyId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
+  [ "$thisKEY" ] && {
   for k in $thisKEY; do
      aws iam delete-access-key --access-key-id $k --user-name $thisUSER
   done
@@ -142,22 +142,22 @@ thisUSER=$1
 # signing-certificates
   thisCERT=$(aws iam list-signing-certificates --user-name $thisUSER |
        grep CertificateId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
-  [ $thisCERT ] && {
+  [ "$thisCERT" ] && {
   for c in $thisCERT; do
      aws iam delete-signing-certificate --certificate-id $c --user-name $thisUSER
   done
   }
 
 # login-profile - delete
-  #thisPROF=$( aws iam get-login-profile --user-name $thisUSER 2> /dev/null )
-  #[ $thisPROF ] && {
+  thisPROF=$( aws iam get-login-profile --user-name $thisUSER 2> /dev/null )
+  [ "$thisPROF" ] && {
     aws iam delete-login-profile --user-name $thisUSER
-  #} # seems to be having a problem, but cut and paste works ?!
+  } # seems to be having a problem, but cut and paste works ?!
 
 # mfa-devices
   thisMFA=$( aws iam list-mfa-devices --user-name $thisUSER |
      grep SerialNumber | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
-  [ $thisMFA ] && {
+  [ "$thisMFA" ] && {
   for m in $thisMFA; do
     aws iam deactivate-mfa-device --serial-number $m --user-name $thisUSER
   done
@@ -166,7 +166,7 @@ thisUSER=$1
 # attached-user-policies
   thisPOL=$( aws iam list-attached-user-policies --user-name $thisUSER |
       grep PolicyName | cut -d':' -f2- | tr -d ' |"' 2> /dev/null )
-  [ $thisPOL ] && {
+  [ "$thisPOL" ] && {
   for p in $thisPOL; do
     aws iam detach-user-policy --policy-name $p --user-name $thisUSER
   done
@@ -175,7 +175,7 @@ thisUSER=$1
 # delete use from groups
   thisGRP=$(aws iam list-groups-for-user --user-name $thisUSER |
       grep GroupName | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
-  [ $thisGRP ] && {
+  [ "$thisGRP" ] && {
   for g in $thisGRP; do
     aws iam remove-user-from-group --group-name $g --user-name $thisUSER
   done
