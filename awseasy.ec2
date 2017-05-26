@@ -9,14 +9,8 @@ ec2ls () {
   aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' | grep '^i-' | column -t | ccze -A
 }
 
-#.  awsls - AWS EC2 -- Same as above, kept for legacy reasons
-awsls () {
-  aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' | grep '^i-' | column -t | ccze -A
-}
-
 #  ec2tag - AWS EC2 -- EC2 retag - might work well with any resource (awstag)
 ec2tag () {
-
   aws ec2 create-tags --resources "${1}" --tags Key=Name,Value="${2}"
 }
 
@@ -225,3 +219,5 @@ ec2kill() {
 ec2type() {
   cat ~/.awseasy/ec2.type.csv | sed -e 's/,,/, ,/g' | column -s, -t | less -#5 -N -S | ccze -A
 }
+
+# fin
