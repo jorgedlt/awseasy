@@ -13,7 +13,19 @@ awseasy-version() {
 #.  awshelp - AWS CLI -- help screen
 awshelp() {
   sameAs "cat ~/.awseasy/awseasy | grep '^#\.'"
-  cat ~/.awseasy/awseasy* | grep -v old | grep '^#\.'
+
+[  $# == 0 ] && {
+    cat ~/.awseasy/awseasy* | grep -v old | grep '^#\.'
+    echo
+    sameAs "help available on ec2 iam ver net rds asg lda vpc"
+    return;
+  }
+
+[  $# == 1 ] && {
+    topic=$(echo $1 | tr 'A-Z' 'a-z')
+    cat ~/.awseasy/awseasy.${topic} | grep -v old | grep '^#\.'
+    return;
+}
 }
 
 #.  awsupdate - AWS CLI -- update awscli and required packages

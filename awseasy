@@ -10,6 +10,11 @@ sameAs () {
 }
 
 #  sameAs - Colorized out
+alsoTry () {
+  echo "${GRAY} Also try: ${GREEN} $1 ${RESET}"
+}
+
+#  sameAs - Colorized out
 divText () {
   echo "${GRAY} ==== ${BLUE} $1 ${GRAY} ==== ${RESET}"
 }
