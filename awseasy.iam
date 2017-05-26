@@ -149,10 +149,10 @@ thisUSER=$1
   }
 
 # login-profile - delete
-  thisPROF=$( aws iam get-login-profile --user-name $thisUSER 2> /dev/null )
-  [ $thisPROF ] && {
+  #thisPROF=$( aws iam get-login-profile --user-name $thisUSER 2> /dev/null )
+  #[ $thisPROF ] && {
     aws iam delete-login-profile --user-name $thisUSER
-  } # seems to be having a problem, but cut and paste works ?!
+  #} # seems to be having a problem, but cut and paste works ?!
 
 # mfa-devices
   thisMFA=$( aws iam list-mfa-devices --user-name $thisUSER |
