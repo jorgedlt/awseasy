@@ -143,7 +143,7 @@ echo Cloud Front $CFid BETA
 trailsls ()
 {
   aws cloudtrail lookup-events --query Events[].EventName | tr -d '"| |,|[|]' | grep -v '^$' | sort | uniq -c | ccze -A
- }
+}
 #
 
 #.  trailslong - AWS Cloud Trails -- ls -long -full list
