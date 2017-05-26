@@ -61,7 +61,6 @@ cfls ()
  }
 #
 
-
 #.  cfstat - AWS Cloud Front -- Status Cloud Front distributions
 cfstat ()
 {
@@ -115,7 +114,6 @@ echo Cloud Front $CFid BETA
 
          echo ' ';
  }
-#
 
 #.  cfdump - AWS Cloud Front -- Dump Cloud Front distributions JSON
 cfdump ()
@@ -131,7 +129,6 @@ echo Cloud Front $CFid BETA
          aws cloudfront get-distribution --id "${CFid}" | jq .
          echo ' ';
  }
-#
 
 # the trails functions - needs to be in its own file
 
@@ -143,23 +140,18 @@ echo Cloud Front $CFid BETA
 trailsls ()
 {
   aws cloudtrail lookup-events --query Events[].EventName | tr -d '"| |,|[|]' | grep -v '^$' | sort | uniq -c | ccze -A
- }
-#
+}
 
 #.  trailslong - AWS Cloud Trails -- ls -long -full list
 trailslong ()
 {
-
   aws cloudtrail lookup-events --query 'Events[*].[EventId, EventName, Username]' | jq . | tr '\012' ' ' | tr '[' '\012' | tr -s ' ' | tr -d '' | tr -d '"|,|]' | sort -k2,3 | awk '{ print $2 " " $3 " " $1 }' | column -t
-
 }
-#
 
 #.  trailswhat - AWS Cloud Trails -- ls -full dump based EventName & Username
 trailswhat ()
 {
   eWHAT=$1
-
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=${eWHAT} | jq .
 }
 #
@@ -169,17 +161,14 @@ trailswho ()
 {
   eWHAT=$1
   eWHO=$2
-
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=${eWHAT} --lookup-attributes AttributeKey=Username,AttributeValue${eWHO}  | jq .
 }
-#
 
 #.  trailsroot - AWS Cloud Trails -- ls -full dump based EventName by ROOT
 trailslong ()
 {
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | jq .
 }
-#
 
 #.  trailsscan - AWS Cloud Trails -- Account Wide Scan
 trailsscan ()
@@ -199,7 +188,6 @@ trailsscan ()
          };
      done
  }
-#
 
 source ~/.awseasy/awseasy.ec2
 source ~/.awseasy/awseasy.iam

@@ -41,6 +41,15 @@ eu-west-2
       not 4.3 0
 '''
 
+### More IAM features
+
+downplay iamls ... more simple 'iamls | egrep 'UserName|UserId''
+
+         add a iamstat <UserID>
+         
+         iamadd & iamdel -- https://docs.google.com/document/d/1CAhmsqNaYvDNDTbryo0zEBkr6utAVGJdOdOdbqDwF14
+
+
 ## How to delete a VPC with --all-dependencies
 
 ### aws ec2 describe-subnets --filters Name=vpc-id,Values=<VPC-ID>
