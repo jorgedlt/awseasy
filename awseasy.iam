@@ -1,21 +1,17 @@
-
 # awseasy.iam
 
 #.
 #. AWS IAM Commands
 #.
 
-##### iam user proto funcs
-
-# iamls -- List AWS IAM users
+#.  iamls - AWS IAM -- List AWS IAM users
 iamls ()
 {
   aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq
 }
 #
 
-
-# iamstat -- Display details on given user
+#.  iamstat - AWS IAM -- Display details on a given Username
 iamstat ()
 {
   aws iam get-user --user-name $1 2> /dev/null  # check user is valid
@@ -26,6 +22,7 @@ iamstat ()
   }
 }
 
+#.  iamstat - AWS IAM -- Account wide scan of users, groups and affiliation
 iamreport()
 {
   myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
@@ -60,11 +57,7 @@ done
 
 # iamreport | enscript -o - | pstopdf -i -o ~/Desktop/iamreport.pdf ## create as PDF
 
-# last last log on # last event 7 days
-aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c
-
-aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c
-
+#.  iamuser - AWS IAM -- Account wide scan of groups and affiliations of a given user
 iamuser()
 {
   myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
@@ -90,36 +83,28 @@ iamuser()
     echo "GROUPS:"
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
     echo
-}
+} # with or without ccze -A
 
-# with or without ccze -A
-
-
-
-#
+#.  iamlsdo - AWS IAM -- Display last events of a given user within a AWS region
 iamlsdo ()
 {
     aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${1} \
     | grep EventName | sort | uniq -c
 }
-#
 
-
+#.  iamsummary - AWS IAM -- Display account summary
 iamsummary ()
 {
     aws iam get-account-summary | jq .
 }
 
-#
+#.  iamsummary - AWS IAM -- Display password policy
 iampolicy ()
 {
     aws iam get-account-password-policy | jq .
 }
 
-###
-
-
-#
+#.  iamuadd - AWS IAM -- Add an AWS IAM user
 iamuadd ()
 {
   if (( $# < 1 )); then
@@ -129,14 +114,12 @@ iamuadd ()
 
   aws iam create-user --user-name $1
 }
-#
- # reset passwd # remove mfa
 
-# iamuakey [active/inactive]
-# iamuapass [reset]
-# iamuamfa [deactivate]
+#. iamuakey  [active/inactive] -- coming soon
+#. iamuapass [reset]           -- coming soon
+#. iamuamfa  [deactivate]      -- coming soon
 
-#
+#.  iamudel - AWS IAM -- Delete an AWS IAM user, along with all affiliation
 iamudel ()
 {
 
@@ -147,44 +130,59 @@ fi;
 
 thisUSER=$1
 
-# access-key list & select then delete - active/deactive is a diff issue
-  #
-  #  thisKEY=$(aws iam list-access-keys --user-name $thisUSER)
-  #  aws iam delete-access-key --access-key-id $thisKEY --user-name $thisUSER
-  #
+# access-key
+  thisKEY=$(aws iam list-access-keys --user-name $thisUSER |
+       grep AccessKeyId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
+  [ $thisKEY ] && {
+  for k in $thisKEY; do
+     aws iam delete-access-key --access-key-id $k --user-name $thisUSER
+  done
+  }
 
-# signing-certificates list & select then delete
-  #
-  #  thisCERT=$(aws iam list-signing-certificates --user-name $thisUSER)
-  #  aws iam delete-signing-certificate --certificate-id $thisCERT --user-name $thisUSER
-  #
-
-# login-profile - delete
-  #
-  #  thisPROF=$(aws iam get-login-profile --user-name $thisUSER)
-  #  aws iam delete-login-profile --certificate-id $thisPROF --user-name $thisUSER
-  #
-
-# mfa-devices list & select then delete
-  #
-  #  thisMFA=$(aws iam list-mfa-devices --user-name $thisUSER)
-  #  aws iam deactivate-mfa-device --certificate-id $thisMFA --user-name $thisUSER
-  #
-
-# user-policies list & select then detach (loop through)
+# signing-certificates
+  thisCERT=$(aws iam list-signing-certificates--user-name $thisUSER |
+       grep CertificateId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
+  [ $thisCERT ] && {
+  for c in $thisCERT; do
+     aws iam delete-signing-certificate --certificate-id $c --user-name $thisUSER
+  done
+  }
 
 # login-profile - delete
-  #
-  #  thisPROF=$(aws iam get-login-profile --user-name $thisUSER)
-  #  aws iam delete-login-profile --certificate-id $thisPROF ---serial-number arn:aws:iam::176599830383:mfa/i_p_coleman
+  thisPROF=$(aws iam get-login-profile --user-name $thisUSER 2> /dev/null)
+  [ $thisPROF ] && {
+    aws iam delete-login-profile -user-name $thisUSER
+  }
 
-# from-group list & select then remove (loop through) groups
-  #
-  # aws iam list-groups-for-user --user-name $thisUSER
-  #
-  # aws iam remove-user-from-group
+# mfa-devices
+  thisMFA=$(aws iam list-mfa-devices --user-name $thisUSER |
+     grep SerialNumber | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
+  [ $thisMFA ] && {
+  for m in $thisMFA; do
+    aws iam deactivate-mfa-device --serial-number $m --user-name $thisUSER
+  done
+  }
 
-# finally
+# attached-user-policies
+  thisPOL=$(aws iam list-attached-user-policies --user-name $thisUSER |
+      grep PolicyName | cut -d':' -f2- | tr -d ' |"' 2> /dev/null )
+  [ $thisPOL ] && {
+  for p in $thisPOL; do
+    aws iam detach-user-policy --user-name $thisUSER --policy-name $p
+  done
+  }
+
+# delete use from groups
+  thisGRP=$(aws iam list-groups-for-user --user-name $thisUSER |
+      grep GroupName | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
+  [ $thisGRP ] && {
+  for g in $thisGRP; do
+    aws iam remove-user-from-group $g --user-name $thisUSER
+  done
+  }
+
+# then finally delete-user
     aws iam delete-user --user-name $thisUSER
 }
-#
+
+# fin
