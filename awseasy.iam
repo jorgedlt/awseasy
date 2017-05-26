@@ -151,7 +151,7 @@ thisUSER=$1
 # login-profile - delete
   thisPROF=$(aws iam get-login-profile --user-name $thisUSER 2> /dev/null)
   [ $thisPROF ] && {
-    aws iam delete-login-profile -user-name $thisUSER
+    aws iam delete-login-profile --user-name $thisUSER
   }
 
 # mfa-devices
@@ -168,7 +168,7 @@ thisUSER=$1
       grep PolicyName | cut -d':' -f2- | tr -d ' |"' 2> /dev/null )
   [ $thisPOL ] && {
   for p in $thisPOL; do
-    aws iam detach-user-policy --policy-name $p --user-name $thisUSER 
+    aws iam detach-user-policy --policy-name $p --user-name $thisUSER
   done
   }
 
