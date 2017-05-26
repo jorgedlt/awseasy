@@ -21,7 +21,7 @@ iamstat ()
         aws iam list-groups-for-user --user-name $1 | grep 'GroupName'
   }
 }
-
+#.
 #.  iamreport - AWS IAM -- Account wide scan of users, groups and affiliation
 iamreport()
 {
@@ -54,7 +54,7 @@ iamreport()
     echo
 done
 }
-
+#.
 # iamreport | enscript -o - | pstopdf -i -o ~/Desktop/iamreport.pdf ## create as PDF
 
 #.  iamuser - AWS IAM -- Account wide scan of groups and affiliations of a given user
@@ -91,6 +91,7 @@ iamlsdo ()
     aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${1} \| grep EventName | sort | uniq -c
 }
 
+#.
 #.  iamsummary - AWS IAM -- Display account summary
 iamsummary ()
 {
@@ -102,10 +103,11 @@ iampolicy ()
 {
     aws iam get-account-password-policy | jq .
 }
+#.
 
 ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . #
 
-# USERs
+#. USERs
 
 #.  iamgrpls - AWS IAM -- Display list of groups for a given user
 iamgrplsu ()
@@ -131,7 +133,87 @@ fi;
 
 # list-users-for-group  -- aws iam get-group --group-name MyTestGroup2
 
-# GROUPs
+
+#.  iamuadd - AWS IAM -- Add an AWS IAM user
+iamuadd ()
+{
+  if (( $# < 1 )); then
+    echo usage: Needs at least one argument {instance ID#};
+    return;
+  fi;
+
+  aws iam create-user --user-name $1 | jq .
+}
+
+#.  iamudel - AWS IAM -- Delete an AWS IAM user, along with all affiliation
+iamudel ()
+{
+
+if (( $# < 1 )); then
+  echo usage: Needs at least one argument {instance ID#};
+  return;
+fi;
+
+thisUSER=$1
+
+# access-key
+  echo checking for access-keys ...
+  thisKEY=$(aws iam list-access-keys --user-name $thisUSER | grep AccessKeyId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
+  [ "$thisKEY" ] && {
+  for k in $thisKEY; do
+     aws iam delete-access-key --access-key-id $k --user-name $thisUSER
+  done
+  }
+
+# signing-certificates
+  echo checking for signing-certificates ...
+  thisCERT=$(aws iam list-signing-certificates --user-name $thisUSER | grep CertificateId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
+  [ "$thisCERT" ] && {
+  for c in $thisCERT; do
+     aws iam delete-signing-certificate --certificate-id $c --user-name $thisUSER
+  done
+  }
+
+# login-profile
+  echo checking for login-profile ...
+  thisPROF=$( aws iam get-login-profile --user-name $thisUSER 2> /dev/null )
+  [ "$thisPROF" ] && {
+    aws iam delete-login-profile --user-name $thisUSER
+  } # seems to be having a problem, but cut and paste works ?!
+
+# mfa-devices
+  echo checking for mfa-devices ...
+  thisMFA=$( aws iam list-mfa-devices --user-name $thisUSER | grep SerialNumber | cut -d':' -f2- | tr -d '"| |,' 2> /dev/null )
+  [ "$thisMFA" ] && {
+  for m in $thisMFA; do
+    aws iam deactivate-mfa-device --serial-number $m --user-name $thisUSER
+  done
+  }
+
+# attached-user-policies
+  echo checking for attached-user-policies ...
+  thisPOL=$( aws iam list-attached-user-policies --user-name $thisUSER | grep PolicyArn | cut -d':' -f2- | tr -d ' |"' 2> /dev/null )
+  [ "$thisPOL" ] && {
+  for p in $thisPOL; do
+    aws iam detach-user-policy --policy-arn $p --user-name $thisUSER
+  done
+  }
+
+# delete use from groups
+  echo checking for groups  ...
+  thisGRP=$(aws iam list-groups-for-user --user-name $thisUSER | grep GroupName | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
+  [ "$thisGRP" ] && {
+  for g in $thisGRP; do
+    aws iam remove-user-from-group --group-name $g --user-name $thisUSER
+  done
+  }
+
+# then finally delete-user
+  echo attempting to DELETE [ $thisUSER ] ...
+    aws iam delete-user --user-name $thisUSER
+}
+
+#. GROUPs
 
 #.  iamgrpls - AWS IAM -- Display list of account groups
 iamgrpls ()
@@ -247,7 +329,7 @@ iampolstat ()
 # AWS Tasks that Require Account Root User
 # http://docs.aws.amazon.com/general/latest/gr/aws_tasks-that-require-root.html
 
-# MFAs
+#. MFAs
 
 # mfa list for given user
 
@@ -257,7 +339,7 @@ iampolstat ()
 
 #  resync-mfa-device  -- aws iam resync-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 987654
 
-# ACCESS KEYs
+#. ACCESS KEYs
 # accesskey list for a given user
 # accesskey add for a given user
 # accesskey ACT/deACT for a given user
@@ -265,103 +347,22 @@ iampolstat ()
 
      #.  iamuakey  - AWS IAM -- [active/inactive] -- coming soon
 
-# PASSWORDs
+#. PASSWORDs
 
 #.  iamuapass - AWS IAM -- [reset]           -- coming soon
 
-# POLICYs
+#. POLICYs
 
-# SIGN-CERTs
+#. SIGN-CERTs
 
-# PROFILEs
+#. PROFILEs
 
 # MISC
 
 # aws iam generate-credential-report
-
 # Wait until a particular condition is satisfied.
-
 # aws iam user-exists --user-name MyTestUser1 # kinda works ??
 
 ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . #
-
-#.  iamuadd - AWS IAM -- Add an AWS IAM user
-iamuadd ()
-{
-  if (( $# < 1 )); then
-    echo usage: Needs at least one argument {instance ID#};
-    return;
-  fi;
-
-  aws iam create-user --user-name $1 | jq .
-}
-
-#.  iamudel - AWS IAM -- Delete an AWS IAM user, along with all affiliation
-iamudel ()
-{
-
-if (( $# < 1 )); then
-  echo usage: Needs at least one argument {instance ID#};
-  return;
-fi;
-
-thisUSER=$1
-
-# access-key
-  echo checking for access-keys ...
-  thisKEY=$(aws iam list-access-keys --user-name $thisUSER | grep AccessKeyId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
-  [ "$thisKEY" ] && {
-  for k in $thisKEY; do
-     aws iam delete-access-key --access-key-id $k --user-name $thisUSER
-  done
-  }
-
-# signing-certificates
-  echo checking for signing-certificates ...
-  thisCERT=$(aws iam list-signing-certificates --user-name $thisUSER | grep CertificateId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
-  [ "$thisCERT" ] && {
-  for c in $thisCERT; do
-     aws iam delete-signing-certificate --certificate-id $c --user-name $thisUSER
-  done
-  }
-
-# login-profile
-  echo checking for login-profile ...
-  thisPROF=$( aws iam get-login-profile --user-name $thisUSER 2> /dev/null )
-  [ "$thisPROF" ] && {
-    aws iam delete-login-profile --user-name $thisUSER
-  } # seems to be having a problem, but cut and paste works ?!
-
-# mfa-devices
-  echo checking for mfa-devices ...
-  thisMFA=$( aws iam list-mfa-devices --user-name $thisUSER | grep SerialNumber | cut -d':' -f2- | tr -d '"| |,' 2> /dev/null )
-  [ "$thisMFA" ] && {
-  for m in $thisMFA; do
-    aws iam deactivate-mfa-device --serial-number $m --user-name $thisUSER
-  done
-  }
-
-# attached-user-policies
-  echo checking for attached-user-policies ...
-  thisPOL=$( aws iam list-attached-user-policies --user-name $thisUSER | grep PolicyArn | cut -d':' -f2- | tr -d ' |"' 2> /dev/null )
-  [ "$thisPOL" ] && {
-  for p in $thisPOL; do
-    aws iam detach-user-policy --policy-arn $p --user-name $thisUSER
-  done
-  }
-
-# delete use from groups
-  echo checking for groups  ...
-  thisGRP=$(aws iam list-groups-for-user --user-name $thisUSER | grep GroupName | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
-  [ "$thisGRP" ] && {
-  for g in $thisGRP; do
-    aws iam remove-user-from-group --group-name $g --user-name $thisUSER
-  done
-  }
-
-# then finally delete-user
-  echo attempting to DELETE [ $thisUSER ] ...
-    aws iam delete-user --user-name $thisUSER
-}
 
 # fin
