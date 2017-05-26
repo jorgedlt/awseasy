@@ -149,13 +149,13 @@ thisUSER=$1
   }
 
 # login-profile - delete
-  thisPROF=$(aws iam get-login-profile --user-name $thisUSER 2> /dev/null)
+  thisPROF=$( aws iam get-login-profile --user-name $thisUSER 2> /dev/null )
   [ $thisPROF ] && {
     aws iam delete-login-profile --user-name $thisUSER
-  }
+  } # seems to be having a problem, but cut and paste works ?!
 
 # mfa-devices
-  thisMFA=$(aws iam list-mfa-devices --user-name $thisUSER |
+  thisMFA=$( aws iam list-mfa-devices --user-name $thisUSER |
      grep SerialNumber | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
   [ $thisMFA ] && {
   for m in $thisMFA; do
@@ -164,7 +164,7 @@ thisUSER=$1
   }
 
 # attached-user-policies
-  thisPOL=$(aws iam list-attached-user-policies --user-name $thisUSER |
+  thisPOL=$( aws iam list-attached-user-policies --user-name $thisUSER |
       grep PolicyName | cut -d':' -f2- | tr -d ' |"' 2> /dev/null )
   [ $thisPOL ] && {
   for p in $thisPOL; do
