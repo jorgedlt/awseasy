@@ -193,7 +193,6 @@ iamgrpaddp ()
 #                  -- aws iam delete-group-policy --group-name MyGroup --policy-name ExamplePolicy
 #                  -- aws iam detach-group-policy --group-name MyGroup --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 #                  -- aws iam attach-group-policy --group-name MyGroup --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl
-#
 
 #.   iamgrpdelp - AWS IAM -- group DELETE policy
 iamgrpdelp ()

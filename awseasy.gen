@@ -10,7 +10,7 @@ awseasy-version() {
   cat ~/.awseasy/awseasy.ver | ccze -A
 }
 
-#.  awshelp - AWS CLI -- help screen
+#.  awshelp - AWS CLI -- Help Screen
 awshelp() {
   sameAs "cat ~/.awseasy/awseasy | grep '^#\.'"
 
