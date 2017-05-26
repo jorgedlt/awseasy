@@ -168,7 +168,7 @@ thisUSER=$1
       grep PolicyName | cut -d':' -f2- | tr -d ' |"' 2> /dev/null )
   [ $thisPOL ] && {
   for p in $thisPOL; do
-    aws iam detach-user-policy --user-name $thisUSER --policy-name $p
+    aws iam detach-user-policy --policy-name $p --user-name $thisUSER 
   done
   }
 
@@ -177,7 +177,7 @@ thisUSER=$1
       grep GroupName | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
   [ $thisGRP ] && {
   for g in $thisGRP; do
-    aws iam remove-user-from-group $g --user-name $thisUSER
+    aws iam remove-user-from-group --group-name $g --user-name $thisUSER
   done
   }
 
