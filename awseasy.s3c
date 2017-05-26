@@ -42,7 +42,7 @@ fi
   echo
 }
 
-#.  s3push - AWS CLI -- AWS/S3 push local data to s3
+#.  s3push - AWS S3 -- AWS/S3 push local data to s3
 s3push() {
 
   echo 's3cp is not fully functional yet'
