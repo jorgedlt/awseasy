@@ -7,14 +7,14 @@
 #.  iamls - AWS IAM -- List AWS IAM users
 iamls ()
 {
-  aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq
+  aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq | ccze -A
 }
 #
 
 #.  iamstat - AWS IAM -- Display details on a given Username
 iamstat ()
 {
-  aws iam get-user --user-name $1 2> /dev/null  # check user is valid
+  aws iam get-user --user-name $1 | jq . 2> /dev/null  # check user is valid
   [ $? -ne 0 ] && { echo "$1 : Not a valid user" ; } || {
 
   echo 'groups'
@@ -52,7 +52,7 @@ iamreport()
     echo "GROUPS:"
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
     echo
-done
+done | ccze -A
 }
 #.
 # iamreport | enscript -o - | pstopdf -i -o ~/Desktop/iamreport.pdf ## create as PDF
