@@ -140,7 +140,7 @@ thisUSER=$1
   }
 
 # signing-certificates
-  thisCERT=$(aws iam list-signing-certificates--user-name $thisUSER |
+  thisCERT=$(aws iam list-signing-certificates --user-name $thisUSER |
        grep CertificateId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
   [ $thisCERT ] && {
   for c in $thisCERT; do
