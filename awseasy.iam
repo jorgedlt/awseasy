@@ -340,7 +340,7 @@ iamreport()
   myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
   myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
 
-  triplewide "Account $myACCNTID Alias $myACCOUNT Region $myREGION"; echo
+  triplewide Account $myACCNTID Alias $myACCOUNT Region $myREGION; echo
 
   divText root
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c
@@ -404,4 +404,3 @@ done
 #
 
 # fin
-                                                                                                                                                                                                                                                                                       
