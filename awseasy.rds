@@ -8,18 +8,17 @@
 rdsls () {
 
 RDSlist=$( aws rds describe-db-instances | grep 'DBInstanceIdentifier' | cut -d':' -f2 | grep -v '\[\]' | tr -d ' |"|:|,' );
-
-for rdsID in $RDSlist; do
-     RDSdesc=$(aws rds describe-db-instances --db-instance-identifier "${rdsID}")
-       _RDSengine=$( _ec2parse "$RDSdesc" Engine )
-       _RDSsize=$( _ec2parse "$RDSdesc" DBInstanceClass )
-       _RDSaz=$( _ec2parse "$RDSdesc" AvailabilityZone )
-       _RDSstatus=$( _ec2parse "$RDSdesc" DBInstanceStatus )
-     #
-     descDUMP RDS $rdsID Engine $_RDSengine;
-     descDUMP Status $_RDSstatus AZ $_RDSaz;
-     echo
-done
+    for rdsID in $RDSlist; do
+         RDSdesc=$(aws rds describe-db-instances --db-instance-identifier "${rdsID}")
+           _RDSengine=$( _ec2parse "$RDSdesc" Engine )
+           _RDSsize=$( _ec2parse "$RDSdesc" DBInstanceClass )
+           _RDSaz=$( _ec2parse "$RDSdesc" AvailabilityZone )
+           _RDSstatus=$( _ec2parse "$RDSdesc" DBInstanceStatus )
+         #
+         descDUMP RDS $rdsID Engine $_RDSengine;
+         descDUMP Status $_RDSstatus AZ $_RDSaz;
+         echo
+    done
 }
 
 #.  rdsstat - AWS RDS -- Show details of RDS
@@ -90,8 +89,9 @@ do
    }
 done
 }
+
 #
 
-#.  rdsmake - AWS RDS -- feature coming soon
-#.  rdskill - AWS RDS -- feature coming soon
+#.  rdsmake  - AWS RDS -- feature coming soon
+#.  rdskill  - AWS RDS -- feature coming soon
 #.  rdsclone - AWS RDS -- feature coming soon

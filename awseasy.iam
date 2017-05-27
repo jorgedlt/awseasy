@@ -320,7 +320,9 @@ usrmfadel ()
 
 #  resync-mfa-device  -- aws iam resync-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 987654
 
+#.
 #. ACCESS KEYs
+
 #.   usrakls - AWS IAM -- access key LIST for a given user
 usrakls ()
 {
@@ -328,9 +330,9 @@ usrakls ()
   for u in $AWSusers; do
     divText $u
     aws iam list-access-keys --user-name ${u} | jq .
-
-    sameAs 'aws iam list-access-keys --user-name USER-NAME'
   done
+  sameAs 'aws iam list-access-keys --user-name USER-NAME'
+
 }
 
 #.   usrakstat - AWS IAM -- access key DETAILS for a given user

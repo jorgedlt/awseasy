@@ -4,24 +4,22 @@
 #. Network
 #.
 
-#.  awsshowip - AWS CLI -- AWS VPC Show all private IPs active on subnet (QUICK)
+#.  awsshowip - AWS NET -- AWS VPC Show all private IPs active on subnet (QUICK)
 awsshowip() {
-
  aws ec2 describe-network-interfaces | grep PrivateIpAddress | cut -d':' -f2 |
      tr -d '"|[' | egrep '^ 10.|^ 17.|^ 19.' | sort | uniq |
      sort -t . -k 1,1n -k 2,2n -k 3,3n -k 4,4n | ccze -A
 }
 
-#.  awsshowenc - AWS CLI -- AWS Shows ENC (Ethernet Interface) based list
+#.  awsshowenc - AWS NET -- AWS Shows ENC (Ethernet Interface) based list
 awsshowenc() {
-
 eniLIST=$(aws ec2 describe-network-interfaces | grep NetworkInterfaceId |
   cut -d':' -f2 | tr -d '"|:|,| ' | sort | uniq )
 
       echo "${RED} Still in BETA, use with care ${RESET}"
 
 for eni in $eniLIST; do
-            
+
       eniDATA=$(aws ec2 describe-network-interfaces --network-interface-ids "$eni" --output text)
 
       eniDEVICE=$( echo "$eniDATA" | grep ATTACHMENT | awk '{print $6}' )
@@ -52,7 +50,7 @@ for eni in $eniLIST; do
             macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $4}' )
             eniDESC='RDS'
        }
-       
+
        [[ $macADDR == 'interface' ]] && {
             macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $6}' )
             eniDESC='EC2'
@@ -69,16 +67,16 @@ for eni in $eniLIST; do
             macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $3}' )
             eniDESC='EC2'
        }
-       
+
        [[ $macADDR == '176599830383' ]] && {
             macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $3}' )
             eniDESC='EC2'
        }
-       
+
        [[ $macADDR == '979912621417' ]] && {
             macADDR=$( echo "$eniDATA" | grep NETWORKINTERFACES | awk '{print $3}' )
             eniDESC='EC2'
-       }       
+       }
 
        [[ $PublicIP == '' ]] && PublicIP='00.00.00.00'
 
