@@ -9,14 +9,14 @@ sameAs () {
   echo "${GRAY} executing command: ${GREEN} $1 ${RESET}"
 }
 
-#  sameAs - Colorized out
+#  alsoTry - Colorized out
 alsoTry () {
   echo "${GRAY} Also try: ${GREEN} $1 ${RESET}"
 }
 
-#  sameAs - Colorized out
+#  divText - Colorized out
 divText () {
-  echo "${GRAY} ==== ${BLUE} $1 ${GRAY} ==== ${RESET}"
+  echo "${GRAY} ==== ${CYAN} $1 ${GRAY} ==== ${RESET}"
 }
 
 #  descDUMP - Colorized out
@@ -24,26 +24,29 @@ descDUMP () {
   echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}] $3: [ ${YELLOW}$4 ${GRAY}]"
 }
 
-#  descDUMP - Colorized out - 1x out and no square brackets
+#  singlewide - Colorized out - 1x out and no square brackets
 singlewide () {
   echo "    ${GRAY}$1: ${GREEN}$2 ${GRAY}"
 }
 
-#  descDUMP - Colorized out - similar to descDUMP but GREEN
+#  doublewide - Colorized out - similar to descDUMP but GREEN
 doublewide () {
   echo "    ${GRAY}$1: [ ${GREEN}$2 ${GRAY}] $3: [ ${GREEN}$4 ${GRAY}]"
 }
 
+###
+
 #  awstag - AWS -- Any AWS Element re-tag
 awstag () {
-
   aws ec2 create-tags --resources "${1}" --tags Key=Name,Value="${2}"
+  sameAs 'aws ec2 create-tags --resources <InstanceId> --tags Key=Name,Value=<NewLabel>'
 }
 
 #.  awsls - AWS ALL -- Scan and display aws regions, previously ec2ls
 awsls () {
-  #aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' | grep '^i-' | column -t | ccze -A
    aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq
+
+   sameAs 'aws ec2 create-tags --resources <InstanceId> --tags Key=Name,Value=<NewLabel>'
 
    echo == More info on AWS Regions
    echo == http://docs.aws.amazon.com/general/latest/gr/rande.html
@@ -72,6 +75,7 @@ cfls ()
 
          echo ' ';
      done
+     sameAs 'aws cloudfront get-distribution --id <CFid>'
  }
 #
 

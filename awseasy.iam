@@ -256,16 +256,41 @@ grpusrdel ()
 # aws iam delete-virtual-mfa-device --serial-number arn:aws:iam::123456789012:mfa/MFATest
 
 #. ACCESS KEYs
-# usrakls - accesskey LIST for a given user
-# aws iam list-access-keys --user-name i_p_coleman | jq .
-#
+# this really should be a parameterless cmd which displays all keys
+#.   usrakls - AWS IAM -- access key LIST for a given user
+usrakls ()
+{
+  AWSusers=$(aws iam list-users --output json | grep UserName | cut -d':' -f2 | tr -d ' |"|,' | sort | uniq)
+  for u in $AWSusers; do
+    divText $u
+    aws iam list-access-keys --user-name ${u} | jq .
+  done
+}
 
 # usrakstat - accesskey more details for a given user
+#.   usrakstat - AWS IAM -- access key DETAILS for a given user
+usrakstat ()
+{
+  if (( $# < 1 )); then
+    echo usage: Needs at least one argument { --user-name Bob }
+    return;
+  fi;
+    aws iam list-access-keys --user-name ${1} | jq .
+}
 
-# accesskey ADD for a given user
-# usrakadd - accesskey more details for a given user
-#     aws iam create-access-key --user-name c_stmd_phillips | jq .
+#.   usrakadd - AWS IAM -- access key ADD for a given user
+usrakadd ()
+{
+  if (( $# < 1 )); then
+    echo usage: Needs at least one argument { --user-name Bob }
+    return;
+  fi;
+    aws iam create-access-key --user-name ${1} | jq .
 
+    SameAs aws iam create-access-key --user-name stanley_user | jq .
+}
+
+zxddx
 # (be sure and grab new secret key)
 
 # usrakset act/dea - accesskey activate / deactivate for a given user  [  Active / Inactive ]
@@ -318,15 +343,14 @@ iamreport()
 
   echo "Account: [ $myACCNTID ] Alias: [ $myACCOUNT ] Region: [ $myREGION ]"; echo
 
-  echo == [ root ] ============================
+  divText root
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c
   echo
 
   AWSusers=$(aws iam list-users --output json | grep UserName | cut -d':' -f2 | tr -d ' |"|,' | sort | uniq)
   for u in $AWSusers; do
-    echo == [ $u ] ============================
+    divText $u
 
-    #echo "PASSWORDLASTUSED:"
       aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
     echo
     echo "RECENT-ACTIONS-LAST-7-DAYS:"
