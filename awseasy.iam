@@ -21,55 +21,6 @@ usrstat ()
   }
 }
 
-#.
-#.  iamsummary - AWS IAM -- Display account summary
-iamsummary ()
-{
-    aws iam get-account-summary | jq .
-}
-
-#.  iampolicy - AWS IAM -- Display password policy
-iampolicy ()
-{
-    aws iam get-account-password-policy | jq .
-}
-#.
-
-#.  iamreport - AWS IAM -- Account wide scan of users, groups and affiliation
-iamreport()
-{
-  myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
-  myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
-  myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
-
-  echo "Account: [ $myACCNTID ] Alias: [ $myACCOUNT ] Region: [ $myREGION ]"; echo
-
-  echo == [ root ] ============================
-  aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c
-  echo
-
-  AWSusers=$(aws iam list-users --output json | grep UserName | cut -d':' -f2 | tr -d ' |"|,' | sort | uniq)
-  for u in $AWSusers; do
-    echo == [ $u ] ============================
-
-    #echo "PASSWORDLASTUSED:"
-      aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
-    echo
-    echo "RECENT-ACTIONS-LAST-7-DAYS:"
-      aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | tr -s ' '
-    echo
-    echo "ACCESS-KEYS:"
-      aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
-    echo "MFA-DEVICES:"
-      aws iam list-mfa-devices --user-name $u | egrep "SerialNumber|EnableDate"
-    echo "GROUPS:"
-      aws iam list-groups-for-user --user-name $u | grep "GroupName"
-    echo
-done | ccze -A
-}
-#.
-# iamreport | enscript -o - | pstopdf -i -o ~/Desktop/iamreport.pdf ## create as PDF
-
 #.  usrsum - AWS IAM -- Account wide scan of groups and affiliations of a given user
 usrsum()
 {
@@ -83,7 +34,6 @@ usrsum()
 
     echo == [ $u ] ============================
 
-    #echo "PASSWORDLASTUSED:"
       aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
     echo
     echo "RECENT-ACTIONS-LAST-7-DAYS:"
@@ -96,7 +46,7 @@ usrsum()
     echo "GROUPS:"
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
     echo
-} # with or without ccze -A
+}
 
 #.  iamlsdo - AWS IAM -- Display last events of a given user within a AWS region
 iamlsdo ()
@@ -105,7 +55,6 @@ iamlsdo ()
 }
 
 #. USERs
-
 #.  usradd  - AWS IAM -- Add an AWS IAM user
 usradd ()
 {
@@ -210,7 +159,6 @@ fi;
 
 #.
 #. GROUPs
-
 #.   grpls  - AWS IAM -- Display list of account groups
 grpls ()
 {
@@ -275,9 +223,6 @@ fi;
  aws iam delete-group-policy --group-name ${1} --policy-arn ${2}
 }
 
-# -- aws iam attach-group-policy --group-name Testers --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
-# -- aws iam detach-group-policy --group-name Testers --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
-
 #.   grppolstat - AWS IAM -- get details on policy
 grppolstat ()
 {
@@ -288,30 +233,6 @@ grppolstat ()
 #
     aws iam get-policy --policy-arn ${1} | jq .
 }
-
-# detail of policy -- aws iam get-policy --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl | jq .
-# Lists all the managed policies that are available
-# policy list [READONLY, ]    -- aws iam list-policies --max-items 2
-#
-#               -- aws iam list-policies | grep PolicyName | grep FullAccess
-#
-#              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
-#
-#              aws iam list-attached-group-policies --group-name UI_UX_S3_Only
-#
-#                          "PolicyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
-#
-#              aws iam list-attached-group-policies --group-name dev_group
-#
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
-#
-# group list users -- aws iam get-group --group-name MyTestGroup | jq .
-#
 
 #.   grpusradd - AWS IAM -- ADD user to group
 grpusradd ()
@@ -342,19 +263,24 @@ grpusrdel ()
 # mfa list for given user
 #.  iamuamfa  - AWS IAM -- [deactivate]      -- coming soon
 
-# not sure how it works - aws iam enable-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 789012
+# not sure how it works
+#                     -- aws iam enable-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 789012
 #  resync-mfa-device  -- aws iam resync-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 987654
 
 #. ACCESS KEYs
 # accesskey list for a given user
+
 # accesskey add for a given user
+
 # accesskey ACT/deACT for a given user
+
 # accesskey del for a given user
 
 #.  iamuakey  - AWS IAM -- [active/inactive] -- coming soon
 
 #. PASSWORDs
 #  iamuapass - AWS IAM -- [reset]           -- coming soon
+
 #. POLICYs
 #. SIGN-CERTs
 #. PROFILEs
@@ -363,5 +289,76 @@ grpusrdel ()
 # aws iam generate-credential-report
 # Wait until a particular condition is satisfied.
 # aws iam user-exists --user-name MyTestUser1 # kinda works ??
+
+#.
+#.  iamsummary - AWS IAM -- Display account summary
+iamsummary ()
+{
+    aws iam get-account-summary | jq .
+}
+
+#.  iampolicy - AWS IAM -- Display password policy
+iampolicy ()
+{
+    aws iam get-account-password-policy | jq .
+}
+#.
+
+#.  iamreport - AWS IAM -- Account wide scan of users, groups and affiliation
+iamreport()
+{
+  myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
+  myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
+  myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
+
+  echo "Account: [ $myACCNTID ] Alias: [ $myACCOUNT ] Region: [ $myREGION ]"; echo
+
+  echo == [ root ] ============================
+  aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c
+  echo
+
+  AWSusers=$(aws iam list-users --output json | grep UserName | cut -d':' -f2 | tr -d ' |"|,' | sort | uniq)
+  for u in $AWSusers; do
+    echo == [ $u ] ============================
+
+    #echo "PASSWORDLASTUSED:"
+      aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
+    echo
+    echo "RECENT-ACTIONS-LAST-7-DAYS:"
+      aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | tr -s ' '
+    echo
+    echo "ACCESS-KEYS:"
+      aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
+    echo "MFA-DEVICES:"
+      aws iam list-mfa-devices --user-name $u | egrep "SerialNumber|EnableDate"
+    echo "GROUPS:"
+      aws iam list-groups-for-user --user-name $u | grep "GroupName"
+    echo
+done | ccze -A
+}
+#.
+# iamreport | enscript -o - | pstopdf -i -o ~/Desktop/iamreport.pdf ## create as PDF
+
+# detail of policy -- aws iam get-policy --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl | jq .
+# Lists all the managed policies that are available
+# policy list [READONLY, ]    -- aws iam list-policies --max-items 2
+#
+#               -- aws iam list-policies | grep PolicyName | grep FullAccess
+#
+#              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
+#
+#              aws iam list-attached-group-policies --group-name UI_UX_S3_Only
+#                          "PolicyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
+#
+#              aws iam list-attached-group-policies --group-name dev_group
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
+#
+# group list users -- aws iam get-group --group-name MyTestGroup | jq .
+#
 
 # fin
