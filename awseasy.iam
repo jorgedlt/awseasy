@@ -313,9 +313,6 @@ grppolstat ()
 # group list users -- aws iam get-group --group-name MyTestGroup | jq .
 #
 
-# group add user -- aws iam add-user-to-group --user-name MyTestUser1 --group-name MyTestGroup2
-# grpusradd
-
 #.   grpusradd - AWS IAM -- ADD user to group
 grpusradd ()
 {
@@ -324,7 +321,7 @@ grpusradd ()
     return;
     fi;
 #
-aws iam add-user-from-group --user-name ${1} --group-name ${2} | jq .
+aws iam add-user-to-group --user-name ${1} --group-name ${2} | jq .
 }
 
 #.   grpusrdel - AWS IAM -- DEL user to group
