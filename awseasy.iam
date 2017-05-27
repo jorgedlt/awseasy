@@ -4,15 +4,15 @@
 #. AWS IAM Commands
 #.
 
-#.  iamls - AWS IAM -- List AWS IAM users
-iamls ()
+#.  usrls - AWS IAM -- List AWS IAM users
+usrls ()
 {
   aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq | ccze -A
 }
 #
 
-#.  iamstat - AWS IAM -- Display details on a given Username
-iamstat ()
+#.  usrstat - AWS IAM -- Display details on a given Username
+usrstat ()
 {
   aws iam get-user --user-name $1 | jq . 2> /dev/null  # check user is valid
   [ $? -ne 0 ] && { echo "$1 : Not a valid user" ; } || {
@@ -21,7 +21,21 @@ iamstat ()
         aws iam list-groups-for-user --user-name $1 | grep 'GroupName'
   }
 }
+
 #.
+#.  iamsummary - AWS IAM -- Display account summary
+iamsummary ()
+{
+    aws iam get-account-summary | jq .
+}
+
+#.  iampolicy - AWS IAM -- Display password policy
+iampolicy ()
+{
+    aws iam get-account-password-policy | jq .
+}
+#.
+
 #.  iamreport - AWS IAM -- Account wide scan of users, groups and affiliation
 iamreport()
 {
@@ -57,8 +71,8 @@ done | ccze -A
 #.
 # iamreport | enscript -o - | pstopdf -i -o ~/Desktop/iamreport.pdf ## create as PDF
 
-#.  iamuser - AWS IAM -- Account wide scan of groups and affiliations of a given user
-iamuser()
+#.  usrsum - AWS IAM -- Account wide scan of groups and affiliations of a given user
+usrsum()
 {
   myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
   myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
@@ -91,26 +105,12 @@ iamlsdo ()
     aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${1} \| grep EventName | sort | uniq -c
 }
 
-#.
-#.  iamsummary - AWS IAM -- Display account summary
-iamsummary ()
-{
-    aws iam get-account-summary | jq .
-}
-
-#.  iampolicy - AWS IAM -- Display password policy
-iampolicy ()
-{
-    aws iam get-account-password-policy | jq .
-}
-#.
-
 ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . #
 
 #. USERs
 
-#.  iamuadd  - AWS IAM -- Add an AWS IAM user
-iamuadd ()
+#.  usradd  - AWS IAM -- Add an AWS IAM user
+usradd ()
 {
   if (( $# < 1 )); then
     echo usage: Needs at least one argument {instance ID#};
@@ -120,8 +120,8 @@ iamuadd ()
   aws iam create-user --user-name $1 | jq .
 }
 
-#.  iamudel  - AWS IAM -- Delete an AWS IAM user, along with all affiliation
-iamudel ()
+#.  usrdel  - AWS IAM -- Delete an AWS IAM user, along with all affiliation
+usrdel ()
 {
 
 if (( $# < 1 )); then
@@ -189,8 +189,8 @@ thisUSER=$1
 }
 
 #.
-#.  iamgrpls - AWS IAM -- Display list of groups for a given user
-iamgrplsu ()
+#.  urslsgrp - AWS IAM -- Display list of groups for a given user
+urslsgrp ()
 {
 if (( $# < 1 )); then
   echo usage: Needs at least one argument { Group2Create};
@@ -200,8 +200,8 @@ fi;
    aws iam list-groups-for-user --user-name ${1} | jq .
 }
 
-#.  iamgrplsu - AWS IAM -- Display list of users for a given group
-iamgrpls ()
+#.  grplsusr - AWS IAM -- Display list of users for a given group
+grplsusr ()
 {
 if (( $# < 1 )); then
   echo usage: Needs at least one argument { Group2Display};
@@ -211,19 +211,18 @@ fi;
    aws iam get-group --group-name ${1} | jq .
 }
 
-# list-users-for-group  -- aws iam get-group --group-name MyTestGroup2
 
 #.
 #. GROUPs
 
-#.  iamgrpls  - AWS IAM -- Display list of account groups
-iamgrpls ()
+#.  grpls  - AWS IAM -- Display list of account groups
+grpls ()
 {
     aws iam list-groups | jq .
 }
 
-#.  iamgrpadd - AWS IAM -- Create an AWS/IAM group
-iamgrpadd ()
+#.  grpadd - AWS IAM -- Create an AWS/IAM group
+grpadd ()
 {
   if (( $# < 1 )); then
     echo usage: Needs at least one argument { Group2Create};
@@ -233,8 +232,8 @@ iamgrpadd ()
   aws iam create-group --group-name ${1} | jq .
 }
 
-#.  iamgrpdel - AWS IAM -- Delete an AWS/IAM group
-iamgrpdel ()
+#.  grpdel - AWS IAM -- Delete an AWS/IAM group
+grpdel ()
 {
   if (( $# < 1 )); then
     echo usage: Needs at least one argument { Group2Delete };
@@ -247,8 +246,8 @@ iamgrpdel ()
 # group list policy (for a given group) -- aws iam list-group-policies --group-name MyTestGroup2 | jq .
 
 
-#.  iamgrplsp - AWS IAM -- group LIST policy (for a given group)
-iamgrplsp ()
+#.  grppolls - AWS IAM -- group LIST policy (for a given group)
+grppolls ()
 {
   if (( $# < 1 )); then
     echo usage: Needs at least one argument { Group };
@@ -260,8 +259,8 @@ iamgrplsp ()
 
 # group add policy -- aws iam attach-group-policy --group-name Finance --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
 
-#.  iamgrpaddp - AWS IAM -- group ADD policy
-iamgrpaddp ()
+#.  grppoladd - AWS IAM -- group ADD policy
+grppoladd ()
 {
   if (( $# < 2 )); then
     echo usage: Needs at least two argument { Group Policy-Arn };
@@ -274,8 +273,8 @@ iamgrpaddp ()
 #. group del policy -- aws iam delete-group-policy --group-name MyGroup --policy-name ExamplePolicy
 #.                  -- aws iam detach-group-policy --group-name MyGroup --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 
-#.   iamgrpdelp - AWS IAM -- group DELETE policy
-iamgrpdelp ()
+#.   grppoldel - AWS IAM -- group DELETE policy
+grppoldel ()
 {
 if (( $# < 2 )); then
  echo usage: Needs at least two argument { Group Policy-Arn };
@@ -289,7 +288,7 @@ fi;
 # -- aws iam detach-group-policy --group-name Testers --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 
 #.   iampolstat - AWS IAM -- get details on policy
-iampolstat ()
+grppolstat ()
 {
   if (( $# < 1 )); then
     echo usage: Needs at least one argument { Policy-Arn };
@@ -299,33 +298,33 @@ iampolstat ()
     aws iam get-policy --policy-arn ${1} | jq .
 }
 
-#. detail of policy -- aws iam get-policy --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl | jq .
-#. Lists all the managed policies that are available
-#. policy list [READONLY, ]    -- aws iam list-policies --max-items 2
+# detail of policy -- aws iam get-policy --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl | jq .
+# Lists all the managed policies that are available
+# policy list [READONLY, ]    -- aws iam list-policies --max-items 2
 #
-#.               -- aws iam list-policies | grep PolicyName | grep FullAccess
-#.
-#.              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
-#.
-#.              aws iam list-attached-group-policies --group-name UI_UX_S3_Only
-#.
-#.                          "PolicyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-#.                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
-#.
-#.              aws iam list-attached-group-policies --group-name dev_group
-#.
-#.                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
-#.                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
-#.                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
-#.                          "PolicyArn": "arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl"
-#.                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
-#.
-#. group list users -- aws iam get-group --group-name MyTestGroup | jq .
-#.
-#. group add user -- aws iam add-user-to-group --user-name MyTestUser1 --group-name MyTestGroup2
-#.
-#. group rem user -- aws iam remove-user-from-group --user-name Bob --group-name Admins
-#.
+#               -- aws iam list-policies | grep PolicyName | grep FullAccess
+#
+#              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
+#
+#              aws iam list-attached-group-policies --group-name UI_UX_S3_Only
+#
+#                          "PolicyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
+#
+#              aws iam list-attached-group-policies --group-name dev_group
+#
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
+#
+# group list users -- aws iam get-group --group-name MyTestGroup | jq .
+#
+# group add user -- aws iam add-user-to-group --user-name MyTestUser1 --group-name MyTestGroup2
+#
+# group rem user -- aws iam remove-user-from-group --user-name Bob --group-name Admins
+#
 
 # AWS Tasks that Require Account Root User
 # http://docs.aws.amazon.com/general/latest/gr/aws_tasks-that-require-root.html
@@ -350,7 +349,7 @@ iampolstat ()
 
 #. PASSWORDs
 
-#.  iamuapass - AWS IAM -- [reset]           -- coming soon
+#  iamuapass - AWS IAM -- [reset]           -- coming soon
 
 #. POLICYs
 
