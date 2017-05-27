@@ -7,7 +7,12 @@
 #.  usrls - AWS IAM -- List AWS IAM users
 usrls ()
 {
-  aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq | ccze -A
+  myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
+  myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
+  myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
+  triplewide Account $myACCNTID Alias $myACCOUNT Region $myREGION; echo ${RESET}
+
+  aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq
 }
 
 #.  usrstat - AWS IAM -- Display details on a given Username
@@ -28,21 +33,18 @@ usrsum()
   myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
   myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
 
-  echo "Account: [ $myACCNTID ] Alias: [ $myACCOUNT ] Region: [ $myREGION ]"; echo
+  triplewide Account $myACCNTID Alias $myACCOUNT Region $myREGION; echo ${RESET}
     export u=$1
 
-    echo == [ $u ] ============================
-
+    divText $u
       aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
-    echo
-    echo "RECENT-ACTIONS-LAST-7-DAYS:"
+    sideHead "RECENT-ACTIONS-LAST-7-DAYS"
       aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | tr -s ' '
-    echo
-    echo "ACCESS-KEYS:"
+    sideHead "ACCESS-KEYS"
       aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
-    echo "MFA-DEVICES:"
+    sideHead "MFA-DEVICES"
       aws iam list-mfa-devices --user-name $u | egrep "SerialNumber|EnableDate"
-    echo "GROUPS:"
+    sideHead "GROUPS"
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
     echo
 }
@@ -135,7 +137,7 @@ thisUSER=$1
 urslsgrp ()
 {
 if (( $# < 1 )); then
-  echo usage: Needs at least one argument { Group2Create};
+  echo usage: Needs at least one argument { GROUPNAME };
   return;
 fi;
 #
@@ -146,29 +148,24 @@ fi;
 grplsusr ()
 {
 if (( $# < 1 )); then
-  echo usage: Needs at least one argument { Group2Display};
+  echo usage: Needs at least one argument { GROUPNAME };
   return;
 fi;
 #
    aws iam get-group --group-name ${1} | jq .
-}
-
-#.
-#. GROUPs
-#.   grpls  - AWS IAM -- Display list of account groups
-grpls ()
-{
-    aws iam list-groups | jq .
+   # aws iam list-groups | jq .
+   sameAs 'aws iam list-groups'
 }
 
 #.   grpadd - AWS IAM -- Create an AWS/IAM group
 grpadd ()
 {
   if (( $# < 1 )); then
-    echo usage: Needs at least one argument { Group2Create};
+    echo usage: Needs at least one argument { GROUPNAME};
     return;
   fi;
   aws iam create-group --group-name ${1} | jq .
+  sameAs 'aws iam create-group  --group-name  GROUPNAME'
 }
 
 #.   grpdel - AWS IAM -- Delete an AWS/IAM group
@@ -179,6 +176,7 @@ grpdel ()
     return;
   fi;
   aws iam delete-group --group-name ${1}
+  sameAs 'aws iam delete-group  --group-name  GROUPNAME'
 }
 
 #.   grppolls - AWS IAM -- group LIST policy (for a given group)
@@ -189,6 +187,7 @@ grppolls ()
     return;
   fi;
     aws iam list-group-policies --group-name ${1} | jq .
+    sameAs 'aws iam get-policy --group-name  GROUPNAME                                                                       '
 }
 
 #.   grppoladd - AWS IAM -- group ADD policy
@@ -199,16 +198,18 @@ grppoladd ()
     return;
   fi;
     aws iam attach-group-policy --group-name ${1} --policy-arn ${2}
+    sameAs 'aws iam get-policy --group-name  GROUPNAME --policy-arn POLICY-ARN'
 }
 
 #.    grppoldel - AWS IAM -- group DELETE policy
 grppoldel ()
 {
-if (( $# < 2 )); then
- echo usage: Needs at least two argument { Group Policy-Arn };
- return;
-fi;
+  if (( $# < 2 )); then
+    echo usage: Needs at least two argument { Group Policy-Arn };
+    return;
+  fi;
  aws iam delete-group-policy --group-name ${1} --policy-arn ${2}
+ sameAs 'aws iam get-policy --policy-arn POLICY-ARN'
 }
 
 #.   grppolstat - AWS IAM -- get details on policy
@@ -217,8 +218,9 @@ grppolstat ()
   if (( $# < 1 )); then
     echo usage: Needs at least one argument { Policy-Arn };
     return;
-    fi;
+  fi;
     aws iam get-policy --policy-arn ${1} | jq .
+    sameAs 'aws iam get-policy --policy-arn POLICY-ARN'
 }
 
 #.   grpusradd - AWS IAM -- ADD user to group
@@ -227,8 +229,9 @@ grpusradd ()
   if (( $# < 2 )); then
     echo usage: Needs at least two arguments { --user-name Bob --group-name Admins };
     return;
-    fi;
+  fi;
     aws iam add-user-to-group --user-name ${1} --group-name ${2} | jq .
+    sameAs 'aws iam add-user-to-group --user-name USER-NAME --group-name GROUP-NAME'
 }
 
 #.   grpusrdel - AWS IAM -- DEL user to group
@@ -237,8 +240,9 @@ grpusrdel ()
   if (( $# < 2 )); then
     echo usage: Needs at least two arguments { --user-name Bob --group-name Admins };
     return;
-    fi;
+  fi;
     aws iam remove-user-from-group --user-name ${1} --group-name ${2}
+    sameAs 'aws iam remove-user-from-group --user-name USER-NAME --group-name GROUP-NAME'
 }
 
 # AWS Tasks that Require Account Root User
@@ -276,7 +280,6 @@ usrakstat ()
     return;
   fi;
     aws iam list-access-keys --user-name ${1} | jq .
-
     sameAs 'aws iam list-access-keys --user-name USER-NAME'
 }
 
@@ -288,7 +291,6 @@ usrakadd ()
     return;
   fi;
     aws iam create-access-key --user-name ${1} | jq .
-
     sameAs 'aws iam create-access-key --user-name USER-NAME'
 }
 
@@ -306,7 +308,6 @@ usraklast ()
     return;
   fi;
     aws iam get-access-key-last-used --access-key-id ${1} | jq .
-
     sameAs 'aws iam get-access-key-last-used --access-key-id ACCESS-KEY'
 }
 
@@ -360,8 +361,7 @@ iamreport()
   myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
   myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
 
-  triplewide Account $myACCNTID Alias $myACCOUNT Region $myREGION; echo
-
+  triplewide Account $myACCNTID Alias $myACCOUNT Region $myREGION; echo ${RESET}
   divText root
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c
   echo
