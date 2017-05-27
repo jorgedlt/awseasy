@@ -246,30 +246,49 @@ grpusrdel ()
 
 #.
 #. MFAs
-# mfa list for given user
+# usrmfals list for given user
 #.  iamuamfa  - AWS IAM -- [deactivate]      -- coming soon
-
+# usrmfals - aws iam list-mfa-devices --user-name c_stmd_phillips | jq .
 # not sure how it works
 #                     -- aws iam enable-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 789012
 #  resync-mfa-device  -- aws iam resync-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 987654
+#
+# aws iam delete-virtual-mfa-device --serial-number arn:aws:iam::123456789012:mfa/MFATest
 
 #. ACCESS KEYs
-# accesskey list for a given user
+# usrakls - accesskey LIST for a given user
+# aws iam list-access-keys --user-name i_p_coleman | jq .
+#
 
-# accesskey add for a given user
+# usrakstat - accesskey more details for a given user
 
-# accesskey ACT/deACT for a given user
+# accesskey ADD for a given user
+# usrakadd - accesskey more details for a given user
+#     aws iam create-access-key --user-name c_stmd_phillips | jq .
 
-# accesskey del for a given user
+# (be sure and grab new secret key)
 
-#.  iamuakey  - AWS IAM -- [active/inactive] -- coming soon
+# usrakset act/dea - accesskey activate / deactivate for a given user  [  Active / Inactive ]
+# aws iam update-access-key --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Active --user-name c_stmd_phillips
+# aws iam update-access-key --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Inactive --user-name c_stmd_phillips
+
+# get-access-key-last-used !!!  -- aws iam get-access-key-last-used --access-key-id AKIAJFJJYXVZ2X74MRQQ
+# aws iam get-access-key-last-used --access-key-id AKIAISIOSCPUU3JJLFLA | jq .
+
+# usrakdel - accesskey DEL for a given user
+# aws iam delete-access-key --access-key AKIAIJUM5RBCTODD6OXA --user-name c_stmd_phillips
 
 #. PASSWORDs
 #  iamuapass - AWS IAM -- [reset]           -- coming soon
 
 #. POLICYs
+
+# aws iam list-attached-group-policies --group-name PowerUsers  # --scope AWS
+
+
 #. SIGN-CERTs
 #. PROFILEs
+# aws iam list-attached-group-policies --group-name S3ReadOnlyAccess
 
 # MISC
 # aws iam generate-credential-report
@@ -288,8 +307,8 @@ iampolicy ()
 {
     aws iam get-account-password-policy | jq .
 }
-#.
 
+#.
 #.  iamreport - AWS IAM -- Account wide scan of users, groups and affiliation
 iamreport()
 {
@@ -322,29 +341,43 @@ iamreport()
     echo
 done | ccze -A
 }
+
 #.
 # iamreport | enscript -o - | pstopdf -i -o ~/Desktop/iamreport.pdf ## create as PDF
 
 # detail of policy -- aws iam get-policy --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl | jq .
 # Lists all the managed policies that are available
-# policy list [READONLY, ]    -- aws iam list-policies --max-items 2
 #
+# policy list [READONLY, ]    -- aws iam list-policies --max-items 2
 #               -- aws iam list-policies | grep PolicyName | grep FullAccess
 #
 #              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
+#              # DatabaseAdministrator # NetworkAdministrator # AmazonAPIGatewayAdministrator
+#              aws iam list-attached-group-policies --group-name Administ
 #
-#              aws iam list-attached-group-policies --group-name UI_UX_S3_Only
-#                          "PolicyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
-#
-#              aws iam list-attached-group-policies --group-name dev_group
+#              aws iam list-attached-group-policies --group-name PowerUsers
 #                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
 #                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"   ???
 #                          "PolicyArn": "arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl"
 #                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
 #
-# group list users -- aws iam get-group --group-name MyTestGroup | jq .
+#              aws iam list-attached-group-policies --group-name Developers     #DevPLUS Lambda or API
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"   ???
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
+#
+#              aws iam list-attached-group-policies --group-name S3FullAccess
+#                          "PolicyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"   ???
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
+#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
+#
+#              aws iam list-attached-group-policies --group-name S3ReadOnlyAccess
+#
 #
 
 # fin
