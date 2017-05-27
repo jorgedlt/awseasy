@@ -3,12 +3,12 @@
 #. AWS IAM Commands
 #.
 
+#. USERs
 #.  usrls - AWS IAM -- List AWS IAM users
 usrls ()
 {
   aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq | ccze -A
 }
-#
 
 #.  usrstat - AWS IAM -- Display details on a given Username
 usrstat ()
@@ -29,7 +29,6 @@ usrsum()
   myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
 
   echo "Account: [ $myACCNTID ] Alias: [ $myACCOUNT ] Region: [ $myREGION ]"; echo
-  #
     export u=$1
 
     echo == [ $u ] ============================
@@ -54,7 +53,6 @@ iamlsdo ()
     aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${1} \| grep EventName | sort | uniq -c
 }
 
-#. USERs
 #.  usradd  - AWS IAM -- Add an AWS IAM user
 usradd ()
 {
@@ -62,7 +60,6 @@ usradd ()
     echo usage: Needs at least one argument {instance ID#};
     return;
   fi;
-
   aws iam create-user --user-name $1 | jq .
 }
 
@@ -76,7 +73,6 @@ if (( $# < 1 )); then
 fi;
 
 thisUSER=$1
-
 # access-key
   echo checking for access-keys ...
   thisKEY=$(aws iam list-access-keys --user-name $thisUSER | grep AccessKeyId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
@@ -100,7 +96,7 @@ thisUSER=$1
   thisPROF=$( aws iam get-login-profile --user-name $thisUSER 2> /dev/null )
   [ "$thisPROF" ] && {
     aws iam delete-login-profile --user-name $thisUSER
-  } # seems to be having a problem, but cut and paste works ?!
+  }
 
 # mfa-devices
   echo checking for mfa-devices ...
@@ -172,7 +168,6 @@ grpadd ()
     echo usage: Needs at least one argument { Group2Create};
     return;
   fi;
-#
   aws iam create-group --group-name ${1} | jq .
 }
 
@@ -183,7 +178,6 @@ grpdel ()
     echo usage: Needs at least one argument { Group2Delete };
     return;
   fi;
-#
   aws iam delete-group --group-name ${1}
 }
 
@@ -194,7 +188,6 @@ grppolls ()
     echo usage: Needs at least one argument { Group };
     return;
   fi;
-#
     aws iam list-group-policies --group-name ${1} | jq .
 }
 
@@ -205,12 +198,8 @@ grppoladd ()
     echo usage: Needs at least two argument { Group Policy-Arn };
     return;
   fi;
-#
     aws iam attach-group-policy --group-name ${1} --policy-arn ${2}
 }
-
-# group del policy -- aws iam delete-group-policy --group-name MyGroup --policy-name ExamplePolicy
-#                  -- aws iam detach-group-policy --group-name MyGroup --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 
 #.    grppoldel - AWS IAM -- group DELETE policy
 grppoldel ()
@@ -219,7 +208,6 @@ if (( $# < 2 )); then
  echo usage: Needs at least two argument { Group Policy-Arn };
  return;
 fi;
-#
  aws iam delete-group-policy --group-name ${1} --policy-arn ${2}
 }
 
@@ -230,7 +218,6 @@ grppolstat ()
     echo usage: Needs at least one argument { Policy-Arn };
     return;
     fi;
-#
     aws iam get-policy --policy-arn ${1} | jq .
 }
 
@@ -241,8 +228,7 @@ grpusradd ()
     echo usage: Needs at least two arguments { --user-name Bob --group-name Admins };
     return;
     fi;
-#
-aws iam add-user-to-group --user-name ${1} --group-name ${2} | jq .
+    aws iam add-user-to-group --user-name ${1} --group-name ${2} | jq .
 }
 
 #.   grpusrdel - AWS IAM -- DEL user to group
@@ -252,13 +238,13 @@ grpusrdel ()
     echo usage: Needs at least two arguments { --user-name Bob --group-name Admins };
     return;
     fi;
-#
     aws iam remove-user-from-group --user-name ${1} --group-name ${2}
 }
 
 # AWS Tasks that Require Account Root User
 # http://docs.aws.amazon.com/general/latest/gr/aws_tasks-that-require-root.html
 
+#.
 #. MFAs
 # mfa list for given user
 #.  iamuamfa  - AWS IAM -- [deactivate]      -- coming soon
