@@ -1,6 +1,5 @@
 # awseasy.iam
 
-#.
 #. AWS IAM Commands
 #.
 
@@ -104,8 +103,6 @@ iamlsdo ()
 {
     aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${1} \| grep EventName | sort | uniq -c
 }
-
-###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . #
 
 #. USERs
 
@@ -211,17 +208,16 @@ fi;
    aws iam get-group --group-name ${1} | jq .
 }
 
-
 #.
 #. GROUPs
 
-#.  grpls  - AWS IAM -- Display list of account groups
+#.   grpls  - AWS IAM -- Display list of account groups
 grpls ()
 {
     aws iam list-groups | jq .
 }
 
-#.  grpadd - AWS IAM -- Create an AWS/IAM group
+#.   grpadd - AWS IAM -- Create an AWS/IAM group
 grpadd ()
 {
   if (( $# < 1 )); then
@@ -232,7 +228,7 @@ grpadd ()
   aws iam create-group --group-name ${1} | jq .
 }
 
-#.  grpdel - AWS IAM -- Delete an AWS/IAM group
+#.   grpdel - AWS IAM -- Delete an AWS/IAM group
 grpdel ()
 {
   if (( $# < 1 )); then
@@ -243,10 +239,7 @@ grpdel ()
   aws iam delete-group --group-name ${1}
 }
 
-# group list policy (for a given group) -- aws iam list-group-policies --group-name MyTestGroup2 | jq .
-
-
-#.  grppolls - AWS IAM -- group LIST policy (for a given group)
+#.   grppolls - AWS IAM -- group LIST policy (for a given group)
 grppolls ()
 {
   if (( $# < 1 )); then
@@ -257,9 +250,7 @@ grppolls ()
     aws iam list-group-policies --group-name ${1} | jq .
 }
 
-# group add policy -- aws iam attach-group-policy --group-name Finance --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
-
-#.  grppoladd - AWS IAM -- group ADD policy
+#.   grppoladd - AWS IAM -- group ADD policy
 grppoladd ()
 {
   if (( $# < 2 )); then
@@ -270,10 +261,10 @@ grppoladd ()
     aws iam attach-group-policy --group-name ${1} --policy-arn ${2}
 }
 
-#. group del policy -- aws iam delete-group-policy --group-name MyGroup --policy-name ExamplePolicy
-#.                  -- aws iam detach-group-policy --group-name MyGroup --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
+# group del policy -- aws iam delete-group-policy --group-name MyGroup --policy-name ExamplePolicy
+#                  -- aws iam detach-group-policy --group-name MyGroup --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 
-#.   grppoldel - AWS IAM -- group DELETE policy
+#.    grppoldel - AWS IAM -- group DELETE policy
 grppoldel ()
 {
 if (( $# < 2 )); then
@@ -287,7 +278,7 @@ fi;
 # -- aws iam attach-group-policy --group-name Testers --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 # -- aws iam detach-group-policy --group-name Testers --policy-arn arn:aws:iam::123456789012:policy/TesterAccessPolicy
 
-#.   iampolstat - AWS IAM -- get details on policy
+#.   grppolstat - AWS IAM -- get details on policy
 grppolstat ()
 {
   if (( $# < 1 )); then
@@ -332,11 +323,9 @@ grppolstat ()
 #. MFAs
 
 # mfa list for given user
-
 #.  iamuamfa  - AWS IAM -- [deactivate]      -- coming soon
 
 # not sure how it works - aws iam enable-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 789012
-
 #  resync-mfa-device  -- aws iam resync-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 987654
 
 #. ACCESS KEYs
@@ -345,20 +334,15 @@ grppolstat ()
 # accesskey ACT/deACT for a given user
 # accesskey del for a given user
 
-     #.  iamuakey  - AWS IAM -- [active/inactive] -- coming soon
+#.  iamuakey  - AWS IAM -- [active/inactive] -- coming soon
 
 #. PASSWORDs
-
 #  iamuapass - AWS IAM -- [reset]           -- coming soon
-
 #. POLICYs
-
 #. SIGN-CERTs
-
 #. PROFILEs
 
 # MISC
-
 # aws iam generate-credential-report
 # Wait until a particular condition is satisfied.
 # aws iam user-exists --user-name MyTestUser1 # kinda works ??
