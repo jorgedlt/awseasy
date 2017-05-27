@@ -290,7 +290,6 @@ usrakadd ()
     SameAs aws iam create-access-key --user-name stanley_user | jq .
 }
 
-zxddx
 # (be sure and grab new secret key)
 
 # usrakset act/dea - accesskey activate / deactivate for a given user  [  Active / Inactive ]
@@ -341,7 +340,7 @@ iamreport()
   myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
   myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
 
-  echo "Account: [ $myACCNTID ] Alias: [ $myACCOUNT ] Region: [ $myREGION ]"; echo
+  triplewide "Account $myACCNTID Alias $myACCOUNT Region $myREGION"; echo
 
   divText root
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c
@@ -363,7 +362,7 @@ iamreport()
     echo "GROUPS:"
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
     echo
-done | ccze -A
+done
 }
 
 #.
@@ -405,3 +404,4 @@ done | ccze -A
 #
 
 # fin
+                                                                                                                                                                                                                                                                                       

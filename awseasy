@@ -34,6 +34,11 @@ doublewide () {
   echo "    ${GRAY}$1: [ ${GREEN}$2 ${GRAY}] $3: [ ${GREEN}$4 ${GRAY}]"
 }
 
+#  triplewide - Colorized out - similar to descDUMP but GREEN
+triplewide () {
+  echo "    ${GRAY}$1: [ ${GREEN}$2 ${GRAY}] $3: [ ${GREEN}$4 ${GRAY}] $5: [ ${GREEN}$6 ${GRAY}]"
+}
+
 ###
 
 #  awstag - AWS -- Any AWS Element re-tag
