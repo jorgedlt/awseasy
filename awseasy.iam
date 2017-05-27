@@ -153,7 +153,14 @@ if (( $# < 1 )); then
 fi;
 #
    aws iam get-group --group-name ${1} | jq .
-   # aws iam list-groups | jq .
+}
+
+#.
+#. GROUPs
+#.   grpls  - AWS IAM -- Display list of account groups
+grpls ()
+{
+   aws iam list-groups | jq .
    sameAs 'aws iam list-groups'
 }
 
@@ -250,14 +257,68 @@ grpusrdel ()
 
 #.
 #. MFAs
-# usrmfals list for given user
-#.  iamuamfa  - AWS IAM -- [deactivate]      -- coming soon
-# usrmfals - aws iam list-mfa-devices --user-name c_stmd_phillips | jq .
-# not sure how it works
-#                     -- aws iam enable-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 789012
+
+#.   usrmfals  - AWS IAM -- LIST mfa devices
+usrmfals ()
+{
+   # aws iam list-virtual-mfa-devices
+   aws iam list-virtual-mfa-devices | egrep 'SerialNumber|PasswordLastUsed|CreateDate' \
+   | tr -d '"|,| ' | sed 's/P/    P/g' | sed 's/C/    C/g ' | sed -e 's/S/\\\nS/g' | ccze -A
+   sameAs 'aws iam list-virtual-mfa-devices'
+}
+# aws iam list-virtual-mfa-devices
+
+#.   usrmfastat  - AWS IAM -- STAT mfa devices
+usrmfastat ()
+{
+  if (( $# < 1 )); then
+    echo usage: Needs at least one arguments { --user-name USER-NAME };
+    return;
+  fi;
+    aws iam list-mfa-devices --user-name ${1} | jq .
+}
+# aws iam list-mfa-devices --user-name testuser200
+
+#.   usrmfaadd - AWS IAM -- ADD MFA for a given user
+usrmfaadd ()
+{
+  if (( $# < 3 )); then
+    echo usage: Needs at least three arguments;
+    echo '   MFAdevName Base32StringSeed TXTfile'
+    echo '   MFAdevName QRCodePNG PNGfile'
+    return;
+  fi;
+    aws iam create-virtual-mfa-device --virtual-mfa-device-name ${1} --bootstrap-method ${2} --outfile ${3} | jq .
+    sameAs 'aws iam create-virtual-mfa-device --virtual-mfa-device-name User-Name --bootstrap-method Base32StringSeed --outfile File-Name.txt'
+}
+# aws iam create-virtual-mfa-device --virtual-mfa-device-name testuser200 --bootstrap-method Base32StringSeed  --outfile testusermfa.txt
+# aws iam create-virtual-mfa-device --virtual-mfa-device-name testuser200 ---bootstrap-method QRCodePNG -outfile testuser.png
+
+#.   usrmfadea - AWS IAM -- DEACTIVATE MFA for a given user
+usrmfadea ()
+{
+  if (( $# < 2 )); then
+    echo usage: Needs at least two arguments { --user-name USER-NAME --serial-number ARN-MFA-USER };
+    return;
+  fi;
+    aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}
+    sameAs 'aws iam delete-virtual-mfa-device --user-name USER-NAME'
+}
+# aws iam deactivate-mfa-device --user-name hamid.montazeri --serial-number arn:aws:iam::674553401808:mfa/hamid.montazeri
+
+#.   usrmfadel - AWS IAM -- DELETE MFA for a given user
+usrmfadel ()
+{
+  if (( $# < 1 )); then
+    echo usage: Needs at least one arguments { --serial-number ARN-MFA-USER };
+    return;
+  fi;
+    aws iam delete-virtual-mfa-device --serial-number ${1}
+    sameAs 'delete-virtual-mfa-device --serial-number ARN-MFA-USER'
+}
+# aws iam delete-virtual-mfa-device --serial-number arn:aws:iam::674553401808:mfa/testuser200
+
 #  resync-mfa-device  -- aws iam resync-mfa-device --user-name Bob --serial-number arn:aws:iam::210987654321:mfa/BobsMFADevice --authentication-code-1 123456 --authentication-code-2 987654
-#
-# aws iam delete-virtual-mfa-device --serial-number arn:aws:iam::123456789012:mfa/MFATest
 
 #. ACCESS KEYs
 #.   usrakls - AWS IAM -- access key LIST for a given user
@@ -319,17 +380,22 @@ usrakdel ()
     return;
   fi;
     aws iam delete-access-key --access-key ${1} --user-name ${2} | jq .
-
     sameAs 'aws iam delete-access-key --access-key ACCESS-KEY --user-name USER-NAME'
 }
 
 #. PASSWORDs
 #  iamuapass - AWS IAM -- [reset]           -- coming soon
 
+#Set an Initial Password for an IAM User - echo MyUser | base64 | tr  '=' '$'
+# aws iam create-login-profile --user-name MyUser --password TXlVc2VyCg$$
+
+# better with update
+# aws iam update-login-profile --user-name matthew.baumgartner --password TXlVc2FOOVyCg$$ --password-reset-required
+
+
 #. POLICYs
 
 # aws iam list-attached-group-policies --group-name PowerUsers  # --scope AWS
-
 
 #. SIGN-CERTs
 #. PROFILEs
@@ -345,12 +411,14 @@ usrakdel ()
 iamsummary ()
 {
     aws iam get-account-summary | jq .
+    sameAs 'aws iam get-account-summary'
 }
 
 #.  iampolicy - AWS IAM -- Display password policy
 iampolicy ()
 {
     aws iam get-account-password-policy | jq .
+    sameAs 'aws iam get-account-password-policy'
 }
 
 #.
