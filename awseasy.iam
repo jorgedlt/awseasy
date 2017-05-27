@@ -264,6 +264,8 @@ usrakls ()
   for u in $AWSusers; do
     divText $u
     aws iam list-access-keys --user-name ${u} | jq .
+
+    sameAs 'aws iam list-access-keys --user-name USER-NAME'
   done
 }
 
@@ -272,22 +274,24 @@ usrakls ()
 usrakstat ()
 {
   if (( $# < 1 )); then
-    echo usage: Needs at least one argument { --user-name Bob }
+    echo 'usage: Needs at least one argument { --user-name USER-NAME }'
     return;
   fi;
     aws iam list-access-keys --user-name ${1} | jq .
+
+    sameAs 'aws iam list-access-keys --user-name USER-NAME'
 }
 
 #.   usrakadd - AWS IAM -- access key ADD for a given user
 usrakadd ()
 {
   if (( $# < 1 )); then
-    echo usage: Needs at least one argument { --user-name Bob }
+    echo 'usage: Needs at least one argument { --user-name USER-NAME }'
     return;
   fi;
     aws iam create-access-key --user-name ${1} | jq .
 
-    SameAs aws iam create-access-key --user-name stanley_user | jq .
+    sameAs 'aws iam create-access-key --user-name USER-NAME'
 }
 
 # (be sure and grab new secret key)
@@ -296,11 +300,32 @@ usrakadd ()
 # aws iam update-access-key --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Active --user-name c_stmd_phillips
 # aws iam update-access-key --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Inactive --user-name c_stmd_phillips
 
-# get-access-key-last-used !!!  -- aws iam get-access-key-last-used --access-key-id AKIAJFJJYXVZ2X74MRQQ
-# aws iam get-access-key-last-used --access-key-id AKIAISIOSCPUU3JJLFLA | jq .
+#.   usraklast - AWS IAM -- LAST ACTION with given access key
+usraklast ()
+{
+  if (( $# < 1 )); then
+    echo 'usage: Needs at least one argument { --user-name USER-NAME }'
+    return;
+  fi;
+    aws iam get-access-key-last-used --access-key-id ${1} | jq .
+
+    sameAs 'aws iam get-access-key-last-used --access-key-id ACCESS-KEY'
+}
 
 # usrakdel - accesskey DEL for a given user
 # aws iam delete-access-key --access-key AKIAIJUM5RBCTODD6OXA --user-name c_stmd_phillips
+
+#.   usrakdel - AWS IAM -- access key ADD for a given user
+usrakdel ()
+{
+  if (( $# < 2 )); then
+    echo 'usage: Needs at least one argument { --access-key ACCESS-KEY --user-name USER-NAME}'
+    return;
+  fi;
+    aws iam delete-access-key --access-key ${1} --user-name ${2} | jq .
+
+    sameAs 'aws iam delete-access-key --access-key ACCESS-KEY --user-name USER-NAME'
+}
 
 #. PASSWORDs
 #  iamuapass - AWS IAM -- [reset]           -- coming soon
