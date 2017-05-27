@@ -74,7 +74,7 @@ fi;
 
 thisUSER=$1
 # access-key
-  echo checking for access-keys ...
+  sideHead "checking for access-keys"
   thisKEY=$(aws iam list-access-keys --user-name $thisUSER | grep AccessKeyId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
   [ "$thisKEY" ] && {
   for k in $thisKEY; do
@@ -83,7 +83,7 @@ thisUSER=$1
   }
 
 # signing-certificates
-  echo checking for signing-certificates ...
+  sideHead "checking for signing-certificates"
   thisCERT=$(aws iam list-signing-certificates --user-name $thisUSER | grep CertificateId | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
   [ "$thisCERT" ] && {
   for c in $thisCERT; do
@@ -92,14 +92,14 @@ thisUSER=$1
   }
 
 # login-profile
-  echo checking for login-profile ...
+  sideHead "checking for login-profile"
   thisPROF=$( aws iam get-login-profile --user-name $thisUSER 2> /dev/null )
   [ "$thisPROF" ] && {
     aws iam delete-login-profile --user-name $thisUSER
   }
 
 # mfa-devices
-  echo checking for mfa-devices ...
+  sideHead "checking for mfa-devices"
   thisMFA=$( aws iam list-mfa-devices --user-name $thisUSER | grep SerialNumber | cut -d':' -f2- | tr -d '"| |,' 2> /dev/null )
   [ "$thisMFA" ] && {
   for m in $thisMFA; do
@@ -108,7 +108,7 @@ thisUSER=$1
   }
 
 # attached-user-policies
-  echo checking for attached-user-policies ...
+  sideHead "checking for attached-user-policies"
   thisPOL=$( aws iam list-attached-user-policies --user-name $thisUSER | grep PolicyArn | cut -d':' -f2- | tr -d ' |"' 2> /dev/null )
   [ "$thisPOL" ] && {
   for p in $thisPOL; do
@@ -117,7 +117,7 @@ thisUSER=$1
   }
 
 # delete use from groups
-  echo checking for groups  ...
+  sideHead "checking for groups"
   thisGRP=$(aws iam list-groups-for-user --user-name $thisUSER | grep GroupName | cut -d':' -f2 | tr -d '"| ' 2> /dev/null )
   [ "$thisGRP" ] && {
   for g in $thisGRP; do
@@ -126,7 +126,7 @@ thisUSER=$1
   }
 
 # then finally delete-user
-  echo attempting to DELETE [ $thisUSER ] ...
+  sideHead "attempting to DELETE $thisUSER"
     aws iam delete-user --user-name $thisUSER
 }
 
@@ -349,17 +349,16 @@ iamreport()
   AWSusers=$(aws iam list-users --output json | grep UserName | cut -d':' -f2 | tr -d ' |"|,' | sort | uniq)
   for u in $AWSusers; do
     divText $u
-
       aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
-    echo
-    echo "RECENT-ACTIONS-LAST-7-DAYS:"
+
+    sideHead "RECENT-ACTIONS-LAST-7-DAYS"
       aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | tr -s ' '
-    echo
-    echo "ACCESS-KEYS:"
+
+    sideHead "ACCESS-KEYS"
       aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
-    echo "MFA-DEVICES:"
+    sideHead "MFA-DEVICES"
       aws iam list-mfa-devices --user-name $u | egrep "SerialNumber|EnableDate"
-    echo "GROUPS:"
+    sideHead "GROUPS"
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
     echo
 done

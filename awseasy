@@ -14,6 +14,11 @@ alsoTry () {
   echo "${GRAY} Also try: ${GREEN} $1 ${RESET}"
 }
 
+#  sideHead - Colorized out
+sideHead () {
+  echo; echo "${GREEN} ${1}: ${RESET}"
+}
+
 #  divText - Colorized out
 divText () {
   echo "${GRAY} ==== ${CYAN} $1 ${GRAY} ==== ${RESET}"
