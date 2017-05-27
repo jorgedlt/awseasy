@@ -256,7 +256,6 @@ grpusrdel ()
 # aws iam delete-virtual-mfa-device --serial-number arn:aws:iam::123456789012:mfa/MFATest
 
 #. ACCESS KEYs
-# this really should be a parameterless cmd which displays all keys
 #.   usrakls - AWS IAM -- access key LIST for a given user
 usrakls ()
 {
@@ -269,7 +268,6 @@ usrakls ()
   done
 }
 
-# usrakstat - accesskey more details for a given user
 #.   usrakstat - AWS IAM -- access key DETAILS for a given user
 usrakstat ()
 {
@@ -312,10 +310,7 @@ usraklast ()
     sameAs 'aws iam get-access-key-last-used --access-key-id ACCESS-KEY'
 }
 
-# usrakdel - accesskey DEL for a given user
-# aws iam delete-access-key --access-key AKIAIJUM5RBCTODD6OXA --user-name c_stmd_phillips
-
-#.   usrakdel - AWS IAM -- access key ADD for a given user
+#.   usrakdel - AWS IAM -- access key DEL for a given user
 usrakdel ()
 {
   if (( $# < 2 )); then
