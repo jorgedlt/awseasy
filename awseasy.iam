@@ -321,7 +321,6 @@ grppolstat ()
 # http://docs.aws.amazon.com/general/latest/gr/aws_tasks-that-require-root.html
 
 #. MFAs
-
 # mfa list for given user
 #.  iamuamfa  - AWS IAM -- [deactivate]      -- coming soon
 
@@ -346,7 +345,5 @@ grppolstat ()
 # aws iam generate-credential-report
 # Wait until a particular condition is satisfied.
 # aws iam user-exists --user-name MyTestUser1 # kinda works ??
-
-###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . ###### . #
 
 # fin
