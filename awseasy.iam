@@ -385,15 +385,32 @@ usrakdel ()
     sameAs 'aws iam delete-access-key --access-key ACCESS-KEY --user-name USER-NAME'
 }
 
+#.
 #. PASSWORDs
-#  iamuapass - AWS IAM -- [reset]           -- coming soon
 
-#Set an Initial Password for an IAM User - echo MyUser | base64 | tr  '=' '$'
+#.   usrpwinit - AWS IAM -- INIT user password - needed for fist time
+usrpwinit ()
+{
+  if (( $# < 2 )); then
+    echo 'usage: Needs at least two argument { --user-name USER-NAME --password NEWPASSWD }'
+    return;
+  fi;
+    aws iam get-access-key-last-used --access-key-id ${1} | jq .
+    sameAs 'aws iam get-access-key-last-used --access-key-id ACCESS-KEY'
+}
 # aws iam create-login-profile --user-name MyUser --password TXlVc2VyCg$$
 
-# better with update
+#.   usrpwrst - AWS IAM -- RESET user password - will also set a flag for reset on login
+usrpwrst ()
+{
+  if (( $# < 2 )); then
+    echo 'usage: Needs at least two argument { --user-name USER-NAME --password NEWPASSWD }'
+    return;
+  fi;
+    aws iam get-access-key-last-used --user-name ${1} --password ${2} --password-reset-required | jq .
+    sameAs 'aws iam get-access-key-last-used --access-key-id ACCESS-KEY'
+}
 # aws iam update-login-profile --user-name matthew.baumgartner --password TXlVc2FOOVyCg$$ --password-reset-required
-
 
 #. POLICYs
 
