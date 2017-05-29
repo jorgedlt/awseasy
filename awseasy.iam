@@ -46,14 +46,20 @@ usrsum()
       aws iam list-mfa-devices --user-name $u | egrep "SerialNumber|EnableDate"
     sideHead "GROUPS"
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
+    sideHead "POLICIES"
+      aws iam list-attached-user-policies --user-name $u | grep "PolicyName"
     echo
 }
 
-#.  iamlsdo - AWS IAM -- Display last events of a given user within a AWS region
-iamlsdo ()
-{
-    aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${1} \| grep EventName | sort | uniq -c
-}
+#
+#  last do - AWS IAM -- Display last events of a given user within a AWS region
+# aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${1} | grep EventName | sort | uniq -c
+#
+# last time
+# aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${1} | grep EventTime | sort | uniq | tail -1 | cut -d':' -f2 | cut -d'.' -f1 | tr -d ' '
+#
+# better to use 'usrsum'
+#
 
 #.  usradd  - AWS IAM -- Add an AWS IAM user
 usradd ()
@@ -541,13 +547,14 @@ iamreport()
 
     sideHead "RECENT-ACTIONS-LAST-7-DAYS"
       aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | tr -s ' '
-
     sideHead "ACCESS-KEYS"
       aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
     sideHead "MFA-DEVICES"
       aws iam list-mfa-devices --user-name $u | egrep "SerialNumber|EnableDate"
     sideHead "GROUPS"
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
+    sideHead "POLICIES"
+        aws iam list-attached-user-policies --user-name $u | grep "PolicyName"
     echo
 done
 }
