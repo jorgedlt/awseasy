@@ -6,17 +6,17 @@
 
 #  sameAs - Colorized out
 sameAs () {
-  echo "${GRAY} executing command: ${GREEN} $1 ${RESET}"
+  echo "${GRAY} executing command: ${BLUE} $1 ${RESET}"
 }
 
 #  basedOn - Colorized out
 basedOn () {
-  echo "${GRAY} based on: ${GREEN} $1 ${RESET}"
+  echo "${GRAY} based on: ${BLUE} $1 ${RESET}"
 }
 
 #  alsoTry - Colorized out
 alsoTry () {
-  echo "${GRAY} also try: ${GREEN} $1 ${RESET}"
+  echo "${GRAY} also try: ${BLUE} $1 ${RESET}"
 }
 
 #  sideHead - Colorized out
