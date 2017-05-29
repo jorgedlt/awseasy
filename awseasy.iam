@@ -494,11 +494,33 @@ iamsummary ()
     sameAs 'aws iam get-account-summary'
 }
 
-#.  iampolicy - AWS IAM -- Display password policy
-iampolicy ()
+#.  iampolls - AWS IAM -- Display password policy
+iampolls ()
 {
     aws iam get-account-password-policy | jq .
     sameAs 'aws iam get-account-password-policy'
+}
+
+#.  iampolset - AWS IAM -- Display password policy
+iampolset ()
+{
+
+echo 'Cut & Paste the floowing template, after editing. '
+echo
+echo  ${YELLOW}
+echo  'aws iam update-account-password-policy \  '
+echo  '--minimum-password-length 14 \            '
+echo  '--allow-users-to-change-password \        '
+echo  '--require-lowercase-characters \          '
+echo  '--require-uppercase-characters \          '
+echo  '--require-numbers \                       '
+echo  '--password-reuse-prevention 8 \           '
+echo  '--no-hard-expiry \                        '
+echo  '--max-password-age 120                    '
+echo
+
+echo  ${RESET}
+sameAs 'aws iam update-account-password-policy'
 }
 
 #.
@@ -531,98 +553,5 @@ iamreport()
     echo
 done
 }
-
-#.
-# iamreport | enscript -o - | pstopdf -i -o ~/Desktop/iamreport.pdf ## create as PDF
-
-# detail of policy -- aws iam get-policy --policy-arn arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl | jq .
-# Lists all the managed policies that are available
-#
-# policy list [READONLY, ]    -- aws iam list-policies --max-items 2
-#               -- aws iam list-policies | grep PolicyName | grep FullAccess
-#
-#              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
-#              # DatabaseAdministrator # NetworkAdministrator # AmazonAPIGatewayAdministrator
-#
-#              aws iam list-attached-group-policies --group-name Admins
-#                          "PolicyName": "AdministratorAccess",
-#
-#              aws iam list-attached-group-policies --group-name PowerUsers
-#                          "PolicyName": "PreventProdAccess",
-#                          "PolicyName": "ManageOwnMFA",
-#                          "PolicyName": "IAMReadOnlyAccess",
-#                          "PolicyName": "PowerUserAccess-NoMarketplaceControl",
-#
-#                           "PolicyName": "PreventIAMOnTrueAdmins",
-#                           "PolicyName": "PreventMarketplaceSubscription",
-#                           "PolicyName": "PreventProdAccess",
-#
-#              aws iam list-attached-group-policies --group-name Developers     #DevPLUS Lambda or API
-#                          "PolicyName": "PreventProdAccess",
-#                          "PolicyName": "ManageOwnMFA",
-#                          "PolicyName": "IAMReadOnlyAccess",
-#                          "PolicyName": "PowerUserAccess-NoMarketplaceControl",
-#
-#                           "PolicyName": "PreventIAMOnTrueAdmins",
-#                           "PolicyName": "PreventMarketplaceSubscription",
-#                           "PolicyName": "PreventProdAccess",
-#
-#              aws iam list-attached-group-policies --group-name S3FullAccess
-#
-#                           "PolicyName": "AmazonS3FullAccess",
-#                           arn:aws:iam::aws:policy/AmazonS3FullAccess
-#
-#                           "PolicyName": "IAMReadOnlyAccess",
-#
-#                           "PolicyName": "PreventIAMOnTrueAdmins",
-#                           "PolicyName": "PreventMarketplaceSubscription",
-#                           "PolicyName": "PreventProdAccess",
-#
-#              aws iam list-attached-group-policies --group-name S3ReadOnlyAccess
-#                          "PolicyName": "AmazonS3ReadOnlyAccess",
-
-#                            arn:aws:iam::aws:policy/ReadOnlyAccess
-
-#                          "PolicyName": "IAMReadOnlyAccess",
-#
-#                           "PolicyName": "PreventIAMOnTrueAdmins",
-#                           "PolicyName": "PreventMarketplaceSubscription",
-#                           "PolicyName": "PreventProdAccess",
-
-
-#              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
-#              # DatabaseAdministrator # NetworkAdministrator # AmazonAPIGatewayAdministrator
-#              aws iam list-attached-group-policies --group-name Administ
-#
-#              aws iam list-attached-group-policies --group-name PowerUsers
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"   ???
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
-#
-#              aws iam list-attached-group-policies --group-name Developers     #DevPLUS Lambda or API
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"   ???
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PowerUserAccess-NoMarketplaceControl"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
-#
-#              aws iam list-attached-group-policies --group-name S3FullAccess
-#                          "PolicyArn": "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/IAMReadOnlyAccess-201509161017"   ???
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventProdAccess"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/ManageOwnMFA"
-#                          "PolicyArn": "arn:aws:iam::674553401808:policy/PreventIAMOnTrueAdmins"
-#
-#              aws iam list-attached-group-policies --group-name S3ReadOnlyAccess
-#
-#
-
-# arn:aws:iam::aws:policy/ReadOnlyAccess
-
-
-# aws iam list-attached-group-policies --group-name dev_group | md5
-# f05619c363b92e5e0a2e5d748b484932
 
 # fin
