@@ -454,7 +454,7 @@ polgrpls ()
 }
 # aws iam list-attached-group-policies --group-name MyTestGroup2
 
-#.  polgrpatt  - AWS IAM -- ATTACH list-attached-group-policies per given GROUP
+#.   polgrpatt  - AWS IAM -- ATTACH list-attached-group-policies per given GROUP
 polgrpatt ()
 {
   if (( $# < 2 )); then
@@ -462,7 +462,7 @@ polgrpatt ()
     return;
   fi;
     aws iam attach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
-    sameAs 'aws iam detach-group-policy  --group-name GROUP-NAME'
+    sameAs 'aws iam attach-group-policy  --group-name GROUP-NAME'
 }
 # aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --group-name MyTestGroup2
 
@@ -474,10 +474,11 @@ polgrpdet ()
     return;
   fi;
     aws iam detach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
-    sameAs 'aws iam list-attached-group-policies --group-name GROUP-NAME'
+    sameAs 'aws iam ldetach-group-policy --group-name GROUP-NAME'
 }
 # aws iam detach-group-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --group-name MyTestGroup2
 
+#.
 #. SIGN-CERTs
 #. PROFILEs
 
@@ -486,6 +487,9 @@ polgrpdet ()
 # Wait until a particular condition is satisfied.
 # aws iam user-exists --user-name MyTestUser1 # kinda works ??
 
+
+#.
+#. Reports & Summaaries
 #.
 #.  iamsummary - AWS IAM -- Display account summary
 iamsummary ()
@@ -509,14 +513,14 @@ echo 'Cut & Paste the floowing template, after editing. '
 echo
 echo  ${YELLOW}
 echo  'aws iam update-account-password-policy \  '
-echo  '--minimum-password-length 14 \            '
-echo  '--allow-users-to-change-password \        '
-echo  '--require-lowercase-characters \          '
-echo  '--require-uppercase-characters \          '
-echo  '--require-numbers \                       '
-echo  '--password-reuse-prevention 8 \           '
-echo  '--no-hard-expiry \                        '
-echo  '--max-password-age 120                    '
+echo  '  --minimum-password-length 14 \          '
+echo  '  --allow-users-to-change-password \      '
+echo  '  --require-lowercase-characters \        '
+echo  '  --require-uppercase-characters \        '
+echo  '  --require-numbers \                     '
+echo  '  --password-reuse-prevention 8 \         '
+echo  '  --no-hard-expiry \                      '
+echo  '  --max-password-age 120                  '
 echo
 
 echo  ${RESET}
