@@ -10,20 +10,44 @@ lambdals () {
 LDAlist=$( aws lambda list-functions | grep 'FunctionName' | cut -d':' -f2 | grep -v '\[\]' | tr -d ' |"|:|,' );
 
 for ldaID in $LDAlist; do
-     LDAdesc=$(aws lambda get-function --function-name "${ldaID}")
 
-       _LDAfunc=$( _ec2parse "$LDAdesc" FunctionName )
-       _LDArun=$( _ec2parse "$LDAdesc" Runtime )
-       _LDAdesc=$( _ec2parse "$LDAdesc" Description )
-       _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
-       _LDAdesc=$( _ec2parse "$LDAdesc" Runtime )
-       _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
-     #
-      descDUMP Lambda $ldaID Name $_LDAfunc;
-      descDUMP Last $_LDALastMod Desc $_LDAdesc;
-      descDUMP Version $_LDArun Desc $_LDAdesc;
+       LDAdesc=$(aws lambda get-function --function-name "${ldaID}")
+       LDAxtra=$(aws lambda list-aliases --function-name "${ldaID}")
 
-      echo
+         _LDAfunc=$( _ec2parse "$LDAdesc" FunctionName )
+         _LDArun=$( _ec2parse "$LDAdesc" Runtime )
+         _LDAdesc=$( _ec2parse "$LDAdesc" Description )
+         _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
+         _LDAmemsize=$( _ec2parse "$LDAdesc" MemorySize )
+         _LDAcodesize=$( _ec2parse "$LDAdesc" CodeSize )
+         _LDArunt=$( _ec2parse "$LDAdesc" Runtime )
+
+         _LDAversion=$( _ec2parse "$LDAxtra" FunctionVersion )
+         _LDAqualifier=$( _ec2parse "$LDAxtra" Name )
+
+       LDAdetails=$(aws lambda get-function-configuration --function-name "${ldaID}" --qualifier "${_LDAqualifier}")
+       # aws lambda get-function-configuration --function-name toolconnect-refresh --qualifier stage
+
+        # LastModified
+        _LDALastMod=$( _ec2parse "$LDAdetails" LastModified )
+        # Description
+        _LDAdesc=$( _ec2parse "$LDAdetails" Description )
+        # Handler
+        _LDAhdlr=$( _ec2parse "$LDAdetails" Handler )
+        # TimeOut
+        _LDAtime=$( _ec2parse "$LDAdetails" Timeout )
+        # CodeSha256
+        _LDAcsha=$( _ec2parse "$LDAdetails" CodeSha256 )
+
+        #
+         descDUMP Lambda $ldaID Name $_LDAfunc;
+         descDUMP Last $_LDALastMod TimeOut $_LDAtime;
+         descDUMP Qualifier $_LDAqualifier Version $_LDAversion;
+
+         descDUMP MEMsize $_LDAmemsize Handler $_LDAhdlr;
+         descDUMP CodeSHA $_LDAcsha CodeSize $_LDAcodesize;
+         echo
+
 done
 }
 
@@ -34,21 +58,45 @@ ldaID=$1
 echo lambda $ldaID
 
      LDAdesc=$(aws lambda get-function --function-name "${ldaID}")
+     LDAxtra=$(aws lambda list-aliases --function-name "${ldaID}")
 
        _LDAfunc=$( _ec2parse "$LDAdesc" FunctionName )
        _LDArun=$( _ec2parse "$LDAdesc" Runtime )
        _LDAdesc=$( _ec2parse "$LDAdesc" Description )
        _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
-       _LDAdesc=$( _ec2parse "$LDAdesc" Runtime )
-       _LDALastMod=$( _ec2parse "$LDAdesc" LastModified )
        _LDAmemsize=$( _ec2parse "$LDAdesc" MemorySize )
        _LDAcodesize=$( _ec2parse "$LDAdesc" CodeSize )
+       _LDArunt=$( _ec2parse "$LDAdesc" Runtime )
+
+       _LDAversion=$( _ec2parse "$LDAxtra" FunctionVersion )
+       _LDAqualifier=$( _ec2parse "$LDAxtra" Name )
+
+     LDAdetails=$(aws lambda get-function-configuration --function-name "${ldaID}" --qualifier "${_LDAqualifier}")
+     # aws lambda get-function-configuration --function-name toolconnect-refresh --qualifier stage
+
+      # LastModified
+      _LDALastMod=$( _ec2parse "$LDAdetails" LastModified )
+      # Description
+      _LDAdesc=$( _ec2parse "$LDAdetails" Description )
+      # Handler
+      _LDAhdlr=$( _ec2parse "$LDAdetails" Handler )
+      # TimeOut
+      _LDAtime=$( _ec2parse "$LDAdetails" Timeout )
+      # CodeSha256
+      _LDAcsha=$( _ec2parse "$LDAdetails" CodeSha256 )
 
       #
        descDUMP Lambda $ldaID Name $_LDAfunc;
-       descDUMP Last $_LDALastMod Last $_LDALastMod;
-       descDUMP Version $_LDArun Desc $_LDAdesc;
-       descDUMP MEMsize $_LDAmemsize CodeSize $_LDAcodesize;
+       descDUMP Last $_LDALastMod TimeOut $_LDAtime;
+       descDUMP Qualifier $_LDAqualifier Version $_LDAversion;
+
+      #
+       # descDUMP Qualifier $_LDAqualifier Version $_LDAversion;
+       # descDUMP Qualifier $_LDAqualifier Version $_LDAversion;
+      #
+
+       descDUMP MEMsize $_LDAmemsize Handler $_LDAhdlr;
+       descDUMP CodeSHA $_LDAcsha CodeSize $_LDAcodesize;
        echo
 }
 
