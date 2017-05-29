@@ -238,7 +238,7 @@ grpusradd ()
     return;
   fi;
     aws iam add-user-to-group --user-name ${1} --group-name ${2} | jq .
-    sameAs 'aws iam add-user-to-group --user-name USER-NAME --group-name GROUP-NAME'
+    sameAs "aws iam add-user-to-group  --user-name ${1} --group-name ${2}"
 }
 
 #.   grpusrdel - AWS IAM -- DEL user to group
@@ -249,7 +249,7 @@ grpusrdel ()
     return;
   fi;
     aws iam remove-user-from-group --user-name ${1} --group-name ${2}
-    sameAs 'aws iam remove-user-from-group --user-name USER-NAME --group-name GROUP-NAME'
+    sameAs "aws iam remove-user-from-group --user-name ${1} --group-name ${2}"
 }
 
 # AWS Tasks that Require Account Root User
