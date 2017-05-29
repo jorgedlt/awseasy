@@ -52,7 +52,7 @@ usrstat()
 # better to use 'usrsum'
 #
 
-#.  usradd  - AWS IAM -- Add an AWS IAM user
+#.  usradd  - AWS IAM -- ADD an AWS IAM user
 usradd ()
 {
   if (( $# < 1 )); then
@@ -63,7 +63,19 @@ usradd ()
   sameAs "aws iam create-user --user-name ${1}"
 }
 
-#.  usrdel  - AWS IAM -- Delete an AWS IAM user, along with all affiliation
+#.  usrchange  - AWS IAM -- CHANGE an AWS IAM user
+usrchange ()
+{
+  if (( $# < 2 )); then
+    echo usage: Needs at least two argument { --user-name Bob --new-user-name Robert };
+    return;
+  fi;
+  aws iam update-user  --user-name ${1} --new-user-name ${2}| jq .
+  sameAs "aws iam update-user  --user-name ${1} --new-user-name ${2}"
+}
+# usrchange - aws iam update-user --user-name Bob --new-user-name Robert
+
+#.  usrdel  - AWS IAM -- DELETE an AWS IAM user, along with all affiliation
 usrdel ()
 {
 
@@ -126,7 +138,7 @@ thisUSER=$1
   }
 
 # then finally delete-user
-  sideHead "attempting to DELETE $thisUSER"
+  sideHead "attempting to DELETE ${WHITE} $thisUSER ${RESET}"
     aws iam delete-user --user-name $thisUSER
 
   basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"
@@ -397,8 +409,8 @@ usrpwinit ()
     echo 'usage: Needs at least two argument { --user-name USER-NAME --password NEWPASSWD }'
     return;
   fi;
-    aws iam get-access-key-last-used --access-key-id ${1} | jq .
-    sameAs 'aws iam get-access-key-last-used --access-key-id ACCESS-KEY'
+    aws iam create-login-profile --user-name ${1} --password ${2} | jq .
+    sameAs "aws iam create-login-profile --user-name ${1} --password ${2}"
 }
 # aws iam create-login-profile --user-name MyUser --password TXlVc2VyCg$$
 
@@ -409,8 +421,8 @@ usrpwrst ()
     echo 'usage: Needs at least two argument { --user-name USER-NAME --password NEWPASSWD }'
     return;
   fi;
-    aws iam get-access-key-last-used --user-name ${1} --password ${2} --password-reset-required | jq .
-    sameAs 'aws iam get-access-key-last-used --access-key-id ACCESS-KEY'
+    aws iam update-login-profile --user-name ${1} --password ${2} --password-reset-required | jq .
+    sameAs "aws update-login-profile --user-name ${1} --password ${2} --password-reset-required"
 }
 # aws iam update-login-profile --user-name matthew.baumgartner --password TXlVc2FOOVyCg$$ --password-reset-required
 
