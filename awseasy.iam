@@ -537,7 +537,7 @@ iamreport()
 
   triplewide Account $myACCNTID Alias $myACCOUNT Region $myREGION; echo ${RESET}
   divText root
-  aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c
+  aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | grep EventName | sort | uniq -c | column -t
   echo
 
   AWSusers=$(aws iam list-users --output json | grep UserName | cut -d':' -f2 | tr -d ' |"|,' | sort | uniq)
