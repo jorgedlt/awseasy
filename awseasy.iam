@@ -13,21 +13,11 @@ usrls ()
   triplewide Account $myACCNTID Alias $myACCOUNT Region $myREGION; echo ${RESET}
 
   aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq
+  sameAs "iam list-users"  
 }
 
-#.  usrstat - AWS IAM -- Display details on a given Username
-usrstat ()
-{
-  aws iam get-user --user-name $1 | jq . 2> /dev/null  # check user is valid
-  [ $? -ne 0 ] && { echo "$1 : Not a valid user" ; } || {
-
-  echo 'groups'
-        aws iam list-groups-for-user --user-name $1 | grep 'GroupName'
-  }
-}
-
-#.  usrsum - AWS IAM -- Account wide scan of groups and affiliations of a given user
-usrsum()
+#.  usrstat - AWS IAM -- Account wide scan of groups and affiliations of a given user
+usrstat()
 {
   myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
   myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
@@ -39,7 +29,7 @@ usrsum()
     divText $u
       aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
     sideHead "RECENT-ACTIONS-LAST-7-DAYS"
-      aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | tr -s ' '
+      aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | column -t
     sideHead "ACCESS-KEYS"
       aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
     sideHead "MFA-DEVICES"
@@ -49,6 +39,7 @@ usrsum()
     sideHead "POLICIES"
       aws iam list-attached-user-policies --user-name $u | grep "PolicyName"
     echo
+    basedOn "aws iam get-user, list-access-keys, list-mfa-devices list-groups-for-user, list-attached-user-policies"
 }
 
 #
@@ -69,6 +60,7 @@ usradd ()
     return;
   fi;
   aws iam create-user --user-name $1 | jq .
+  sameAs "aws iam create-user --user-name ${1}"
 }
 
 #.  usrdel  - AWS IAM -- Delete an AWS IAM user, along with all affiliation
@@ -136,6 +128,8 @@ thisUSER=$1
 # then finally delete-user
   sideHead "attempting to DELETE $thisUSER"
     aws iam delete-user --user-name $thisUSER
+
+  basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"
 }
 
 #.
@@ -148,6 +142,7 @@ if (( $# < 1 )); then
 fi;
 #
    aws iam list-groups-for-user --user-name ${1} | jq .
+   sameAs "aws iam list-groups-for-user --user-name  ${1}"
 }
 
 #.  grplsusr - AWS IAM -- Display list of users for a given group
@@ -159,6 +154,7 @@ if (( $# < 1 )); then
 fi;
 #
    aws iam get-group --group-name ${1} | jq .
+   sameAs "aws iam get-group --group-name  ${1}"
 }
 
 #.
