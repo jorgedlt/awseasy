@@ -414,7 +414,69 @@ usrpwrst ()
 
 #. POLICYs
 
-# aws iam list-attached-group-policies --group-name PowerUsers  # --scope AWS
+#.   proawsls  - AWS IAM -- Display all AWS list of account groups
+proawsls ()
+{
+   aws iam list-policies --scope AWS | jq .
+   sameAs 'aws iam list-policies'
+}
+# aws iam list-policies
+
+#.   proallls  - AWS IAM -- Display ALL list of account groups
+proallls ()
+{
+  aws iam list-policies | jq .   # No Scope
+   sameAs 'aws iam list-policies'
+}
+# aws iam list-policies
+
+#.   prousrls  - AWS IAM -- Display list-attached-user-policies per given User
+prousrls ()
+{
+  if (( $# < 1 )); then
+    echo 'usage: Needs at least one argument { --user-name USER-NAME }'
+    return;
+  fi;
+    aws iam list-attached-user-policies --user-name ${1} | jq .
+    sameAs 'aws iam list-attached-group-policies --user-name USER-NAME'
+}
+# aws iam list-attached-userpolicies --group-name MyTestGroup2
+
+#.   progrpls  - AWS IAM -- Display list-attached-group-policies per given GROUP
+progrpls ()
+{
+  if (( $# < 1 )); then
+    echo 'usage: Needs at least one argument { --group-name GROUP-NAME }'
+    return;
+  fi;
+    aws iam list-attached-group-policies --group-name ${1} | jq .
+    sameAs 'aws iam list-attached-group-policies --group-name GROUP-NAME'
+}
+# aws iam list-attached-group-policies --group-name MyTestGroup2
+
+#.   progrpatt  - AWS IAM -- ATTACH list-attached-group-policies per given GROUP
+progrpatt ()
+{
+  if (( $# < 2 )); then
+    echo 'usage: Needs at least one argument { --policy-arn ARM --group-name GROUP-NAME }'
+    return;
+  fi;
+    aws iam attach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
+    sameAs 'aws iam detach-group-policy  --group-name GROUP-NAME'
+}
+# aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --group-name MyTestGroup2
+
+#.   progrpdet  - AWS IAM -- DETTACH list-attached-group-policies per given GROUP
+progrpdet ()
+{
+  if (( $# < 2 )); then
+    echo 'usage: Needs at least one argument { --policy-arn ARM --group-name GROUP-NAME }'
+    return;
+  fi;
+    aws iam detach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
+    sameAs 'aws iam list-attached-group-policies --group-name GROUP-NAME'
+}
+# aws iam detach-group-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --group-name MyTestGroup2
 
 #. SIGN-CERTs
 #. PROFILEs
@@ -482,6 +544,55 @@ done
 #
 #              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
 #              # DatabaseAdministrator # NetworkAdministrator # AmazonAPIGatewayAdministrator
+#
+#              aws iam list-attached-group-policies --group-name Admins
+#                          "PolicyName": "AdministratorAccess",
+#
+#              aws iam list-attached-group-policies --group-name PowerUsers
+#                          "PolicyName": "PreventProdAccess",
+#                          "PolicyName": "ManageOwnMFA",
+#                          "PolicyName": "IAMReadOnlyAccess",
+#                          "PolicyName": "PowerUserAccess-NoMarketplaceControl",
+#
+#                           "PolicyName": "PreventIAMOnTrueAdmins",
+#                           "PolicyName": "PreventMarketplaceSubscription",
+#                           "PolicyName": "PreventProdAccess",
+#
+#              aws iam list-attached-group-policies --group-name Developers     #DevPLUS Lambda or API
+#                          "PolicyName": "PreventProdAccess",
+#                          "PolicyName": "ManageOwnMFA",
+#                          "PolicyName": "IAMReadOnlyAccess",
+#                          "PolicyName": "PowerUserAccess-NoMarketplaceControl",
+#
+#                           "PolicyName": "PreventIAMOnTrueAdmins",
+#                           "PolicyName": "PreventMarketplaceSubscription",
+#                           "PolicyName": "PreventProdAccess",
+#
+#              aws iam list-attached-group-policies --group-name S3FullAccess
+#
+#                           "PolicyName": "AmazonS3FullAccess",
+#                           arn:aws:iam::aws:policy/AmazonS3FullAccess
+#
+#                           "PolicyName": "IAMReadOnlyAccess",
+#
+#                           "PolicyName": "PreventIAMOnTrueAdmins",
+#                           "PolicyName": "PreventMarketplaceSubscription",
+#                           "PolicyName": "PreventProdAccess",
+#
+#              aws iam list-attached-group-policies --group-name S3ReadOnlyAccess
+#                          "PolicyName": "AmazonS3ReadOnlyAccess",
+
+                            arn:aws:iam::aws:policy/ReadOnlyAccess
+
+#                          "PolicyName": "IAMReadOnlyAccess",
+#
+#                           "PolicyName": "PreventIAMOnTrueAdmins",
+#                           "PolicyName": "PreventMarketplaceSubscription",
+#                           "PolicyName": "PreventProdAccess",
+
+
+#              # AdministratorAccess # PowerUserAccess # SystemAdministrator # AmazonWorkSpacesAdmin
+#              # DatabaseAdministrator # NetworkAdministrator # AmazonAPIGatewayAdministrator
 #              aws iam list-attached-group-policies --group-name Administ
 #
 #              aws iam list-attached-group-policies --group-name PowerUsers
@@ -508,5 +619,11 @@ done
 #              aws iam list-attached-group-policies --group-name S3ReadOnlyAccess
 #
 #
+
+arn:aws:iam::aws:policy/ReadOnlyAccess
+
+
+# aws iam list-attached-group-policies --group-name dev_group | md5
+# f05619c363b92e5e0a2e5d748b484932
 
 # fin
