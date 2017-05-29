@@ -414,36 +414,36 @@ usrpwrst ()
 
 #. POLICYs
 
-#.   proawsls  - AWS IAM -- Display all AWS list of account groups
-proawsls ()
+#.   polawsls  - AWS IAM -- LIST AWS of account groups
+polawsls ()
 {
    aws iam list-policies --scope AWS | jq .
    sameAs 'aws iam list-policies'
 }
 # aws iam list-policies
 
-#.   proallls  - AWS IAM -- Display ALL list of account groups
-proallls ()
+#.   polallls  - AWS IAM -- LIST ALL of account groups
+polallls ()
 {
   aws iam list-policies | jq .   # No Scope
    sameAs 'aws iam list-policies'
 }
 # aws iam list-policies
 
-#.   prousrls  - AWS IAM -- Display list-attached-user-policies per given User
-prousrls ()
+#.   polusrls  - AWS IAM -- Display list-attached-user-policies per given User
+polusrls ()
 {
   if (( $# < 1 )); then
     echo 'usage: Needs at least one argument { --user-name USER-NAME }'
     return;
   fi;
     aws iam list-attached-user-policies --user-name ${1} | jq .
-    sameAs 'aws iam list-attached-group-policies --user-name USER-NAME'
+    sameAs 'aws iam list-attached-user-policies --user-name USER-NAME'
 }
 # aws iam list-attached-userpolicies --group-name MyTestGroup2
 
-#.   progrpls  - AWS IAM -- Display list-attached-group-policies per given GROUP
-progrpls ()
+#.   polgrpls  - AWS IAM -- Display list-attached-group-policies per given GROUP
+polgrpls ()
 {
   if (( $# < 1 )); then
     echo 'usage: Needs at least one argument { --group-name GROUP-NAME }'
@@ -454,8 +454,8 @@ progrpls ()
 }
 # aws iam list-attached-group-policies --group-name MyTestGroup2
 
-#.   progrpatt  - AWS IAM -- ATTACH list-attached-group-policies per given GROUP
-progrpatt ()
+#.  polgrpatt  - AWS IAM -- ATTACH list-attached-group-policies per given GROUP
+polgrpatt ()
 {
   if (( $# < 2 )); then
     echo 'usage: Needs at least one argument { --policy-arn ARM --group-name GROUP-NAME }'
@@ -466,8 +466,8 @@ progrpatt ()
 }
 # aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --group-name MyTestGroup2
 
-#.   progrpdet  - AWS IAM -- DETTACH list-attached-group-policies per given GROUP
-progrpdet ()
+#.   polgrpdet  - AWS IAM -- DETTACH list-attached-group-policies per given GROUP
+polgrpdet ()
 {
   if (( $# < 2 )); then
     echo 'usage: Needs at least one argument { --policy-arn ARM --group-name GROUP-NAME }'
@@ -480,7 +480,6 @@ progrpdet ()
 
 #. SIGN-CERTs
 #. PROFILEs
-# aws iam list-attached-group-policies --group-name S3ReadOnlyAccess
 
 # MISC
 # aws iam generate-credential-report
