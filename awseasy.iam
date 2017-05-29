@@ -582,7 +582,7 @@ done
 #              aws iam list-attached-group-policies --group-name S3ReadOnlyAccess
 #                          "PolicyName": "AmazonS3ReadOnlyAccess",
 
-                            arn:aws:iam::aws:policy/ReadOnlyAccess
+#                            arn:aws:iam::aws:policy/ReadOnlyAccess
 
 #                          "PolicyName": "IAMReadOnlyAccess",
 #
@@ -620,7 +620,7 @@ done
 #
 #
 
-arn:aws:iam::aws:policy/ReadOnlyAccess
+# arn:aws:iam::aws:policy/ReadOnlyAccess
 
 
 # aws iam list-attached-group-policies --group-name dev_group | md5
