@@ -13,7 +13,7 @@ usrls ()
   triplewide Account $myACCNTID Alias $myACCOUNT Region $myREGION; echo ${RESET}
 
   aws iam list-users --output json | grep 'UserName' | cut -d':' -f2 | tr -d '"| |,' | sort | uniq
-  sameAs "iam list-users"  
+  sameAs "aws iam list-users"
 }
 
 #.  usrstat - AWS IAM -- Account wide scan of groups and affiliations of a given user
