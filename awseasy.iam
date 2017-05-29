@@ -161,7 +161,7 @@ fi;
 grpls ()
 {
    aws iam list-groups | jq .
-   sameAs 'aws iam list-groups'
+   sameAs "aws iam list-groups"
 }
 
 #.   grpadd - AWS IAM -- Create an AWS/IAM group
@@ -172,7 +172,7 @@ grpadd ()
     return;
   fi;
   aws iam create-group --group-name ${1} | jq .
-  sameAs 'aws iam create-group  --group-name  GROUPNAME'
+  sameAs "aws iam create-group  --group-name  ${1}"
 }
 
 #.   grpdel - AWS IAM -- Delete an AWS/IAM group
@@ -183,7 +183,7 @@ grpdel ()
     return;
   fi;
   aws iam delete-group --group-name ${1}
-  sameAs 'aws iam delete-group  --group-name  GROUPNAME'
+  sameAs "aws iam delete-group  --group-name  ${1}"
 }
 
 #.   grppolls - AWS IAM -- group LIST policy (for a given group)
@@ -194,7 +194,7 @@ grppolls ()
     return;
   fi;
     aws iam list-group-policies --group-name ${1} | jq .
-    sameAs 'aws iam get-policy --group-name  GROUPNAME                                                                       '
+    sameAs "aws iam get-policy --group-name  ${1}"
 }
 
 #.   grppoladd - AWS IAM -- group ADD policy
@@ -205,7 +205,7 @@ grppoladd ()
     return;
   fi;
     aws iam attach-group-policy --group-name ${1} --policy-arn ${2}
-    sameAs 'aws iam get-policy --group-name  GROUPNAME --policy-arn POLICY-ARN'
+    sameAs "aws iam get-policy --group-name  ${1} --policy-arn ${2}"
 }
 
 #.    grppoldel - AWS IAM -- group DELETE policy
@@ -216,7 +216,7 @@ grppoldel ()
     return;
   fi;
  aws iam delete-group-policy --group-name ${1} --policy-arn ${2}
- sameAs 'aws iam get-policy --policy-arn POLICY-ARN'
+ sameAs "aws iam delete-group-policy --group-name ${1} --policy-arn ${2}"
 }
 
 #.   grppolstat - AWS IAM -- get details on policy
@@ -227,7 +227,7 @@ grppolstat ()
     return;
   fi;
     aws iam get-policy --policy-arn ${1} | jq .
-    sameAs 'aws iam get-policy --policy-arn POLICY-ARN'
+    sameAs "aws iam get-policy --group-name ${1}"
 }
 
 #.   grpusradd - AWS IAM -- ADD user to group
@@ -289,7 +289,7 @@ usrmfaadd ()
     return;
   fi;
     aws iam create-virtual-mfa-device --virtual-mfa-device-name ${1} --bootstrap-method ${2} --outfile ${3} | jq .
-    sameAs 'aws iam create-virtual-mfa-device --virtual-mfa-device-name User-Name --bootstrap-method Base32StringSeed --outfile File-Name.txt'
+    sameAs "aws iam create-virtual-mfa-device --virtual-mfa-device-name ${1} --bootstrap-method ${2} --outfile ${3}"
 }
 # aws iam create-virtual-mfa-device --virtual-mfa-device-name testuser200 --bootstrap-method Base32StringSeed  --outfile testusermfa.txt
 # aws iam create-virtual-mfa-device --virtual-mfa-device-name testuser200 ---bootstrap-method QRCodePNG -outfile testuser.png
@@ -480,14 +480,8 @@ polgrpdet ()
 
 #.
 #. SIGN-CERTs
+#.
 #. PROFILEs
-
-# MISC
-# aws iam generate-credential-report
-# Wait until a particular condition is satisfied.
-# aws iam user-exists --user-name MyTestUser1 # kinda works ??
-
-
 #.
 #. Reports & Summaaries
 #.
