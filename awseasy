@@ -150,7 +150,7 @@ echo Cloud Front $CFid BETA
 
          echo; echo
          singlewide 'DomainName Cloud Front' "$DomianCF"
-         singlewide 'DomainName Target' "$DomianTR"
+         singlewide '     DomainName Target' "$DomianTR"
 
          echo
          singlewide ForwardedValues "$CFForwardedValues"
