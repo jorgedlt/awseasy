@@ -96,7 +96,7 @@ cfls ()
 
          echo ' ';
      done
-     sameAs 'aws cloudfront get-distribution --id <CFid>'
+     sameAs "aws cloudfront get-distribution --id ${CFid}"
  }
 #
 
@@ -123,6 +123,9 @@ echo Cloud Front $CFid BETA
          _CFminttl=$(_ec2parse "$CFdesc" MinTTL);
          _CFmaxttl=$(_ec2parse "$CFdesc" MaxTTL);
 
+         DomianCF=$( echo "$CFdesc"  | grep DomainName | head -1 | cut -d':' -f2 | tr -d '"| ' )
+         DomianTR=$( echo "$CFdesc"  | grep DomainName | tail -1 | cut -d':' -f2 | tr -d '"| ' )
+
          CFAllowedMethods=$( echo "$CFdesc" \
           | jq  .Distribution.DistributionConfig.DefaultCacheBehavior.AllowedMethods.Items \
           | tr '\012' ' ' | tr -s ' ' )
@@ -145,6 +148,10 @@ echo Cloud Front $CFid BETA
          descDUMP  'S3 Bucket' $_CFbucket prefix $_CFtprefix;
          descDUMP  MinTTL $_CFminttl MaxTTL $_CFmaxttl;
 
+         echo; echo
+         singlewide 'DomainName Cloud Front' "$DomianCF"
+         singlewide 'DomainName Target' "$DomianTR"
+
          echo
          singlewide ForwardedValues "$CFForwardedValues"
          singlewide AllowedMethods "$CFAllowedMethods"
@@ -152,6 +159,8 @@ echo Cloud Front $CFid BETA
          # singlewide 'SSL Protocols' "$CFOriginSslProtocols"
 
          echo ' ';
+         sameAs "aws cloudfront get-distribution --id ${CFid}"
+
  }
 
 #.  cfdump - AWS Cloud Front -- Dump Cloud Front distributions JSON
@@ -167,6 +176,8 @@ CFid=$1
 echo Cloud Front $CFid BETA
          aws cloudfront get-distribution --id "${CFid}" | jq .
          echo ' ';
+         sameAs "cloudfront get-distribution --id "${CFid}""
+
  }
 
 # the trails functions - needs to be in its own file
