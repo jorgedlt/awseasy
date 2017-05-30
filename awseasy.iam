@@ -374,8 +374,20 @@ usrakadd ()
 # (be sure and grab new secret key)
 
 # usrakset act/dea - accesskey activate / deactivate for a given user  [  Active / Inactive ]
-# aws iam update-access-key --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Active --user-name c_stmd_phillips
-# aws iam update-access-key --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Inactive --user-name c_stmd_phillips
+
+
+#.   usrakset - AWS IAM -- Access Key set to  [  Active / Inactive ]
+usrakset()
+{
+  if (( $# < 3 )); then
+    echo 'usage: Needs at least three argument { --user-name user-name --access-key-id KEY --status Active  [ Active / Inactive  ] }'
+    return;
+  fi;
+    aws update-access-key --user-name ${1} --access-key-id ${2} --status ${3} | jq .
+    sameAs "aws update-access-key --user-name ${1} --access-key-id ${2} --status ${3}"
+}
+# aws iam update-access-key --user-name user-name --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Active
+# aws iam update-access-key --user-name user-name --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Inactive
 
 #.   usraklast - AWS IAM -- LAST ACTION with given access key
 usraklast ()
