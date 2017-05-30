@@ -383,8 +383,8 @@ usrakset()
     echo 'usage: Needs at least three argument { --user-name user-name --access-key-id KEY --status Active  [ Active / Inactive  ] }'
     return;
   fi;
-    aws update-access-key --user-name ${1} --access-key-id ${2} --status ${3} | jq .
-    sameAs "aws update-access-key --user-name ${1} --access-key-id ${2} --status ${3}"
+    aws iam update-access-key --user-name ${1} --access-key-id ${2} --status ${3} | jq .
+    sameAs "aws iam update-access-key --user-name ${1} --access-key-id ${2} --status ${3}"
 }
 # aws iam update-access-key --user-name user-name --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Active
 # aws iam update-access-key --user-name user-name --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Inactive
