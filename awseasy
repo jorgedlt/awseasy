@@ -59,12 +59,18 @@ awstag () {
 
 #.  awsls - AWS ALL -- Scan and display aws regions, previously ec2ls
 awsls () {
-   aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq
 
-   sameAs 'aws ec2 create-tags --resources <InstanceId> --tags Key=Name,Value=<NewLabel>'
+  myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
+  myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
+  myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
+  triplewide Account $myACCNTID Alias $myACCOUNT Region $myREGION; echo ${RESET}
 
-   echo == More info on AWS Regions
-   echo == http://docs.aws.amazon.com/general/latest/gr/rande.html
+  divText "AWS Regions"
+  aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq
+  echo
+  sameAs 'aws ec2 describe-regions'
+
+   echo == More info on AWS Regions - http://docs.aws.amazon.com/general/latest/gr/rande.html
 }
 
 # the cf functions - needs to be in its own file
