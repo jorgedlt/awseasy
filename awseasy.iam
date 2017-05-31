@@ -538,6 +538,7 @@ polgrpls ()
   fi;
     aws iam list-attached-group-policies --group-name ${1} | jq .
     sameAs "aws iam list-attached-group-policies --group-name ${1}"; echo
+}
 # aws iam list-attached-group-policies --group-name MyTestGroup2
 
 # future feature
@@ -565,7 +566,6 @@ polgrpdet ()
   fi;
     aws iam detach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
     sameAs "aws iam detach-group-policy --policy-arn ${1} --group-name ${2}"; echo
-
 }
 # aws iam detach-group-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --group-name MyTestGroup2
 
@@ -593,22 +593,21 @@ iampolls ()
 #.  iampolset - AWS IAM -- Display password policy
 iampolset ()
 {
+    echo 'Cut & Paste the floowing template, after editing. '
+    echo
+    echo  ${YELLOW}
+    echo  'aws iam update-account-password-policy \  '
+    echo  '  --minimum-password-length 14 \          '
+    echo  '  --allow-users-to-change-password \      '
+    echo  '  --require-lowercase-characters \        '
+    echo  '  --require-uppercase-characters \        '
+    echo  '  --require-numbers \                     '
+    echo  '  --password-reuse-prevention 8 \         '
+    echo  '  --no-hard-expiry \                      '
+    echo  '  --max-password-age 120                  '
+    echo
 
-echo 'Cut & Paste the floowing template, after editing. '
-echo
-echo  ${YELLOW}
-echo  'aws iam update-account-password-policy \  '
-echo  '  --minimum-password-length 14 \          '
-echo  '  --allow-users-to-change-password \      '
-echo  '  --require-lowercase-characters \        '
-echo  '  --require-uppercase-characters \        '
-echo  '  --require-numbers \                     '
-echo  '  --password-reuse-prevention 8 \         '
-echo  '  --no-hard-expiry \                      '
-echo  '  --max-password-age 120                  '
-echo
-
-echo  ${RESET}
+    echo  ${RESET}
 sameAs 'aws iam update-account-password-policy'
 }
 
