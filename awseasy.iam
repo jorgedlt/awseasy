@@ -140,8 +140,7 @@ thisUSER=$1
 # then finally delete-user
   sideHead "attempting to DELETE ${WHITE} $thisUSER ${RESET}"
     aws iam delete-user --user-name $thisUSER
-
-  basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"; echox
+    basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"; echox
 }
 
 #.
@@ -290,11 +289,7 @@ usrmfastat ()
     return;
   fi;
     aws iam list-mfa-devices --user-name ${1} | jq .
-<<<<<<< HEAD
     sameAs "aws iam list-mfa-devices --user-name ${1}" ; echo
-=======
-    sameAs "aws iam list-mfa-devices --user-name ${1}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam list-mfa-devices --user-name testuser200
 
@@ -321,11 +316,7 @@ usrmfadea ()
     return;
   fi;
     aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}
-<<<<<<< HEAD
     sameAs "aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}" ; echo
-=======
-    sameAs "aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam deactivate-mfa-device --user-name hamid.montazeri --serial-number arn:aws:iam::674553401808:mfa/hamid.montazeri
 
@@ -337,11 +328,7 @@ usrmfadel ()
     return;
   fi;
     aws iam delete-virtual-mfa-device --serial-number ${1}
-<<<<<<< HEAD
     sameAs "aws iam delete-virtual-mfa-device --serial-number ${1}" ; echo
-=======
-    sameAs "delete-virtual-mfa-device --serial-number ${1}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam delete-virtual-mfa-device --serial-number arn:aws:iam::674553401808:mfa/testuser200
 
@@ -358,12 +345,7 @@ usrakls ()
     divText $u
     aws iam list-access-keys --user-name ${u} | jq .
   done
-<<<<<<< HEAD
   sameAs "aws iam list-access-keys --user-name ${u}" ; echo
-
-=======
-  sameAs "aws iam list-access-keys --user-name ${u}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 
 #.   usrakstat - AWS IAM -- access key DETAILS for a given user
@@ -374,11 +356,7 @@ usrakstat ()
     return;
   fi;
     aws iam list-access-keys --user-name ${1} | jq .
-<<<<<<< HEAD
     sameAs "aws iam list-access-keys --user-name ${1}" ; echo
-=======
-    sameAs "aws iam list-access-keys --user-name ${1}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 
 #.   usrakadd - AWS IAM -- access key ADD for a given user
@@ -389,11 +367,7 @@ usrakadd ()
     return;
   fi;
     aws iam create-access-key --user-name ${1} | jq .
-<<<<<<< HEAD
     sameAs "aws iam create-access-key --user-name ${1}" ; echo
-=======
-    sameAs "aws iam create-access-key ---user-name ${1}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 
 # (be sure and grab new secret key)
@@ -422,13 +396,8 @@ usraklast ()
     return;
   fi;
     aws iam get-access-key-last-used --access-key-id ${1} | jq .
-<<<<<<< HEAD
     sameAs "aws iam get-access-key-last-used --access-key-id ${1}"; echo
-=======
-    sameAs "aws iam get-access-key-last-used --access-key-id ${1}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
-
 #.   usrakdel - AWS IAM -- access key DEL for a given user
 usrakdel ()
 {
@@ -437,11 +406,7 @@ usrakdel ()
     return;
   fi;
     aws iam delete-access-key --access-key ${1} --user-name ${2} | jq .
-<<<<<<< HEAD
     sameAs "aws iam delete-access-key --access-key ${1} --user-name ${2}"; echo
-=======
-    sameAs "aws iam delete-access-key --access-key ${1} --user-name ${2}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 
 #.
@@ -560,11 +525,7 @@ polusrls ()
     return;
   fi;
     aws iam list-attached-user-policies --user-name ${1} | jq .
-<<<<<<< HEAD
     sameAs "aws iam list-attached-user-policies --user-name ${1}"; echo
-=======
-    sameAs "aws iam list-attached-user-policies --user-name ${1}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam list-attached-userpolicies --user-name USER-NAME MyUser
 
@@ -576,12 +537,7 @@ polgrpls ()
     return;
   fi;
     aws iam list-attached-group-policies --group-name ${1} | jq .
-<<<<<<< HEAD
     sameAs "aws iam list-attached-group-policies --group-name ${1}"; echo
-=======
-    sameAs "aws iam list-attached-group-policies --group-name ${1}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
-}
 # aws iam list-attached-group-policies --group-name MyTestGroup2
 
 # future feature
@@ -596,11 +552,7 @@ polgrpatt ()
     return;
   fi;
     aws iam attach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
-<<<<<<< HEAD
     sameAs "aws iam attach-group-policy  --policy-arn ${1} --group-name ${2}"; echo
-=======
-    sameAs "aws iam attach-group-policy ${1} --group-name GROUP-NAME ${2}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/S3FullAccess' --group-name 'S3FullAccess001'
 
@@ -612,11 +564,8 @@ polgrpdet ()
     return;
   fi;
     aws iam detach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
-<<<<<<< HEAD
-    sameAs "aws iam detach-group-policy  --policy-arn ${1} --group-name ${2}"; echo
-=======
-    sameAs "aws iam detach-group-policy --policy-arn ${1} --group-name ${2}"
->>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
+    sameAs "aws iam detach-group-policy --policy-arn ${1} --group-name ${2}"; echo
+
 }
 # aws iam detach-group-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --group-name MyTestGroup2
 
