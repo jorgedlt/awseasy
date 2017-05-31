@@ -141,7 +141,7 @@ thisUSER=$1
   sideHead "attempting to DELETE ${WHITE} $thisUSER ${RESET}"
     aws iam delete-user --user-name $thisUSER
 
-  basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"
+  basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"; echox
 }
 
 #.
@@ -154,7 +154,7 @@ if (( $# < 1 )); then
 fi;
 #
    aws iam list-groups-for-user --user-name ${1} | jq .
-   sameAs "aws iam list-groups-for-user --user-name  ${1}"
+   sameAs "aws iam list-groups-for-user --user-name  ${1}"; echo
 }
 
 #.  grplsusr - AWS IAM -- Display list of users for a given group
@@ -166,7 +166,7 @@ if (( $# < 1 )); then
 fi;
 #
    aws iam get-group --group-name ${1} | jq .
-   sameAs "aws iam get-group --group-name  ${1}"
+   sameAs "aws iam get-group --group-name  ${1}"; echo
 }
 
 #.
@@ -175,7 +175,7 @@ fi;
 grpls ()
 {
    aws iam list-groups | jq .
-   sameAs "aws iam list-groups"
+   sameAs "aws iam list-groups"; echo
 }
 
 #.   grpadd - AWS IAM -- Create an AWS/IAM group
@@ -186,7 +186,7 @@ grpadd ()
     return;
   fi;
   aws iam create-group --group-name ${1} | jq .
-  sameAs "aws iam create-group  --group-name  ${1}"
+  sameAs "aws iam create-group  --group-name  ${1}"; echo
 }
 
 #.   grpdel - AWS IAM -- Delete an AWS/IAM group
@@ -197,7 +197,7 @@ grpdel ()
     return;
   fi;
   aws iam delete-group --group-name ${1}
-  sameAs "aws iam delete-group  --group-name  ${1}"
+  sameAs "aws iam delete-group  --group-name  ${1}"; echo
 }
 
 #.   grppolls - AWS IAM -- group LIST policy (for a given group)
@@ -208,7 +208,7 @@ grppolls ()
     return;
   fi;
     aws iam list-group-policies --group-name ${1} | jq .
-    sameAs "aws iam get-policy --group-name  ${1}"
+    sameAs "aws iam get-policy --group-name  ${1}"; echo
 }
 
 #.   grppoladd - AWS IAM -- group ADD policy
@@ -219,7 +219,7 @@ grppoladd ()
     return;
   fi;
     aws iam attach-group-policy --group-name ${1} --policy-arn ${2}
-    sameAs "aws iam get-policy --group-name  ${1} --policy-arn ${2}"
+    sameAs "aws iam get-policy --group-name  ${1} --policy-arn ${2}"; echo
 }
 
 #.    grppoldel - AWS IAM -- group DELETE policy
@@ -230,7 +230,7 @@ grppoldel ()
     return;
   fi;
  aws iam delete-group-policy --group-name ${1} --policy-arn ${2}
- sameAs "aws iam delete-group-policy --group-name ${1} --policy-arn ${2}"
+ sameAs "aws iam delete-group-policy --group-name ${1} --policy-arn ${2}"; echo
 }
 
 #.   grppolstat - AWS IAM -- get details on policy
@@ -241,7 +241,7 @@ grppolstat ()
     return;
   fi;
     aws iam get-policy --policy-arn ${1} | jq .
-    sameAs "aws iam get-policy --group-name ${1}"
+    sameAs "aws iam get-policy --group-name ${1}"; echo
 }
 
 #.   grpusradd - AWS IAM -- ADD user to group
@@ -252,7 +252,7 @@ grpusradd ()
     return;
   fi;
     aws iam add-user-to-group --user-name ${1} --group-name ${2} | jq .
-    sameAs "aws iam add-user-to-group  --user-name ${1} --group-name ${2}"
+    sameAs "aws iam add-user-to-group  --user-name ${1} --group-name ${2}"; echo
 }
 
 #.   grpusrdel - AWS IAM -- DEL user to group
@@ -263,7 +263,7 @@ grpusrdel ()
     return;
   fi;
     aws iam remove-user-from-group --user-name ${1} --group-name ${2}
-    sameAs "aws iam remove-user-from-group --user-name ${1} --group-name ${2}"
+    sameAs "aws iam remove-user-from-group --user-name ${1} --group-name ${2}"; echo
 }
 
 # AWS Tasks that Require Account Root User
@@ -278,7 +278,7 @@ usrmfals ()
    # aws iam list-virtual-mfa-devices
    aws iam list-virtual-mfa-devices | egrep 'SerialNumber|PasswordLastUsed|CreateDate' \
    | tr -d '"|,| ' | sed 's/P/    P/g' | sed 's/C/    C/g ' | sed -e 's/S/\\\nS/g' | ccze -A
-   sameAs 'aws iam list-virtual-mfa-devices'
+   sameAs 'aws iam list-virtual-mfa-devices' ; echo
 }
 # aws iam list-virtual-mfa-devices
 
@@ -290,7 +290,11 @@ usrmfastat ()
     return;
   fi;
     aws iam list-mfa-devices --user-name ${1} | jq .
+<<<<<<< HEAD
+    sameAs "aws iam list-mfa-devices --user-name ${1}" ; echo
+=======
     sameAs "aws iam list-mfa-devices --user-name ${1}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam list-mfa-devices --user-name testuser200
 
@@ -304,7 +308,7 @@ usrmfaadd ()
     return;
   fi;
     aws iam create-virtual-mfa-device --virtual-mfa-device-name ${1} --bootstrap-method ${2} --outfile ${3} | jq .
-    sameAs "aws iam create-virtual-mfa-device --virtual-mfa-device-name ${1} --bootstrap-method ${2} --outfile ${3}"
+    sameAs "aws iam create-virtual-mfa-device --virtual-mfa-device-name ${1} --bootstrap-method ${2} --outfile ${3}" ; echo
 }
 # aws iam create-virtual-mfa-device --virtual-mfa-device-name testuser200 --bootstrap-method Base32StringSeed  --outfile testusermfa.txt
 # aws iam create-virtual-mfa-device --virtual-mfa-device-name testuser200 ---bootstrap-method QRCodePNG -outfile testuser.png
@@ -317,7 +321,11 @@ usrmfadea ()
     return;
   fi;
     aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}
+<<<<<<< HEAD
+    sameAs "aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}" ; echo
+=======
     sameAs "aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam deactivate-mfa-device --user-name hamid.montazeri --serial-number arn:aws:iam::674553401808:mfa/hamid.montazeri
 
@@ -329,7 +337,11 @@ usrmfadel ()
     return;
   fi;
     aws iam delete-virtual-mfa-device --serial-number ${1}
+<<<<<<< HEAD
+    sameAs "aws iam delete-virtual-mfa-device --serial-number ${1}" ; echo
+=======
     sameAs "delete-virtual-mfa-device --serial-number ${1}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam delete-virtual-mfa-device --serial-number arn:aws:iam::674553401808:mfa/testuser200
 
@@ -346,7 +358,12 @@ usrakls ()
     divText $u
     aws iam list-access-keys --user-name ${u} | jq .
   done
+<<<<<<< HEAD
+  sameAs "aws iam list-access-keys --user-name ${u}" ; echo
+
+=======
   sameAs "aws iam list-access-keys --user-name ${u}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 
 #.   usrakstat - AWS IAM -- access key DETAILS for a given user
@@ -357,7 +374,11 @@ usrakstat ()
     return;
   fi;
     aws iam list-access-keys --user-name ${1} | jq .
+<<<<<<< HEAD
+    sameAs "aws iam list-access-keys --user-name ${1}" ; echo
+=======
     sameAs "aws iam list-access-keys --user-name ${1}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 
 #.   usrakadd - AWS IAM -- access key ADD for a given user
@@ -368,7 +389,11 @@ usrakadd ()
     return;
   fi;
     aws iam create-access-key --user-name ${1} | jq .
+<<<<<<< HEAD
+    sameAs "aws iam create-access-key --user-name ${1}" ; echo
+=======
     sameAs "aws iam create-access-key ---user-name ${1}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 
 # (be sure and grab new secret key)
@@ -384,7 +409,7 @@ usrakset()
     return;
   fi;
     aws iam update-access-key --user-name ${1} --access-key-id ${2} --status ${3} | jq .
-    sameAs "aws iam update-access-key --user-name ${1} --access-key-id ${2} --status ${3}"
+    sameAs "aws iam update-access-key --user-name ${1} --access-key-id ${2} --status ${3}"; echo
 }
 # aws iam update-access-key --user-name user-name --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Active
 # aws iam update-access-key --user-name user-name --access-key-id AKIAJFJJYXVZ2X74MRQQ --status Inactive
@@ -397,7 +422,11 @@ usraklast ()
     return;
   fi;
     aws iam get-access-key-last-used --access-key-id ${1} | jq .
+<<<<<<< HEAD
+    sameAs "aws iam get-access-key-last-used --access-key-id ${1}"; echo
+=======
     sameAs "aws iam get-access-key-last-used --access-key-id ${1}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 
 #.   usrakdel - AWS IAM -- access key DEL for a given user
@@ -408,7 +437,11 @@ usrakdel ()
     return;
   fi;
     aws iam delete-access-key --access-key ${1} --user-name ${2} | jq .
+<<<<<<< HEAD
+    sameAs "aws iam delete-access-key --access-key ${1} --user-name ${2}"; echo
+=======
     sameAs "aws iam delete-access-key --access-key ${1} --user-name ${2}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 
 #.
@@ -422,7 +455,7 @@ usrpwinit ()
     return;
   fi;
     aws iam create-login-profile --user-name ${1} --password ${2} | jq .
-    sameAs "aws iam create-login-profile --user-name ${1} --password ${2}"
+    sameAs "aws iam create-login-profile --user-name ${1} --password ${2}"; echo
 }
 # aws iam create-login-profile --user-name MyUser --password TXlVc2VyCg$$
 
@@ -434,29 +467,92 @@ usrpwrst ()
     return;
   fi;
     aws iam update-login-profile --user-name ${1} --password ${2} --password-reset-required | jq .
-    sameAs "aws update-login-profile --user-name ${1} --password ${2} --password-reset-required"
+    sameAs "aws update-login-profile --user-name ${1} --password ${2} --password-reset-required"; echo
 }
 # aws iam update-login-profile --user-name matthew.baumgartner --password TXlVc2FOOVyCg$$ --password-reset-required
 
+#.
 #. POLICYs
 
-#.   polawsls  - AWS IAM -- LIST AWS of account groups
+#.   polcheat  - AWS IAM -- Print brief AWSeasy IAM Cheats
+polcheat ()
+{
+  echo "${YELLOW}Brief HELPS for AWSeasy IAM Policy Commands"
+  echo
+  echo  "${GREEN}  polawsls   -  ${WHITE}LIST policy library with an AWS scope"
+  echo  "${GREEN}  polallls   -  ${WHITE}LIST policy library regardless of scope"
+  echo
+  echo  "${GREEN}  polstat    -  ${WHITE}STAT of a given policy"
+  echo  "${GREEN}  poldump    -  ${WHITE}DUMP full JSON of a given policy"
+  echo  "${GREEN}  polslurp   -  ${WHITE}SLURP (Create) a new custom policy from a given JSON file"
+  echo
+  echo  "${GREEN}  polusrls   -  ${WHITE}LIST attached-USER-policies per a given USER-NAME"
+  echo  "${GREEN}  polgrpls   -  ${WHITE}LIST attached-GROUP-policies per a given GROUP"
+  echo
+  echo  "${GREEN}  polgrpatt  -  ${WHITE}ATTACH a policy to a given GROUP"
+  echo  "${GREEN}  polgrpdet  -  ${WHITE}DETTACH a policies from a given GROUP"
+  echo  "${RESET}"
+}
+
+#.   polawsls  - AWS IAM -- LIST policy library with an AWS scope
 polawsls ()
 {
    aws iam list-policies --scope AWS | jq .
-   sameAs 'aws iam list-policies'
+   sameAs 'aws iam list-policies --scope AWS'; echo
 }
-# aws iam list-policies
+# aws iam list-policies --scope AWS
 
-#.   polallls  - AWS IAM -- LIST ALL of account groups
+#.   polallls  - AWS IAM -- LIST policy library regardless of scope
 polallls ()
 {
-  aws iam list-policies | jq .   # No Scope
-   sameAs 'aws iam list-policies'
+   aws iam list-policies | jq .   # No Scope
+   sameAs 'aws iam list-policies'; echo
 }
 # aws iam list-policies
 
-#.   polusrls  - AWS IAM -- Display list-attached-user-policies per given User
+#.   polstat  - AWS IAM -- STAT of a given policy
+polstat ()
+{
+  if (( $# < 1 )); then
+    echo 'usage: Needs at least one argument { --policy-arn ARN }'
+    return;
+  fi;
+   aws iam get-policy --policy-arn ${1} | jq .   # No Scope
+   sameAs "aws iam get-policy --policy-arn ${1}"; echo
+}
+# aws iam get-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
+
+#.   poldump  - AWS IAM -- DUMP full JSON of a given policy
+poldump ()
+{
+  if (( $# < 2 )); then
+    echo 'usage: Needs at least two argument { --policy-arn ARN --version-id vID }'
+    return;
+  fi;
+   aws iam get-policy-version --policy-arn ${1} --version-id ${2} | jq .
+   sameAs "aws iam get-policy-version --policy-arn ${1} --version-id ${2}"; echo
+}
+# aws iam get-policy-version --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --version-id v1
+
+#.   polslurp  - AWS IAM -- SLURP (Create) a new custom policy from a given JSON file
+polslurp ()
+{
+  if (( $# < 2 )); then
+    echo 'usage: Needs at least two argument { --policy-name my-policy --policy-document file://policy }'
+    return;
+  fi;
+   aws iam create-policy --policy-name ${1} --policy-document ${2} | jq .
+   sameAs "aws iam create-policy --policy-name ${1} --policy-document ${2}"; echo
+}
+# aws iam create-policy --policy-name my-policy --policy-document file://policy
+
+# set-default-policy-version
+# aws iam set-default-policy-version --policy-arn arn:aws:iam::123456789012:policy/MyPolicy --version-id v2
+
+# list-saml-providers
+# aws iam list-saml-providers
+
+#.   polusrls  - AWS IAM -- LIST attached-USER-policies per a given USER-NAME
 polusrls ()
 {
   if (( $# < 1 )); then
@@ -464,11 +560,15 @@ polusrls ()
     return;
   fi;
     aws iam list-attached-user-policies --user-name ${1} | jq .
+<<<<<<< HEAD
+    sameAs "aws iam list-attached-user-policies --user-name ${1}"; echo
+=======
     sameAs "aws iam list-attached-user-policies --user-name ${1}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
-# aws iam list-attached-userpolicies --group-name MyTestGroup2
+# aws iam list-attached-userpolicies --user-name USER-NAME MyUser
 
-#.   polgrpls  - AWS IAM -- Display list-attached-group-policies per given GROUP
+#.   polgrpls  - AWS IAM -- LIST attached-GROUP-policies per a given GROUP
 polgrpls ()
 {
   if (( $# < 1 )); then
@@ -476,11 +576,19 @@ polgrpls ()
     return;
   fi;
     aws iam list-attached-group-policies --group-name ${1} | jq .
+<<<<<<< HEAD
+    sameAs "aws iam list-attached-group-policies --group-name ${1}"; echo
+=======
     sameAs "aws iam list-attached-group-policies --group-name ${1}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam list-attached-group-policies --group-name MyTestGroup2
 
-#.   polgrpatt  - AWS IAM -- ATTACH list-attached-group-policies per given GROUP
+# future feature
+# aws iam get-group-policy --group-name Test-Group --policy-name S3-ReadOnly-Policy
+# aws iam get-group-policy --group-name dev_group --policy-name ReadOnlyAccess
+
+#.   polgrpatt  - AWS IAM -- ATTACH a policy to a given GROUP
 polgrpatt ()
 {
   if (( $# < 2 )); then
@@ -488,11 +596,15 @@ polgrpatt ()
     return;
   fi;
     aws iam attach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
+<<<<<<< HEAD
+    sameAs "aws iam attach-group-policy  --policy-arn ${1} --group-name ${2}"; echo
+=======
     sameAs "aws iam attach-group-policy ${1} --group-name GROUP-NAME ${2}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/S3FullAccess' --group-name 'S3FullAccess001'
 
-#.   polgrpdet  - AWS IAM -- DETTACH list-attached-group-policies per given GROUP
+#.   polgrpdet  - AWS IAM -- DETTACH a policies from a given GROUP
 polgrpdet ()
 {
   if (( $# < 2 )); then
@@ -500,7 +612,11 @@ polgrpdet ()
     return;
   fi;
     aws iam detach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
+<<<<<<< HEAD
+    sameAs "aws iam detach-group-policy  --policy-arn ${1} --group-name ${2}"; echo
+=======
     sameAs "aws iam detach-group-policy --policy-arn ${1} --group-name ${2}"
+>>>>>>> 65a96748455c081dc5457b906f0f7551ae4481d9
 }
 # aws iam detach-group-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --group-name MyTestGroup2
 
