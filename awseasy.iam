@@ -140,7 +140,8 @@ thisUSER=$1
 # then finally delete-user
   sideHead "attempting to DELETE ${WHITE} $thisUSER ${RESET}"
     aws iam delete-user --user-name $thisUSER
-    basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"; echox
+
+  basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"; echox
 }
 
 #.
@@ -398,6 +399,7 @@ usraklast ()
     aws iam get-access-key-last-used --access-key-id ${1} | jq .
     sameAs "aws iam get-access-key-last-used --access-key-id ${1}"; echo
 }
+
 #.   usrakdel - AWS IAM -- access key DEL for a given user
 usrakdel ()
 {
@@ -565,7 +567,7 @@ polgrpdet ()
     return;
   fi;
     aws iam detach-group-policy  --policy-arn ${1} --group-name ${2} | jq .
-    sameAs "aws iam detach-group-policy --policy-arn ${1} --group-name ${2}"; echo
+    sameAs "aws iam detach-group-policy  --policy-arn ${1} --group-name ${2}"; echo
 }
 # aws iam detach-group-policy --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --group-name MyTestGroup2
 
@@ -593,21 +595,22 @@ iampolls ()
 #.  iampolset - AWS IAM -- Display password policy
 iampolset ()
 {
-    echo 'Cut & Paste the floowing template, after editing. '
-    echo
-    echo  ${YELLOW}
-    echo  'aws iam update-account-password-policy \  '
-    echo  '  --minimum-password-length 14 \          '
-    echo  '  --allow-users-to-change-password \      '
-    echo  '  --require-lowercase-characters \        '
-    echo  '  --require-uppercase-characters \        '
-    echo  '  --require-numbers \                     '
-    echo  '  --password-reuse-prevention 8 \         '
-    echo  '  --no-hard-expiry \                      '
-    echo  '  --max-password-age 120                  '
-    echo
 
-    echo  ${RESET}
+echo 'Cut & Paste the floowing template, after editing. '
+echo
+echo  ${YELLOW}
+echo  'aws iam update-account-password-policy \  '
+echo  '  --minimum-password-length 14 \          '
+echo  '  --allow-users-to-change-password \      '
+echo  '  --require-lowercase-characters \        '
+echo  '  --require-uppercase-characters \        '
+echo  '  --require-numbers \                     '
+echo  '  --password-reuse-prevention 8 \         '
+echo  '  --no-hard-expiry \                      '
+echo  '  --max-password-age 120                  '
+echo
+
+echo  ${RESET}
 sameAs 'aws iam update-account-password-policy'
 }
 
