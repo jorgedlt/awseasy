@@ -578,12 +578,6 @@ polgrpdet ()
 #.
 #. Reports & Summaaries
 #.
-#.  iamsummary - AWS IAM -- Display account summary
-iamsummary ()
-{
-    aws iam get-account-summary | jq .
-    sameAs 'aws iam get-account-summary'
-}
 
 #.  iampolls - AWS IAM -- Display password policy
 iampolls ()
@@ -644,6 +638,13 @@ iamreport()
         aws iam list-attached-user-policies --user-name $u | grep "PolicyName"
     echo
 done
+}
+
+#.  iamsummary - AWS IAM -- Display account summary
+iamsummary ()
+{
+    aws iam get-account-summary | jq .
+    sameAs 'aws iam get-account-summary'
 }
 
 # fin
