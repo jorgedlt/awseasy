@@ -41,6 +41,8 @@ In favor of the ssh env pass technique
 
 ----
 
+broken up into AWS Names spaces - http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
+
 ### AWS SecurityGroup commands
 
   sgls - AWS EC2 -- List SecurityGroup (Brief)
