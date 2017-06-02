@@ -23,7 +23,10 @@ myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$'
 echo; singlewide Account $myACCOUNT ; echo ${RESET}
 
 #
-Buckets=$(aws s3 ls s3://${1}| awk '{print $3}')
+Buckets=$(aws s3 ls s3://${1} | awk '{print $3}')
+BucketCnt=$(echo "$Buckets" | grep '^20' | wc -l | tr -d ' ')
+
+[ $BucketCnt -eq 1 ] && { Buckets=${1} ; }
 for b in $Buckets; do
 
     echo "   s3://${b}"                       # this up here, in case it gets hung
@@ -32,11 +35,15 @@ for b in $Buckets; do
 
     S3raw=$(aws s3 ls s3://${b} --summarize --human-readable --recursive )
 
+    S3region=$(aws s3api get-bucket-location --bucket ${b})
+                _S3Location=$(_ec2parse "$S3region" LocationConstraint);
+
+
     # S3desc=$(aws s3api get-bucket-acl --bucket "${b}")
     #         _S3owner=$(_ec2parse "$S3desc" DisplayName);
     #         _S3perms=$(_ec2parse "$S3desc" Permission);
 
-    S3bsize=$(echo "${S3raw}" | grep 'Total.Size' | cut -d':' -f2 | tr -d ' ')
+    S3bsize=$(echo "${S3raw}" | grep 'Total.Size' | cut -d':' -f2 | tr -s ' ')
     S3bfiles=$(echo "${S3raw}" | grep 'Total.Objects' | cut -d':' -f2 | tr -d ' ')
 
     # stats calc
@@ -51,9 +58,10 @@ for b in $Buckets; do
 
     #
     # descDUMP 'Owner' "${_S3owner}" 'Perms' "${_S3perms}"
-    descDUMP 'Bucket Size' "${S3bsize}" 'Files' "${S3bfiles}"
-    descDUMP 'Since' "${S3since}" 'Last' "${S3last}"
-    descDUMP 'Days Used' "${S3dused}" 'Dormant' "${S3quiet}"
+    doubleDUMP 'Bucket Size' "${S3bsize}" 'Files' "${S3bfiles}"
+    doubleDUMP 'Since' "${S3since}" 'Last' "${S3last}"
+    doubleDUMP 'Days Used' "${S3dused}" 'Dormant' "${S3quiet}"
+    singleDUMP 'Location' "${_S3Location}"
     echo "${RESET}"
 done
 }
@@ -127,16 +135,66 @@ fi
   echo
 }
 
+# #.  s3rmold - AWS S3 -- AWS/S3 remove old files (recursive) any older than 30 days
+# s3rmold() {
+# if (( $# < 1 )); then
+#  echo usage: Needs at least one argument {30 days}
+#  return
+# fi
+#
+# s3cmd ls s3://${1} | while read -r line;
+#   do
+#     echo $line
+#     createDate=$(echo $line|awk {'print $1" "$2'})
+#     createDate=$(gdate -d"$createDate" +%s)
+#     olderThan=$(gdate -d"-$2" +%s)
+#     if [[ $createDate -lt $olderThan ]]
+#       then
+#         fileName=$(echo $line|awk {'print $4'})
+#         echo $fileName
+#         if [[ $fileName != "" ]]
+#           then
+#             s3cmd del "$fileName"
+#         fi
+#     fi
+#   done;
+# }
+#
+# #####
+#
+# # admin-portal-elb-logs
+#
+#    s3://admin-portal-elb-logs
+#     Bucket Size: [  3.5 MiB ] Files: [ 13607 ]
+#     Since: [ 2015-12-01 ] Last: [ 2016-06-01 ]
+#     Days Used: [ 184 ] Dormant: [ 366 days ]
+#     Location: [ null ]
+#
+# jld0517@UKRA:~$ s3cmd ls s3://admin-portal-elb-logs
+#                       DIR   s3://admin-portal-elb-logs/AWSLogs/
+#
+# ######
+#
+#
+#  #
+#
+#     s3://proccessminerconsolelog
+#     Bucket Size: [ 303.9MiB ] Files: [ 424188 ]
+#     Since: [ 2016-12-19 ] Last: [ 2017-06-02 ]
+#     Days Used: [ 166 ] Dormant: [ 0 days ]
+#
+
 #.  s3help - AWS S3 -- AWS/S3 pull get info from s3
 s3help() {
 
   echo s3ls      -- AWS/S3 list files Quick
   echo s3long    -- AWS/S3 list files Slow with details
   echo s3deep    -- AWS/S3 list recursively
-  echo s3push   -- AWS/S3 push local data to s3
-  echo s3pull   -- AWS/S3 pull get info from s3
-  echo s3make   -- AWS/S3 make/create new s3 bucket
-  echo s3rm     -- AWS/S3 make/create new s3 bucket
-  echo s3rb     -- AWS/S3 make/create new s3 bucket
+  echo s3push    -- AWS/S3 push local data to s3
+  echo s3pull    -- AWS/S3 pull get info from s3
+  echo s3make    -- AWS/S3 make/create new s3 bucket
+  echo s3rm      -- AWS/S3 empties all files
+  echo s3rmold   -- AWS/S3 empties all files with a given age -- coming soon
+  echo s3rb      -- AWS/S3 removes bucket with force
 }
 #

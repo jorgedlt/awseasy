@@ -29,8 +29,18 @@ divText () {
   echo "${GRAY} ==== ${CYAN} $1 ${GRAY} ==== ${RESET}"
 }
 
+#  singleDUMP - Colorized out
+singleDUMP () {
+  echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}]"
+}
+
 #  descDUMP - Colorized out
 descDUMP () {
+  echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}] $3: [ ${YELLOW}$4 ${GRAY}]"
+}
+
+#  doubleDUMP - Colorized out
+doubleDUMP () {
   echo "    ${GRAY}$1: [ ${YELLOW}$2 ${GRAY}] $3: [ ${YELLOW}$4 ${GRAY}]"
 }
 
