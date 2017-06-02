@@ -192,7 +192,7 @@ trailsls ()
   aws cloudtrail lookup-events --query Events[].EventName | tr -d '"| |,|[|]' | grep -v '^$' | sort | uniq -c | ccze -A
 }
 
-#.  trailslong - AWS Cloud Trails -- ls -long -full list
+#.  trailslong - AWS Cloud Trails -- ls -long -full list - not working as expected
 trailslong ()
 {
   aws cloudtrail lookup-events --query 'Events[*].[EventId, EventName, Username]' | jq . | tr '\012' ' ' | tr '[' '\012' | tr -s ' ' | tr -d '' | tr -d '"|,|]' | sort -k2,3 | awk '{ print $2 " " $3 " " $1 }' | column -t
@@ -224,10 +224,11 @@ trailswho ()
   sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue${eWHO}"
 }
 
-#.  trailsroot - AWS Cloud Trails -- ls -full dump based EventName by ROOT
-trailslong ()
+#.  trailsroot - AWS Cloud Trails -- ls -full dump based by ROOT's actions
+trailsroot ()
 {
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | jq .
+  sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root"
 }
 
 #.  trailsscan - AWS Cloud Trails -- Account Wide Scan

@@ -7,20 +7,55 @@
 #.  s3ls - AWS S3 -- AWS/S3 list files
 s3ls() {
 
-#if (( $# < 1 )); then
-# echo usage: Needs at least one argument {instance ID#}
-# return
-#fi
+myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
+echo; singlewide Account $myACCOUNT ; echo ${RESET}
 
-  myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
-  echo ${GREEN}; echo $myACCOUNT; echo ${RESET}
-
-  # aws s3 ls s3://${1}                   # previously, but trim as below
   aws s3 ls s3://${1}
+  echo
+  sameAs "aws s3 ls s3://${1}"
+  echo
+}
 
-  echo
-  echo "${CYAN} executing command: ${GRAY} aws s3 ls s3://<bucket-list> ${BLUE}# also see s3deep ${RESET}"
-  echo
+#.  s3long - AWS S3 -- AWS/S3 long listing
+s3long() {
+
+myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
+echo; singlewide Account $myACCOUNT ; echo ${RESET}
+
+#
+Buckets=$(aws s3 ls s3://${1}| awk '{print $3}')
+for b in $Buckets; do
+
+    echo "   s3://${b}"                       # this up here, in case it gets hung
+
+    S3bsize=0;S3bfiles=0;S3dused=0;S3since=0000-00-00;S3last=0000-00-00;S3quiet=0
+
+    S3raw=$(aws s3 ls s3://${b} --summarize --human-readable --recursive )
+
+    # S3desc=$(aws s3api get-bucket-acl --bucket "${b}")
+    #         _S3owner=$(_ec2parse "$S3desc" DisplayName);
+    #         _S3perms=$(_ec2parse "$S3desc" Permission);
+
+    S3bsize=$(echo "${S3raw}" | grep 'Total.Size' | cut -d':' -f2 | tr -d ' ')
+    S3bfiles=$(echo "${S3raw}" | grep 'Total.Objects' | cut -d':' -f2 | tr -d ' ')
+
+    # stats calc
+    S3raw2=$(echo "${S3raw}" | grep '^20' | awk '{print $1}' | sort | uniq -c )
+    S3dused=$(echo "${S3raw2}" | wc -l | tr -d ' ' )
+    S3since=$(echo "${S3raw2}" | head -1 | awk '{print $2}')
+    # S3last3=$(echo "${S3raw2}" | tail -3 )
+
+    # no activity calc
+    S3last=$(echo "${S3raw2}" | tail -1 | awk '{print $2}')
+    S3quiet=$(echo "$(( ($(gdate +%s) - $(gdate --date="${S3last}" +%s) )/(60*60*24) )) days")
+
+    #
+    # descDUMP 'Owner' "${_S3owner}" 'Perms' "${_S3perms}"
+    descDUMP 'Bucket Size' "${S3bsize}" 'Files' "${S3bfiles}"
+    descDUMP 'Since' "${S3since}" 'Last' "${S3last}"
+    descDUMP 'Days Used' "${S3dused}" 'Dormant' "${S3quiet}"
+    echo "${RESET}"
+done
 }
 
 #.  s3deep - AWS S3 -- AWS/S3 list recursively
@@ -32,13 +67,11 @@ if (( $# < 1 )); then
 fi
 
   myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
-  echo ${GREEN}; echo $myACCOUNT; echo ${RESET}
+  echo; doublewide Account $myACCOUNT Bucket $1; echo ${RESET}
 
-  echo "${CYAN} executing command: ${GRAY} aws s3 ls s3://s3bucketName ${RED} --recursive ${BLUE}# also see s3deep${RESET}"
-  aws s3 ls s3://${1} --recursive
-
+  aws s3 ls --summarize --human-readable --recursive s3://${1}
   echo
-  echo "${CYAN} executing command: ${GRAY} aws s3 ls s3://<bucket-list> --recursive${RESET}"
+  sameAs "aws s3 ls --summarize --human-readable --recursive s3://${1}"
   echo
 }
 
@@ -68,4 +101,43 @@ fi
   aws s3api create-bucket --bucket $1 --region us-east-1
 }
 
+#.  s3rm - AWS S3 -- AWS/S3 remove files (recursive)
+s3rm() {
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {Bucket Name}
+ return
+fi
+
+  aws s3 rm --recursive s3://${1}
+  echo
+  sameAs "aws s3 rm --recursive s3://${1}"
+  echo
+}
+
+#.  s3rb - AWS S3 -- AWS/S3 Remove Bucket (with Force)
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {Bucket Name}
+ return
+fi
+
+  aws s3 rb --force s3://${1}
+  echo
+  sameAs "aws s3 rm --recursive s3://${1}"
+  echo
+}
+
+#.  s3help - AWS S3 -- AWS/S3 pull get info from s3
+s3help() {
+
+  echo s3ls      -- AWS/S3 list files (Quick)
+  echo s3long    -- AWS/S3 list files (Slow) with details
+  echo s3deep    -- AWS/S3 list recursively
+
+  echo s3push   -- AWS/S3 push local data to s3
+  echo s3pull   -- AWS/S3 pull get info from s3
+
+  echo s3make   -- AWS/S3 make/create new s3 bucket
+
+  echo s3rm     -- AWS/S3 make/create new s3 bucket
+  echo s3rb     -- AWS/S3 make/create new s3 bucket}
 #
