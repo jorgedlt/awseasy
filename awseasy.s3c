@@ -115,6 +115,7 @@ fi
 }
 
 #.  s3rb - AWS S3 -- AWS/S3 Remove Bucket (with Force)
+s3rb () {
 if (( $# < 1 )); then
  echo usage: Needs at least one argument {Bucket Name}
  return
@@ -122,22 +123,20 @@ fi
 
   aws s3 rb --force s3://${1}
   echo
-  sameAs "aws s3 rm --recursive s3://${1}"
+  sameAs "aws s3 rb --force s3://${1}"
   echo
 }
 
 #.  s3help - AWS S3 -- AWS/S3 pull get info from s3
 s3help() {
 
-  echo s3ls      -- AWS/S3 list files (Quick)
-  echo s3long    -- AWS/S3 list files (Slow) with details
+  echo s3ls      -- AWS/S3 list files Quick
+  echo s3long    -- AWS/S3 list files Slow with details
   echo s3deep    -- AWS/S3 list recursively
-
   echo s3push   -- AWS/S3 push local data to s3
   echo s3pull   -- AWS/S3 pull get info from s3
-
   echo s3make   -- AWS/S3 make/create new s3 bucket
-
   echo s3rm     -- AWS/S3 make/create new s3 bucket
-  echo s3rb     -- AWS/S3 make/create new s3 bucket}
+  echo s3rb     -- AWS/S3 make/create new s3 bucket
+}
 #
