@@ -33,7 +33,6 @@ ec2stat() {
        fi
 
        AWSdesc=$(aws ec2 describe-instances --instance-ids $1);
-
 #
       _VpcId=$(_ec2parse "$AWSdesc" VpcId)
       _InstanceNm=$(_ec2parse "$AWSdesc" Value)
@@ -63,6 +62,9 @@ ec2stat() {
      descDUMP STATE $_EC2State DATE $_LaunchTime;
      descDUMP sg $_GroupIds sgNAME $_GroupName;
      descDUMP KEY $_KeyName AZ $_AZone
+
+     basedOn "aws ec2 describe-instances --instance-ids $1)"
+
 }
 
 #.  ec2dump - AWS EC2 -- dump EC2 JSON
@@ -212,5 +214,70 @@ ec2kill() {
 ec2type() {
   cat ~/.awseasy/ec2.type.csv | sed -e 's/,,/, ,/g' | column -s, -t | less -#5 -N -S | ccze -A
 }
+
+##### VOLs
+
+#.  volls - List current ec2 volome list
+volls() {
+
+  VOLSraw=$(aws ec2 describe-volumes | grep VolumeId | cut -d':'  -f2 | tr -d '"| |,' | sort | uniq)
+  #_InstanceId=$(_ec2parse "$VOLSraw" InstanceId)
+
+for v in $VOLSraw; do
+
+  thisVOL=$(aws ec2 describe-volumes --volume-ids ${v})
+  #
+  _InstanceId=$(_ec2parse "$thisVOL" InstanceId)
+
+  # Get the Name of the Assoc EC2
+  Instances=$(aws ec2 describe-instances --instance-ids $_InstanceId)
+     _VolumeName=$(_ec2parse "$Instances" Value)
+
+  #_VolumeID=$(_ec2parse "$thisVOL" _VolumeId)
+  _VolAZ=$(_ec2parse "$thisVOL" AvailabilityZone)
+  _CreateTime=$(_ec2parse "$thisVOL" CreateTime)
+  _AttachTime=$(_ec2parse "$thisVOL" AttachTime)
+  _VolType=$(_ec2parse "$thisVOL" VolumeType)
+  _VolSize=$(_ec2parse "$thisVOL" Size)
+
+  _Volterm=$(_ec2parse "$thisVOL" DeleteOnTermination)
+
+
+  _VolAttach=$( _ec2parse "$thisVOL" State | head -1 )
+  _VolInUse=$( _ec2parse "$thisVOL" State | tail -1 )
+
+  _SnapshotId=$(_ec2parse "$thisVOL" SnapshotId)
+
+  # Get the data of the SNAP
+  SNAPraw=$(aws ec2 describe-snapshots --snapshot-ids $_SnapshotId)
+     _SNAPtime=$(_ec2parse "$SNAPraw" StartTime)
+     _SNAPcryp=$(_ec2parse "$SNAPraw" Encrypted)
+     _SNAPdesc=$(_ec2parse "$SNAPraw" Description | cut -c1-80) # use singlewide
+     #
+
+  echo VolumeID $v
+  doubleDUMP Created $_CreateTime Attached $_AttachTime;
+  doubleDUMP 'AZ' $_VolAZ 'Delete On Termination' $_Volterm;
+  doubleDUMP 'Volume Type' $_VolType 'Volume Size' $_VolSize;
+
+  doubleDUMP 'State' $_VolAttach 'State' $_VolInUse;
+
+  echo "${RESET} EC2"
+  doubleDUMP InstanceName $_VolumeName InstanceID $_InstanceId;
+  echo "${RESET} SNAP"
+  doubleDUMP 'Snapshot ID' $_SnapshotId 'Volume Size' $_VolSize;
+  doubleDUMP 'Snapshot Date' $_SNAPtime 'Encrypted' $_SNAPcryp;
+  singlewide 'SNAP Desc' $_SNAPdesc;
+  echo ${RESET}
+
+done
+  basedOn "aws ec2 describe-volumes"
+}
+
+##### SNAPs
+
+
+
+###### AMIs
 
 # fin
