@@ -258,13 +258,17 @@ for v in $VOLSraw; do
   # An error occurred (InvalidSnapshot.NotFound) when calling the DescribeSnapshots
   # operation: The snapshot 'snap-3fc936ae' does not exist.
 
-  # Get the data of the SNAP
-  SNAPraw=$(aws ec2 describe-snapshots --snapshot-ids $_SnapshotId)
+  [ -z $_SnapshotId  ] && {
+      # No SNAP found
+      _SnapshotId=0000 ;
+  } || {
+    # Get the data of the SNAP
+    SNAPraw=$(aws ec2 describe-snapshots --snapshot-ids $_SnapshotId)
      _SNAPtime=$(_ec2parse "$SNAPraw" StartTime)
      _SNAPcryp=$(_ec2parse "$SNAPraw" Encrypted)
      _SNAPdesc=$(_ec2parse "$SNAPraw" Description | cut -c1-80) # use singlewide
-     #
-
+  }
+  #
   echo VolumeID $v
   doubleDUMP Created $_CreateTime Attached $_AttachTime;
   doubleDUMP 'AZ' $_VolAZ 'Delete On Termination' $_Volterm;
