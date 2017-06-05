@@ -24,6 +24,12 @@ _ec2parse ()
   echo "${1}" | grep -w ${2} | head -1 | cut -d':' -f2- | tr -d ' |,|"';
 }
 
+# utility function for awsbrief # # # # # #
+_ec2parstl ()
+{
+  echo "${1}" | grep -w ${2} | tail -1 | cut -d':' -f2- | tr -d ' |,|"';
+}
+
 #.  ec2stat - AWS EC2 -- briefly describe instances with key chosen parameters
 ec2stat() {
 
@@ -242,12 +248,8 @@ for v in $VOLSraw; do
 
   _Volterm=$(_ec2parse "$thisVOL" DeleteOnTermination)
 
-
-  _Volcheck=$( _ec2parse "$thisVOL" State)
-  echo vvvvvvvvv "$_Volcheck" vvvvvvvvvvv
-
-  _VolAttach=$( _ec2parse "$thisVOL" State | head -1 )
-  _VolInUse=$( _ec2parse "$thisVOL" State | tail -1 )
+  _VolAttach=$( _ec2parse "$thisVOL" State)
+  _VolInUse=$( _ec2parstl "$thisVOL" State)
 
   _SnapshotId=$(_ec2parse "$thisVOL" SnapshotId)
 
