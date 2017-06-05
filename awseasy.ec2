@@ -243,6 +243,9 @@ for v in $VOLSraw; do
   _Volterm=$(_ec2parse "$thisVOL" DeleteOnTermination)
 
 
+  _Volcheck=$( _ec2parse "$thisVOL" State)
+  echo vvvvvvvvv "$_Volcheck" vvvvvvvvvvv
+
   _VolAttach=$( _ec2parse "$thisVOL" State | head -1 )
   _VolInUse=$( _ec2parse "$thisVOL" State | tail -1 )
 
