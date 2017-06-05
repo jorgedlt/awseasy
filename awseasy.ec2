@@ -253,6 +253,11 @@ for v in $VOLSraw; do
 
   _SnapshotId=$(_ec2parse "$thisVOL" SnapshotId)
 
+  # reset values
+  #
+  # An error occurred (InvalidSnapshot.NotFound) when calling the DescribeSnapshots
+  # operation: The snapshot 'snap-3fc936ae' does not exist.
+
   # Get the data of the SNAP
   SNAPraw=$(aws ec2 describe-snapshots --snapshot-ids $_SnapshotId)
      _SNAPtime=$(_ec2parse "$SNAPraw" StartTime)
