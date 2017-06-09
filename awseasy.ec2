@@ -237,7 +237,7 @@ for v in $VOLSraw; do
 
   # Get the Name of the Assoc EC2
   Instances=$(aws ec2 describe-instances --instance-ids $_InstanceId)
-     _VolumeName=$(_ec2parse "$Instances" Value)
+     _VolumeName=$(_ec2parse "$Instances" Value | cut -c1-80 )
 
   #_VolumeID=$(_ec2parse "$thisVOL" _VolumeId)
   _VolAZ=$(_ec2parse "$thisVOL" AvailabilityZone)
@@ -258,13 +258,17 @@ for v in $VOLSraw; do
   # An error occurred (InvalidSnapshot.NotFound) when calling the DescribeSnapshots
   # operation: The snapshot 'snap-3fc936ae' does not exist.
 
-  # Get the data of the SNAP
-  SNAPraw=$(aws ec2 describe-snapshots --snapshot-ids $_SnapshotId)
+  [ -z $_SnapshotId  ] && {
+      # No SNAP found
+      _SnapshotId=0000 ;
+  } || {
+    # Get the data of the SNAP
+    SNAPraw=$(aws ec2 describe-snapshots --snapshot-ids $_SnapshotId 2>/dev/null)
      _SNAPtime=$(_ec2parse "$SNAPraw" StartTime)
      _SNAPcryp=$(_ec2parse "$SNAPraw" Encrypted)
      _SNAPdesc=$(_ec2parse "$SNAPraw" Description | cut -c1-80) # use singlewide
-     #
-
+  }
+  #
   echo VolumeID $v
   doubleDUMP Created $_CreateTime Attached $_AttachTime;
   doubleDUMP 'AZ' $_VolAZ 'Delete On Termination' $_Volterm;
