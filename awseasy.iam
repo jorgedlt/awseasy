@@ -316,8 +316,8 @@ usrmfadea ()
     echo usage: Needs at least two arguments { --user-name USER-NAME --serial-number ARN-MFA-USER };
     return;
   fi;
-    aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}
-    sameAs "aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}" ; echo
+    aws iam deactivate-virtual-mfa-device --user-name ${1} --serial-number ${2}
+    sameAs "aws iam deactivate-virtual-mfa-device --user-name ${1} --serial-number ${2}" ; echo
 }
 # aws iam deactivate-mfa-device --user-name hamid.montazeri --serial-number arn:aws:iam::674553401808:mfa/hamid.montazeri
 
