@@ -56,7 +56,19 @@ usrstat()
 usradd ()
 {
   if (( $# < 1 )); then
-    echo usage: Needs at least one argument {instance ID#};
+    echo ${CYAN}
+    echo "         Add User  -- ${GREEN}usradd NEWUSER${CYAN}"
+    echo "        Init User  -- ${GREEN}usrpwinit NEWUSER 111222333aBa!@# ${CYAN}"
+    echo "       Reset User  -- ${GREEN}usrpwinit NEWUSER 333222111AbA#@! ${CYAN} -forces user password reset"
+    echo ' '
+    echo "     Find a Group  -- ${GREEN}grpls    ${CYAN} -pick a group from list"
+    echo "add User to Group  -- ${GREEN}grpusradd NEWUSER GROUP2ADD ${CYAN}"
+    echo ' '
+    echo 'Securely send to user;'
+    echo '      login URL  http://'$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$').signin.aws.amazon.com
+    echo '       password  TEMPPASSWORD'
+    echo '          group  ASSIGNEDGRP'
+    echo ${RESET}
     return;
   fi;
   aws iam create-user --user-name $1 | jq .
