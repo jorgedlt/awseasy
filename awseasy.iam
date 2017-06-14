@@ -59,7 +59,7 @@ usradd ()
     echo ${CYAN}
     echo "         Add User  -- ${GREEN}usradd NEWUSER${CYAN}"
     echo "        Init User  -- ${GREEN}usrpwinit NEWUSER 111222333aBa!@# ${CYAN}"
-    echo "       Reset User  -- ${GREEN}usrpwinit NEWUSER 333222111AbA#@! ${CYAN} -forces user password reset"
+    echo "       Reset User  -- ${GREEN}usrpwrst NEWUSER 333222111AbA#@! ${CYAN} -forces user password reset"
     echo ' '
     echo "     Find a Group  -- ${GREEN}grpls    ${CYAN} -pick a group from list"
     echo "add User to Group  -- ${GREEN}grpusradd NEWUSER GROUP2ADD ${CYAN}"
