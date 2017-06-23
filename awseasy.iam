@@ -59,7 +59,7 @@ usradd ()
     echo ${CYAN}
     echo "         Add User  -- ${GREEN}usradd NEWUSER${CYAN}"
     echo "        Init User  -- ${GREEN}usrpwinit NEWUSER 111222333aBa!@# ${CYAN}"
-    echo "       Reset User  -- ${GREEN}usrpwinit NEWUSER 333222111AbA#@! ${CYAN} -forces user password reset"
+    echo "       Reset User  -- ${GREEN}usrpwrst NEWUSER 333222111AbA#@! ${CYAN} -forces user password reset"
     echo ' '
     echo "     Find a Group  -- ${GREEN}grpls    ${CYAN} -pick a group from list"
     echo "add User to Group  -- ${GREEN}grpusradd NEWUSER GROUP2ADD ${CYAN}"
@@ -289,7 +289,7 @@ usrmfals ()
 {
    # aws iam list-virtual-mfa-devices
    aws iam list-virtual-mfa-devices | egrep 'SerialNumber|PasswordLastUsed|CreateDate' \
-   | tr -d '"|,| ' | sed 's/P/    P/g' | sed 's/C/    C/g ' | sed -e 's/S/\\\nS/g' | ccze -A
+   | tr -d '"|,| ' | sed 's/P/    P/g' | sed 's/C/    C/g ' | sed -e 's/S/\\\nS/g'
    sameAs 'aws iam list-virtual-mfa-devices' ; echo
 }
 # aws iam list-virtual-mfa-devices
@@ -328,8 +328,8 @@ usrmfadea ()
     echo usage: Needs at least two arguments { --user-name USER-NAME --serial-number ARN-MFA-USER };
     return;
   fi;
-    aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}
-    sameAs "aws iam delete-virtual-mfa-device --user-name ${1} --serial-number ${2}" ; echo
+    aws iam deactivate-mfa-device --user-name ${1} --serial-number ${2}
+    sameAs "aws iam deactivate-mfa-device --user-name ${1} --serial-number ${2}" ; echo
 }
 # aws iam deactivate-mfa-device --user-name hamid.montazeri --serial-number arn:aws:iam::674553401808:mfa/hamid.montazeri
 
