@@ -185,7 +185,7 @@ ec2start() {
     return
    fi
 
-    aws ec2 start-instances --instance-ids "$@"
+    aws ec2 start-instances --instance-ids "$@" | jq .
     sameAs "aws ec2 start-instances --instance-ids ###"
 }
 

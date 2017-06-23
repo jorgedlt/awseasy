@@ -153,7 +153,7 @@ thisUSER=$1
   sideHead "attempting to DELETE ${WHITE} $thisUSER ${RESET}"
     aws iam delete-user --user-name $thisUSER
 
-  basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"; echox
+  basedOn "aws iam delete-access-key, deactivate-mfa-device, detach-user-policy, remove-user-from-group, delete-user"; echo
 }
 
 #.
