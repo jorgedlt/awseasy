@@ -1,0 +1,26 @@
+# Jorge de la Torre - jorgedlt@gmail.com - Standard .gitignore
+
+# MAC OS X
+.DS_Store
+
+# Log file
+*.log
+*-log.json
+
+# AWS env files
+*.pem
+
+# DLT pem file
+*.env
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Compiled class file
+*.class
+
