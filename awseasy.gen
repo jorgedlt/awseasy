@@ -14,8 +14,10 @@ awseasy-version() {
 awshelp() {
   sameAs "cat ~/.awseasy/awseasy | grep '^#\.'"
 
+echo ${CYAN}
+
 [  $# == 0 ] && {
-    cat ~/.awseasy/awseasy* | grep -v old | grep '^#\.' 
+    cat ~/.awseasy/awseasy* | grep -v old | grep '^#\.'
     echo
     sameAs "help available on ec2 iam ver net rds asg lda vpc"
     return;
@@ -23,9 +25,11 @@ awshelp() {
 
 [  $# == 1 ] && {
     topic=$(echo $1 | tr 'A-Z' 'a-z')
-    cat ~/.awseasy/awseasy.${topic} | grep -v old | grep '^#\.' | ccze -A
+    cat ~/.awseasy/awseasy* | grep "${topic}" | grep -v old | grep '^#\.'
     return;
 }
+
+echo ${RESET}
 }
 
 #.  awsupdate - AWS CLI -- update awscli and required packages
