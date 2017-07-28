@@ -1,6 +1,14 @@
 
 # to do
 
+## show ec2-instance-limits
+
+aws gamelift describe-ec2-instance-limits --ec2-instance-type t2.small
+
+or 
+
+aws gamelift describe-ec2-instance-limits 
+
 ## add version info for lambda
 
 see notes from 25MAY2017
