@@ -7,7 +7,36 @@ aws gamelift describe-ec2-instance-limits --ec2-instance-type t2.small
 
 or 
 
-aws gamelift describe-ec2-instance-limits 
+aws gamelift describe-ec2-instance-limits
+
+## New S3 Size and Age scanner - add to main code
+
+	#
+	Buckets=$(aws s3 ls| awk '{print $3}')
+	for b in $Buckets; do
+	    S3raw=$(aws s3 ls s3://${b} --summarize --human-readable --recursive )   # has to go
+	
+	    S3bsize=$(echo "${S3raw}" | grep 'Total.Size' | cut -d':' -f2 | tr -s ' ')
+	    S3bfiles=$(echo "${S3raw}" | grep 'Total.Objects' | cut -d':' -f2 | tr -s ' ')
+	
+	
+	    S3raw2=$(echo "${S3raw}" | grep '^20' | awk '{print $1}' | sort | uniq -c )
+	    S3dused=$(echo "${S3raw2}" | wc -l | tr -d ' ' )
+	    S3since=$(echo "${S3raw2}" | head -1 | awk '{print $2}')
+	    S3last3=$(echo "${S3raw2}" | tail -3 )
+	
+	    # no activity
+	    S3last=$(echo "${S3raw2}" | tail -1 | awk '{print $2}')
+	    S3quiet=$(echo "$(( ($(gdate +%s) - $(gdate --date="${S3last}" +%s) )/(60*60*24) )) days")
+	
+	    echo "  $b"
+	    descDUMP 'Bucket Size' "${S3bsize}" 'Files' "${S3bfiles}"
+	    descDUMP Since "${S3since}" Last "${S3last}"
+	    descDUMP 'Days Used' "${S3dused}" 'Dormant' "${S3quiet}"
+	    echo "${RESET}"
+	done
+	#
+
 
 ## add version info for lambda
 
@@ -147,18 +176,18 @@ aws ec2 describe-security-groups --filters Name=ip-permission.from-port,Values=2
 
 # !!
 
-aws rds describe-db-instances --query 'DBInstances[].DBInstanceIdentifier'
-[
-    "international-papers",
-    "wr-mahrt"
-]
-
-aws rds describe-db-instances --query 'DBInstances[].{DBInstanceIdentifier:DBInstanceClass}'
-[
-    {
-        "DBInstanceIdentifier": "db.t2.medium"
-    },
-    {
-        "DBInstanceIdentifier": "db.t2.medium"
-    }
-]
+	aws rds describe-db-instances --query 'DBInstances[].DBInstanceIdentifier'
+	[
+	    "international-papers",
+	    "wr-mahrt"
+	]
+	
+	aws rds describe-db-instances --query 'DBInstances[].{DBInstanceIdentifier:DBInstanceClass}'
+	[
+	    {
+	        "DBInstanceIdentifier": "db.t2.medium"
+	    },
+	    {
+	        "DBInstanceIdentifier": "db.t2.medium"
+	    }
+	]
