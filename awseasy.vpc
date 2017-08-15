@@ -60,7 +60,7 @@ for vpcID in $1; do
           _NETzone=$( _ec2parse "$NETdesc" AvailabilityZone )
           _NETDefault=$( _ec2parse "$NETdesc" DefaultForAz )
           #
-          descDUMP netID $netID VPCname $_NETname;
+          descDUMP netID $netID NetName $_NETname;
           descDUMP CIDR $_NETcidr State $_NETstate;
           descDUMP IPavail $_NETcount AZ $_NETzone;
           descDUMP Public $_NETpublic  Default $_NETDefault;

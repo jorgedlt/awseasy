@@ -242,6 +242,9 @@ sameAs   "aws ec2 authorize-security-group-ingress  --group-id $1 --protocol $2 
   sgstat $1 | grep $1
 }
 
+# add/drop all protocals for all ports
+# sgauthdropi sg-499e6e32 '-1' '-1' '219.166.144.80/32'
+
 #.  sgauthdropi -- DROP authorize security group ingress
 sgauthdropi() {
 
