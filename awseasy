@@ -288,5 +288,12 @@ source ~/.awseasy/awseasy.asg
 source ~/.awseasy/awseasy.elb
 source ~/.awseasy/awseasy.gen
 source ~/.awseasy/awseasy.s3c
+source ~/.awseasy/awseasy.spt
+source ~/.awseasy/awseasy.vol
+
+##
+
+
+
 
 # fin
