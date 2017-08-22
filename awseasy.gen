@@ -57,3 +57,57 @@ awsupdate() {
     echo -n ${RESET}
   }
 }
+
+#.  loopazs - AWS CLI -- repeat the given command in all known regions
+looprgns() {
+
+      if (( $# < 1 )); then
+        echo usage: Needs at least one argument { run command };
+        return;
+      fi;
+
+# Scan Users Accross Accounts - depends on a valid $HOME/.aws-keys
+SBDawsacnts=$(cat $HOME/.aws-keys | grep function | sed -e 's/function x/!!!/g' |
+sed -n -e '/!!!/,$p' | grep -v '\-' | grep -v '!!!' |
+sed -e 's/function./ /g' | tr -d ' ' | tr -d '\{' | sed '/.Stest/,$!d')
+#
+for i in $SBDawsacnts
+do
+    $i
+    # usrls | grep maiolo
+    $1
+    echo =====================================================================
+
+    # Scan for a given user across all known accounts
+    #   usrls | grep maiolo
+    # Scan and count the number S3 bucklets across all known accounts
+    #   s3ls | wc -l
+done
+#
+}
+# there is a similar for ec2scan
+
+
+#.  loopazs - AWS CLI -- repeat the given command in all known AZs
+loopazs() {
+
+      if (( $# < 1 )); then
+        echo usage: Needs at least one argument { run command };
+        return;
+      fi;
+
+3     awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq );
+4     for thisregion in $awsREGIONS;
+5     do
+6         echo ${RESET}$thisregion;
+7         export AWS_DEFAULT_REGION=$thisregion;
+8         EventsTR=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "');
+9         [ -z "$EventsTR" ] && {
+10             :
+11         } || {
+12             echo "  some EC2 found this region $thisregion";
+13             $1
+14             echo =====================================================================
+15         };
+16     done
+17 }

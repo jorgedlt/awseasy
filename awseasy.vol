@@ -1,0 +1,96 @@
+# awseasy.vol
+
+#. AWS EBS VOLUME snap Commands
+#.
+
+#.  snapls - AWS CLI -- a listing of snaps
+snapls () {
+
+  myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
+
+    aws ec2 describe-snapshots --owner ${myACCNTID} \
+       --query 'Snapshots[*].{ID:SnapshotId,Time:StartTime}'
+}
+
+#.  snapstat - AWS CLI -- shows details about snap
+snapstat () {
+
+}
+
+#.  snapadd - AWS CLI -- creates a news snap for a given ec2 instance-state-name
+snapadd () {
+
+}
+
+#.  snapnew - AWS CLI -- kills oldest snap
+snapdrop () {
+
+}
+
+#.  snap2ami - AWS CLI --creates ami from AMI
+snap2ami () {
+
+}
+
+#.  amils - AWS CLI --show all ami
+amils () {
+
+  myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
+
+  aws ec2 describe-images --owners ${myACCNTID} | jq .
+
+}
+
+#.  volls - AWS CLI -- Show Vols with EC2 Names
+volls () {
+
+    aws ec2 describe-tags --query "Tags[*].{Name:Value,ResourceId:ResourceId}" \
+      --filters "Name=key,Values=Name"  \
+      --filters "Name=resource-type,Values=volume" \
+      --output json | jq .
+}
+
+#.  volstat - AWS CLI -- Show Vols details
+volstat () {
+
+# finding volumes for a given EC2 instance
+#
+export ec2ID=$1
+  echo
+  #
+  aws ec2 describe-instances --instance-ids ${ec2ID} \
+    --query 'Reservations[*].Instances[*].[InstanceId,State.Name,InstanceType,Tags[?Key==`Name`].Value[]]' \
+    | egrep -v '\[|\]' | tr -d ' |"' | tr '\012' ' ' ; echo
+  #
+  aws ec2 describe-volumes --region us-west-1 \
+    --filters Name=attachment.instance-id,Values="${ec2ID}" \
+    Name=attachment.delete-on-termination,Values=true | jq .
+}
+#
+
+
+
+
+
+# https://blog.corpinfo.com/using-aws-cli-to-find-untagged-instances
+
+### How to clean up Amazon EBS Volumes and Snapshots
+http://www.robertsindall.co.uk/blog/blog/2013/04/20/how-to-clean-up-amazon-ebs-volumes-and-snapshots/
+
+# EBS Volumes available to remove
+aws ec2 describe-volumes --region us-east-1 | grep available | awk '{print $2}' | tr '\n' ' '
+
+# All Snapshots - tried text and table - neither weems to work
+aws ec2 describe-snapshots --region us-east-1 --output table | grep SNAPSHOT | awk '{print $2}' | sort | uniq
+
+# All Snapshots not in use by any AMI’s // delete all volumes which are unattached
+ec2-delete-volume --regionus-east-1 $(aws ec2 describe-volumes --region us-east-1  | grep available | awk '{print $2}' | tr '\n' ' ')
+
+#
+aws ec2 monitor-instances --instance-ids i-44a44ac3
+
+http://www.thegeekstuff.com/2016/04/aws-ec2-cli-examples/
+
+yet another useless script https://devopsideas.com/automate-ebs-volume-snapshot/
+
+# fin
