@@ -14,21 +14,24 @@ snapls () {
 
 #.  snapstat - AWS CLI -- shows details about snap
 snapstat () {
-
+       echo not ready
 }
 
 #.  snapadd - AWS CLI -- creates a news snap for a given ec2 instance-state-name
 snapadd () {
+       echo not ready
 
 }
 
 #.  snapnew - AWS CLI -- kills oldest snap
 snapdrop () {
+       echo not ready
 
 }
 
 #.  snap2ami - AWS CLI --creates ami from AMI
 snap2ami () {
+       echo not ready
 
 }
 
@@ -68,29 +71,29 @@ export ec2ID=$1
 }
 #
 
-
-
-
-
-# https://blog.corpinfo.com/using-aws-cli-to-find-untagged-instances
-
-### How to clean up Amazon EBS Volumes and Snapshots
-http://www.robertsindall.co.uk/blog/blog/2013/04/20/how-to-clean-up-amazon-ebs-volumes-and-snapshots/
-
-# EBS Volumes available to remove
-aws ec2 describe-volumes --region us-east-1 | grep available | awk '{print $2}' | tr '\n' ' '
-
-# All Snapshots - tried text and table - neither weems to work
-aws ec2 describe-snapshots --region us-east-1 --output table | grep SNAPSHOT | awk '{print $2}' | sort | uniq
-
-# All Snapshots not in use by any AMI’s // delete all volumes which are unattached
-ec2-delete-volume --regionus-east-1 $(aws ec2 describe-volumes --region us-east-1  | grep available | awk '{print $2}' | tr '\n' ' ')
-
 #
-aws ec2 monitor-instances --instance-ids i-44a44ac3
-
-http://www.thegeekstuff.com/2016/04/aws-ec2-cli-examples/
-
-yet another useless script https://devopsideas.com/automate-ebs-volume-snapshot/
-
+#
+# 
+#
+# # https://blog.corpinfo.com/using-aws-cli-to-find-untagged-instances
+#
+# ### How to clean up Amazon EBS Volumes and Snapshots
+# http://www.robertsindall.co.uk/blog/blog/2013/04/20/how-to-clean-up-amazon-ebs-volumes-and-snapshots/
+#
+# # EBS Volumes available to remove
+# aws ec2 describe-volumes --region us-east-1 | grep available | awk '{print $2}' | tr '\n' ' '
+#
+# # All Snapshots - tried text and table - neither weems to work
+# aws ec2 describe-snapshots --region us-east-1 --output table | grep SNAPSHOT | awk '{print $2}' | sort | uniq
+#
+# # All Snapshots not in use by any AMI’s // delete all volumes which are unattached
+# ec2-delete-volume --regionus-east-1 $(aws ec2 describe-volumes --region us-east-1  | grep available | awk '{print $2}' | tr '\n' ' ')
+#
+# #
+# aws ec2 monitor-instances --instance-ids i-44a44ac3
+#
+# http://www.thegeekstuff.com/2016/04/aws-ec2-cli-examples/
+#
+# yet another useless script https://devopsideas.com/automate-ebs-volume-snapshot/
+#
 # fin
