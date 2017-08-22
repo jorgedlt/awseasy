@@ -96,20 +96,20 @@ loopazs() {
         return;
       fi;
 
-3     awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq );
-4     for thisregion in $awsREGIONS;
-5     do
-6         echo ${RESET}$thisregion;
-7         export AWS_DEFAULT_REGION=$thisregion;
-8         EventsTR=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "');
-9         [ -z "$EventsTR" ] && {
-10             :
-11         } || {
-12             echo "  some EC2 found this region $thisregion";
-13             $1
-14             echo =====================================================================
-15         };
-16     done
+     awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq );
+     for thisregion in $awsREGIONS;
+     do
+         echo ${RESET}$thisregion;
+         export AWS_DEFAULT_REGION=$thisregion;
+         EventsTR=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "');
+         [ -z "$EventsTR" ] && {
+              :
+          } || {
+              echo "  some EC2 found this region $thisregion";
+              $1
+              echo =====================================================================
+          };
+      done
 
 17 }
 
