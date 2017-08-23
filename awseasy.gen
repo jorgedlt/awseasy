@@ -58,8 +58,8 @@ awsupdate() {
   }
 }
 
-#.  lpregions - AWS CLI -- Loops the given command in all known regions
-lpregions() {
+#.  lpacnts - AWS CLI -- loops the given command in all known accounts
+lpacnts() {
 
       if (( $# < 1 )); then
         echo usage: Needs at least one argument { run command };
@@ -87,8 +87,8 @@ done
 }
 
 
-#.  lpazs - AWS CLI -- loops the given command in all known AZs
-lpazs() {
+#.  lpregions - AWS CLI -- loops the given command in all known regions
+lpregions() {
 
     if (( $# < 1 )); then
          echo usage: Needs at least one argument
