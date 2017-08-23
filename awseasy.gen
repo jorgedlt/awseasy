@@ -58,8 +58,8 @@ awsupdate() {
   }
 }
 
-#.  loopazs - AWS CLI -- repeat the given command in all known regions
-looprgns() {
+#.  lpregions - AWS CLI -- Loops the given command in all known regions
+lpregions() {
 
       if (( $# < 1 )); then
         echo usage: Needs at least one argument { run command };
@@ -85,30 +85,30 @@ do
 done
 #
 }
-# there is a similar for ec2scan
 
 
-#.  loopazs - AWS CLI -- repeat the given command in all known AZs
-loopazs() {
+#.  lpazs - AWS CLI -- loops the given command in all known AZs
+lpazs() {
 
-      if (( $# < 1 )); then
-        echo usage: Needs at least one argument { foo foo }
-        return
-      fi
+    if (( $# < 1 )); then
+         echo usage: Needs at least one argument
+         return
+    fi
 
-#     awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq );
-#     for thisregion in $awsREGIONS;
-#     do
-#         echo ${RESET}$thisregion;
-#         export AWS_DEFAULT_REGION=$thisregion;
-#         EventsTR=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "');
-#         [ -z "$EventsTR" ] && {
-#              :
-#          } || {
-#              echo "  some EC2 found this region $thisregion";
-#              $1
-#              echo =====================================================================
-#          };
-#      done
+    awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq );
+    for thisregion in $awsREGIONS;
+    do
+            echo ${RESET}$thisregion;
+            export AWS_DEFAULT_REGION=$thisregion;
+            EventsTR=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]' --output json | tr -d '\n[] "');
 
-17 }
+            [ -z "$EventsTR" ] && {
+                :
+            } || {
+                echo "  some EC2 found this region $thisregion";
+                $1
+                echo =====================================================================
+            };
+            done
+17 };
+}
