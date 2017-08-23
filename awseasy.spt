@@ -51,7 +51,7 @@ aws ec2 describe-spot-instance-requests --query 'SpotInstanceRequests[*].[Instan
 }
 
 spotshop ( ) {
-export ec2types='c5.2xlarge c5.4xlarge c5.8xlarge c4.4xlarge c4.8xlarge m4.2xlarge m4.4xlarge'
+export ec2types='c5.2xlarge c5.4xlarge c5.8xlarge c4.2xlarge c4.4xlarge c4.8xlarge m4.2xlarge m4.4xlarge m4.8xlarge m4.10xlarge m4.16xlarge'
 for itype in $ec2types
 do
 AVGMAX=$(aws ec2 describe-spot-price-history --instance-types $itype \
@@ -61,7 +61,7 @@ AVGMAX=$(aws ec2 describe-spot-price-history --instance-types $itype \
  | grep SpotPrice | cut -d':' -f2 | sort | uniq | tr -d '[|"|]' \
  | awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1<min) {min=$1}; total+=$1; count+=1} END {print total/count, max, min}')
 echo "$itype $AVGMAX"
-done
+done | ccze -A
 }
 
 # fin

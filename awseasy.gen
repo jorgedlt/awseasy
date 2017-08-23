@@ -112,3 +112,59 @@ lpregions() {
             done
 17 };
 }
+
+#### Finding Similar UBUNTU AMI across AWS Regions
+# highly experimental feature
+
+remove_last_comma() {
+  sed '$x;$G;/\(.*\),/!H;//!{$!d}; $!x;$s//\1/;s/^\n//'
+} # needed as json list returned by ubuntu site is mal-formed
+
+#.  whichu - AWS CLI -- Finds similar UBUNTU AMI across AWS Regions
+whichu () {
+
+if (( $# < 1 )); then
+ echo usage: Needs at least one argument {"16.04" "eu-central-1" "hvm:ebs" "x86_64"}
+ return
+fi
+
+# Name=root-device-type,Values=ebs Name=architecture,Values=x86_64 Name=name,Values='*hvm-ssd/ubuntu-trusty-14.04*'
+ uversion="${1:-16.04}"
+ uregion="${2:-us-east-1}"
+ utype="${3:-hvm}"
+ uvolm="${4:-ebs}"
+ uarch="${5:-x86_64}"
+
+ubuntuAMI=$( aws ec2 describe-images \
+    --region ${uregion} \
+    --owners 099720109477 \
+    --filters Name=root-device-type,Values=${uvolm} Name=architecture,Values=${uarch} Name=name,Values="*hvm-ssd/*${uversion}*" \
+    --query 'sort_by(Images, &Name)[-1].ImageId' | tr -d '"')
+
+  sameAs "aws ec2 describe-images .... "; echo
+
+  echo Please Ubuntu AMI ${YELLOW}$ubuntuAMI${RESET} for AWS Region ${YELLOW}${uregion}${RESET}
+
+}
+
+# # #  alternative
+# curl -s "https://cloud-images.ubuntu.com/locator/ec2/releasesTable" \
+#     | remove_last_comma \
+#     | jq -c ".aaData[] | select(contains([${uversion}, ${uregion}, ${utype}\:${uvolm}]))" \
+#     | grep -o 'ami-[a-z0-9]\+' | head -1
+# }
+
+#
+# ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20160907.1 EBS / HVM ver 1
+#
+# export AWS_DEFAULT_REGION=us-east-1  ; export EC2_ami="ami-cd0f5cb6"    # VA
+# export AWS_DEFAULT_REGION=us-east-2  ; export EC2_ami="ami-10547475"    # Ohio
+# export AWS_DEFAULT_REGION=us-west-1  ; export EC2_ami="ami-09d2fb69"    # NORCAL
+# export AWS_DEFAULT_REGION=us-west-2  ; export EC2_ami="ami-6e1a0117"    # OR
+# export AWS_DEFAULT_REGION=eu-west-2  ; export EC2_ami="ami-746aba14"    # London
+
+# original article:
+# https://askubuntu.com/questions/53582/how-do-i-know-what-ubuntu-ami-to-launch-on-ec2/533491#533491?newreg=344b0808d512414e8454915d812693ec
+#
+
+####
