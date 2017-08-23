@@ -58,8 +58,8 @@ awsupdate() {
   }
 }
 
-#.  lpacnts - AWS CLI -- loops the given command in all known accounts
-lpacnts() {
+#.  lpaccounts - AWS CLI -- loops the given command in all known accounts
+lpaccounts() {
 
       if (( $# < 1 )); then
         echo usage: Needs at least one argument { run command };
