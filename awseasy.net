@@ -80,6 +80,6 @@ for eni in $eniLIST; do
 
        [[ $PublicIP == '' ]] && PublicIP='00.00.00.00'
 
-     echo -e "$eni \t$macADDR \t$PrivateIP \t$PublicIP \t$eniDESC \t$eniDEVICE" | ccze -A
+     echo -e "$eni \t$macADDR \t$PrivateIP \t$PublicIP \t$eniDESC \t$eniDEVICE" | fcat
 done
 }
