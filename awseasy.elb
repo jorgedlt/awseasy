@@ -4,6 +4,39 @@
 #. AWS ELB commands
 #.
 
+#.  albls -- AWS ELBv2 List
+albls() {
+
+elbLOOP=$(aws elbv2 describe-load-balancers | egrep -w 'LoadBalancerName' | cut -d':' -f2 | tr -d '"| |,')
+echo
+
+for elb in $elbLOOP; do
+    elbDUMP=$( aws elbv2 describe-load-balancers --load-balancer-name "${elb}" )    # this fails
+    elbTEXT=$( aws elbv2 describe-load-balancers --load-balancer-name "${elb}" --output text )
+    elbTAGS=$( aws elbv2 describe-tags --load-balancer-name "${elb}" --output text)
+
+    elbATT=$(aws elbv2 describe-load-balancer-attributes --load-balancer-name "${elb}" --output text)
+
+      elbNAME=$(echo "$elbDUMP" | grep LoadBalancerName | sed 's/^ \+//g' | tr -d '"|,' | cut -d':' -f2 )
+      elbSCHM=$(echo "$elbDUMP" | grep Scheme | cut -d':' -f2 | tr -d ' |"|,' )
+      elbSCGR=$(echo "$elbTEXT" | grep SECURITYGROUPS | awk '{print $2}' )
+      elbSBNT=$(echo "$elbTEXT" | grep SUBNETS | awk '{print $2}')
+      elbAVZN=$(echo "$elbTEXT" | grep AVAILABILITYZONES | awk '{print $2}' )
+
+      elbINST=$(echo "$elbHEALTH" | grep INSTANCESTATES)
+      elbLIST=$(echo "$elbTEXT" | grep LISTENER | cut -c1-27 )
+      tagNAME=$( echo "$elbTAGS" | grep TAGS | grep Name | awk '{print $3}' )
+
+      LogEnable=$( echo "$elbATT" | grep ACCESSLOG | awk '{print $3}' )
+      S3BucketName=$( echo "$elbATT" | grep ACCESSLOG | awk '{print $4}' )
+
+      echo  "NAME [${GREEN} $tagNAME ${RESET}]"
+      echo  "  FORMAL [${GREEN} $elbNAME ${RESET}] Scheme [${YELLOW} $elbSCHM ${RESET}]"
+      echo  "  S3BucketName [${YELLOW} $S3BucketName ${RESET}] Log Enable [${YELLOW} $LogEnable ${RESET}] "
+      echo
+done
+}
+
 #.  elbls -- AWS ELB List
 elbls() {
 

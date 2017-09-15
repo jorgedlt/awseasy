@@ -128,12 +128,14 @@ if (( $# < 1 )); then
  return
 fi
 
+# example - 'whichu 16.04' works with all other values comining from default settings
+myREGION=$(aws configure list | grep region | awk '{print $2}' | tr -d ' ');
 # Name=root-device-type,Values=ebs Name=architecture,Values=x86_64 Name=name,Values='*hvm-ssd/ubuntu-trusty-14.04*'
- uversion="${1:-16.04}"
- uregion="${2:-us-east-1}"
- utype="${3:-hvm}"
- uvolm="${4:-ebs}"
- uarch="${5:-x86_64}"
+    uversion="${1:-16.04}"
+    uregion="${2:-$myREGION}"
+    utype="${3:-hvm}"
+    uvolm="${4:-ebs}"
+    uarch="${5:-x86_64}"
 
 ubuntuAMI=$( aws ec2 describe-images \
     --region ${uregion} \
@@ -143,9 +145,10 @@ ubuntuAMI=$( aws ec2 describe-images \
 
   sameAs "aws ec2 describe-images .... "; echo
 
-  echo Please Ubuntu AMI ${YELLOW}$ubuntuAMI${RESET} for AWS Region ${YELLOW}${uregion}${RESET}
+  echo "Please Ubuntu AMI ${YELLOW}$ubuntuAMI${RESET} for AWS Region ${YELLOW}${uregion}${RESET}"
 
 }
+#
 
 # # #  alternative
 # curl -s "https://cloud-images.ubuntu.com/locator/ec2/releasesTable" \

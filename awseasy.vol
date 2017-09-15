@@ -9,21 +9,48 @@ snapls () {
   myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
 
     aws ec2 describe-snapshots --owner ${myACCNTID} \
-       --query 'Snapshots[*].{ID:SnapshotId,Time:StartTime}'
+       --query 'Snapshots[*].{ID:SnapshotId,Time:StartTime,Volume:VolumeId}' | jq .
 }
 
 #.  snapstat - AWS CLI -- shows details about snap
 snapstat () {
-       echo not ready
+
+if (( $# < 1 )); then
+  echo usage: Needs at least one argument {snapshot ID#};
+  return;
+fi;
+
+       myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
+
+       aws ec2 describe-snapshots \
+           --owner ${myACCNTID} \
+           --query 'Snapshots[*].{ID:SnapshotId,Time:StartTime,Volume:VolumeId,Desc:Description}' \
+           --snapshot-ids ${1} | jq .
+}
+
+#.  snapdump - AWS CLI -- shows ALL details about snap
+snapdump () {
+
+if (( $# < 1 )); then
+  echo usage: Needs at least one argument {snapshot ID#};
+  return;
+fi;
+
+       myACCNTID=$(aws iam get-user | grep Arn | cut -d':' -f2- | tr -d '"' | cut -d':' -f5);
+
+       aws ec2 describe-snapshots \
+          --owner ${myACCNTID} \
+          --snapshot-ids ${1} | jq .
 }
 
 #.  snapadd - AWS CLI -- creates a news snap for a given ec2 instance-state-name
 snapadd () {
+
        echo not ready
 
 }
 
-#.  snapnew - AWS CLI -- kills oldest snap
+#.  snapdrop - AWS CLI -- kills oldest snap
 snapdrop () {
        echo not ready
 
