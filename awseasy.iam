@@ -598,7 +598,7 @@ iampolls ()
     sameAs 'aws iam get-account-password-policy'
 }
 
-#.  iampolset - AWS IAM -- Display a proposed password policy, cut and paste into CLI
+#.  iampolset - AWS IAM -- Display password policy
 iampolset ()
 {
 

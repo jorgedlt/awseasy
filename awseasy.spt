@@ -22,6 +22,9 @@ done
 spottime ()
 {
 #
+
+_spottime ()
+{
 export requestId=$1
 #
 CreateTime=$(aws ec2 describe-spot-instance-requests \
@@ -37,11 +40,13 @@ CreateTime=$(aws ec2 describe-spot-instance-requests \
 spotLIST=$(aws ec2 describe-spot-instance-requests --query 'SpotInstanceRequests[*].[InstanceId,SpotInstanceRequestId,State,SpotPrice,Tags[?Key==`Name`].Value[]]' --output json \
  | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' \
  | grep '^i-' | grep 'sir-'| grep active | awk '{print $2}' | tr '\012' ' '; echo )
+
 for i in $spotLIST
 do
-  spottime $i
+  _spottime $i
 done
 #
+}
 
 #.  spotls - AWS CLI -- show a simple list of spots
 spotls ( ) {
