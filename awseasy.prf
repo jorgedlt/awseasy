@@ -12,7 +12,7 @@ ec2uptime ()
 {
 
   datediff() {
-    then=$(databin -d "$1" +%s); now=$(gdate +%s)
+    then=$( $databin -d "$1" +%s); now=$( $databin +%s )
     results=$(( (now - then) ))
 
     [ $results -gt 60 ] && { echo $InstanceId : $(( results / 60 )) minutes ; return ; } || { echo $InstanceId : $results seconds ; }
