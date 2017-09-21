@@ -276,7 +276,6 @@ trailsscan ()
 
 
  # aws cloudtrail get-trail-status --name Default
-s
 #####
 
 source ~/.awseasy/awseasy.ec2
