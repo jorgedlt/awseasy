@@ -15,9 +15,9 @@ ec2uptime ()
     then=$( $databin -d "$1" +%s); now=$( $databin +%s )
     results=$(( (now - then) ))
 
-    [ $results -gt 60 ] && { echo $InstanceId : $(( results / 60 )) minutes ; return ; } || { echo $InstanceId : $results seconds ; }
-    [ $results -gt 3600 ] && { echo $InstanceId : $(( results / 3600 )) hours ; return ; }
     [ $results -gt 86400 ] && { echo $InstanceId : $(( results / 86400 )) days ; return ; }
+    [ $results -gt 3600 ] && { echo $InstanceId : $(( results / 3600 )) hours ; return ; }
+    [ $results -gt 60 ] && { echo $InstanceId : $(( results / 60 )) minutes ; return ; } || { echo $InstanceId : $results seconds ; }
 }
 
     if (( $# < 1 )); then
