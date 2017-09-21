@@ -58,7 +58,7 @@ for b in $Buckets; do
 
     # no activity calc
     S3last=$(echo "${S3raw2}" | tail -1 | awk '{print $2}')
-    S3quiet=$(echo "$(( ($( $databin +%s) - $( databin --date="${S3last}" +%s) )/(60*60*24) )) days")
+    S3quiet=$(echo "$(( ($( $databin +%s ) - $( $databin --date="${S3last}" +%s ) )/(60*60*24) )) days")
 
     #
     # descDUMP 'Owner' "${_S3owner}" 'Perms' "${_S3perms}"

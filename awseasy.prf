@@ -48,7 +48,7 @@ aws cloudwatch get-metric-statistics --namespace AWS/EC2 \
   --metric-name CPUUtilization \
   --dimensions Name=InstanceId,Value=${1} \
   --statistics Maximum \
-  --start-time $(databin -u '+%FT%TZ' -d '10 mins ago') --end-time $(databin -u '+%FT%TZ') \
+  --start-time $( $databin -u '+%FT%TZ' -d '10 mins ago') --end-time $( $databin -u '+%FT%TZ') \
   --period 60 | jq .
 
 
