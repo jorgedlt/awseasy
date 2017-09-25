@@ -1,0 +1,47 @@
+# awseasy.prf
+
+#. AWS Performance Commands
+#.
+
+#
+[[ "$OSTYPE" == "linux-gnu" ]] && databin='/bin/date'
+[[ "$OSTYPE" == "darwin"* ]] && databin='/usr/local/bin/gdate'
+
+#.  eventsls - AWS EVENTS -- List Upcoming Account Notification
+eventsls ()
+{
+
+# accountNotification
+  aws health describe-events \
+    | jq -c '.events[] | select(.eventTypeCategory \
+    | . and contains("accountNotification"))' | jq .
+
+    sameAs "Based on - aws health describe-events"
+}
+
+#.  ec2health - AWS EVENTS -- List Upcoming Events for a given EC2
+ec2health ()
+{
+  if (( $# < 1 )); then
+      echo usage: Needs at least one argument {instance ID#};
+    return;
+  fi;
+
+# describe-instance-status
+aws ec2 describe-instance-status --instance-id $1 | jq .
+
+    sameAs "Based on - aws ec2 describe-instance-status --instance-id $1 "
+}
+
+# Health Checks and Maintenance
+#
+# # General Check
+# aws ec2 describe-instance-status --instance-id  i-a3125b5d | jq .
+#
+# # check for any EC2 status Values=impaired
+# aws ec2 describe-instance-status --filters Name=instance-status.status,Values=impaired | jq .
+#
+# --query 'Reservations[*].Instances[*].[InstanceId,State.Name,VpcId,InstanceType,PrivateIpAddress,PublicIpAddress,Tags[?Key==`Name`].Value[]]'
+#
+# aws ec2 describe-instance-status --query \
+# 'InstanceStatuses[?Events!=""].{InstanceId:InstanceId,Events:Events}' | jq .
