@@ -13,8 +13,8 @@ eventsls ()
 
 # accountNotification
   aws health describe-events \
-    | jq -c '.events[] | select(.eventTypeCategory \
-    | . and contains("accountNotification"))' | jq .
+    | jq -c '.events[] | select(.eventTypeCategory | . and contains("accountNotification"))' \
+    | jq .
 
     sameAs "Based on - aws health describe-events"
 }
