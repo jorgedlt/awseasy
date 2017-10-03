@@ -1,0 +1,71 @@
+# awseasy.prf
+
+#. AWS Performance Commands
+#.
+
+#
+[[ "$OSTYPE" == "linux-gnu" ]] && databin='/bin/date'
+[[ "$OSTYPE" == "darwin"* ]] && databin='/usr/local/bin/gdate'
+
+#.  ec2uptime - AWS PRF -- AWS EC2 uptime
+ec2uptime ()
+{
+
+  datediff() {
+    then=$( $databin -d "$1" +%s); now=$( $databin +%s )
+    results=$(( (now - then) ))
+
+    [ $results -gt 86400 ] && { echo $InstanceId : $(( results / 86400 )) days ; return ; }
+    [ $results -gt 3600 ] && { echo $InstanceId : $(( results / 3600 )) hours ; return ; }
+    [ $results -gt 60 ] && { echo $InstanceId : $(( results / 60 )) minutes ; return ; } || { echo $InstanceId : $results seconds ; }
+}
+
+    if (( $# < 1 )); then
+        echo usage: Needs at least one argument {instance ID#};
+      return;
+    fi;
+
+    InstanceId=$1
+
+   _ec2uptime=$(aws ec2 describe-instances --instance-ids $InstanceId \
+       --query 'Reservations[*].Instances[*].LaunchTime' --output text )
+
+  datediff ${_ec2uptime}
+  sameAs "aws ec2 describe-instances --instance-ids $1"
+}
+
+#.  ec2load - AWS PRF -- cloudwatch CPU Utilization statistics
+ec2load ()
+{
+
+if (( $# < 1 )); then
+    echo usage: Needs at least one argument {instance ID#};
+  return;
+fi;
+
+# CPUUtilization
+aws cloudwatch get-metric-statistics --namespace AWS/EC2 \
+  --metric-name CPUUtilization \
+  --dimensions Name=InstanceId,Value=${1} \
+  --statistics Maximum \
+  --start-time $( $databin -u '+%FT%TZ' -d '10 mins ago') --end-time $( $databin -u '+%FT%TZ') \
+  --period 60 | jq .
+
+
+  sameAs "Based on - aws cloudwatch get-metric-statistics --namespace AWS/EC2"
+}
+
+# other future commands based on these ...
+
+# "MetricName": "DiskWriteOps"
+# "MetricName": "DiskReadOps"
+# "MetricName": "DiskWriteBytes"
+# "MetricName": "DiskReadBytes"
+# "MetricName": "NetworkIn"
+# "MetricName": "CPUUtilization"
+# "MetricName": "NetworkPacketsIn"
+# "MetricName": "NetworkOut"
+# "MetricName": "NetworkPacketsOut"
+# "MetricName": "StatusCheckFailed"
+# "MetricName": "StatusCheckFailed_Instance"
+# "MetricName": "StatusCheckFailed_System"

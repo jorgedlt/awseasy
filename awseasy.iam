@@ -38,6 +38,7 @@ usrstat()
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
     sideHead "POLICIES"
       aws iam list-attached-user-policies --user-name $u | grep "PolicyName"
+      aws iam list-user-policies --user-name $u | jq .
     echo
     basedOn "aws iam get-user, list-access-keys, list-mfa-devices list-groups-for-user, list-attached-user-policies"
 }
@@ -648,6 +649,7 @@ iamreport()
       aws iam list-groups-for-user --user-name $u | grep "GroupName"
     sideHead "POLICIES"
         aws iam list-attached-user-policies --user-name $u | grep "PolicyName"
+        aws iam list-user-policies --user-name $u | jq .  
     echo
 done
 }

@@ -3,8 +3,11 @@
 #. AWS SPOT Commands
 #.
 
-#.  spottag - AWS CLI -- rename SPOT instances
+#
+[[ "$OSTYPE" == "linux-gnu" ]] && databin='/bin/date'
+[[ "$OSTYPE" == "darwin"* ]] && databin='/usr/local/bin/gdate'
 
+#.  spottag - AWS CLI -- rename SPOT instances
 spottag () {
 tagLIST=$(aws ec2 describe-spot-instance-requests --query 'SpotInstanceRequests[*].[InstanceId,SpotInstanceRequestId,State,SpotPrice,Tags[?Key==`Name`].Value[]]' --output json \
  | tr -d '\n[] "' | perl -pe 's/i-/\ni-/g' | tr ',' '\t' | sed -e 's/null/None/g' \
@@ -31,8 +34,8 @@ CreateTime=$(aws ec2 describe-spot-instance-requests \
   --spot-instance-request-ids $requestId \
   | grep CreateTime | cut -d':' -f2,3,4 | tr -d ',|"| ')
 
- tTHN=$(gdate --date="${CreateTime}" +%s)
- tNOW=$(gdate +%s)
+ tTHN=$( $databin --date="${CreateTime}" +%s)
+ tNOW=$( $databin +%s)
  tSPOT=$(bc <<< "scale=2;($tNOW-$tTHN)/60")
  echo "SPOT instance [ $requestId ] has a duration of [ $tSPOT ] minutes"
 }
@@ -61,8 +64,8 @@ for itype in $ec2types
 do
 AVGMAX=$(aws ec2 describe-spot-price-history --instance-types $itype \
  --product-descriptions Linux/UNIX \
- --start-time $(gdate -u '+%FT%TZ' -d '1 hour ago') \
- --end-time $(gdate -u '+%FT%TZ') \
+ --start-time $( $databin -u '+%FT%TZ' -d '1 hour ago') \
+ --end-time $( $databin -u '+%FT%TZ') \
  | grep SpotPrice | cut -d':' -f2 | sort | uniq | tr -d '[|"|]' \
  | awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1<min) {min=$1}; total+=$1; count+=1} END {print total/count, max, min}')
 echo "$itype $AVGMAX"

@@ -219,10 +219,7 @@ trailswhat ()
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventId,AttributeValue=${eWHAT} | jq .
   sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=${eWHAT}"
 
- aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventId,AttributeValue=${eWHAT} \
- | grep CloudTrailEvent | 
-
-
+ aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventId,AttributeValue=${eWHAT} | grep CloudTrailEvent
 }
 # aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=ConsoleLogin
 
@@ -277,11 +274,7 @@ trailsscan ()
 
  # http://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-cli.html
 
-
  # aws cloudtrail get-trail-status --name Default
-
-
-#####
 
 source ~/.awseasy/awseasy.ec2
 source ~/.awseasy/awseasy.iam
@@ -295,10 +288,7 @@ source ~/.awseasy/awseasy.gen
 source ~/.awseasy/awseasy.s3c
 source ~/.awseasy/awseasy.spt
 source ~/.awseasy/awseasy.vol
-
-##
-
-
-
+source ~/.awseasy/awseasy.prf
+source ~/.awseasy/awseasy.hth
 
 # fin
