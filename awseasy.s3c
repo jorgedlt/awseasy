@@ -16,14 +16,18 @@ echo; singlewide Account $myACCOUNT ; echo ${RESET}
   echo
 }
 
-#.  s3long - AWS S3 -- AWS/S3 long listing
-s3long() {
+#.  s3stat - AWS S3 -- AWS/S3 long listing
+s3stat() {
 
 myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
 echo; singlewide Account $myACCOUNT ; echo ${RESET}
 
+[ $# -ge 1 ] && {
+  Buckets=${1}
+} || {
+  Buckets=$(aws s3 ls | awk '{print $3}')
+}
 #
-Buckets=$(aws s3 ls s3://${1} | awk '{print $3}')
 BucketCnt=$(echo "$Buckets" | grep '^20' | wc -l | tr -d ' ')
 
 [ $BucketCnt -eq 1 ] && { Buckets=${1} ; }
@@ -36,12 +40,7 @@ for b in $Buckets; do
     S3raw=$(aws s3 ls s3://${b} --summarize --human-readable --recursive )
 
     S3region=$(aws s3api get-bucket-location --bucket ${b})
-                _S3Location=$(_ec2parse "$S3region" LocationConstraint);
-
-
-    # S3desc=$(aws s3api get-bucket-acl --bucket "${b}")
-    #         _S3owner=$(_ec2parse "$S3desc" DisplayName);
-    #         _S3perms=$(_ec2parse "$S3desc" Permission);
+    _S3Location=$(_ec2parse "$S3region" LocationConstraint);
 
     S3bsize=$(echo "${S3raw}" | grep 'Total.Size' | cut -d':' -f2 | tr -s ' ')
     S3bfiles=$(echo "${S3raw}" | grep 'Total.Objects' | cut -d':' -f2 | tr -d ' ')
@@ -50,7 +49,6 @@ for b in $Buckets; do
     S3raw2=$(echo "${S3raw}" | grep '^20' | awk '{print $1}' | sort | uniq -c )
     S3dused=$(echo "${S3raw2}" | wc -l | tr -d ' ' )
     S3since=$(echo "${S3raw2}" | head -1 | awk '{print $2}')
-    # S3last3=$(echo "${S3raw2}" | tail -3 )
 
     # no activity calc
     S3last=$(echo "${S3raw2}" | tail -1 | awk '{print $2}')
