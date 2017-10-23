@@ -6,6 +6,7 @@
 
 #.  awseasy-version - Display Current Version
 awseasy-version() {
+  aws --version
   echo AWSEASY VERSION:
   cat ~/.awseasy/awseasy.ver | ccze -A
 }
@@ -35,6 +36,7 @@ echo ${RESET}
 #.  awsupdate - AWS CLI -- update awscli and required packages
 awsupdate() {
   echo -n "${RESET}${WHITE}"
+      aws --version
       read -r -p "Are you sure you want to update the AWS CLI environment? [y/N] " response
   echo "${RESET}"
 
