@@ -26,6 +26,8 @@ s3stat() {
 myACCOUNT=$(aws iam list-account-aliases | tr -d '{|}|[|]|"| ' | egrep -v ':|^$');
 echo; singlewide Account $myACCOUNT ; echo ${RESET}
 
+Buckets=
+
 [ $# -ge 1 ] && {
   Buckets=${1}
 } || {
