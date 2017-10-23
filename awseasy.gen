@@ -60,12 +60,16 @@ awsupdate() {
       echo "${CYAN} executing command: ${GRAY} sudo brew install figlet ccze ${RESET}"
       brew install figlet ccze
 
-      echo "${CYAN} executing command: ${GRAY} sudo -H pip install pjson ${RESET}"
+      echo "${CYAN} executing command: ${GRAY} sudo -H pip install  --upgrade pip ${RESET}"
       sudo -H pip install --upgrade pip
+      echo "${CYAN} executing command: ${GRAY} brew upgrade jq ${RESET}"
       brew upgrade jq                                        # replaced pjson
+      brew update
+
+      # brew list and brew cask list # to list all brew installed packages
 
       echo "${CYAN} executing command: ${GRAY} sudo -H pip install awscli --upgrade ${RESET}"
-      sudo -H  pip install awscli --upgrade
+      sudo -H pip install awscli --upgrade
 
       echo ${CYAN}Environment updated attempted, currently at${GREEN}
         aws --version
