@@ -232,7 +232,19 @@ trailswho ()
   fi;
 
   eWHO=$1
-  aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue${eWHO}  | jq .
+  aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${eWHO}  | jq .
+  sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue${eWHO}"
+}
+
+trailswhols ()
+{
+  if (( $# < 1 )); then
+    echo usage: Needs at least one argument { Username };
+    return;
+  fi;
+
+  eWHO=$1
+  aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${eWHO} | grep EventName | sort | uniq -c
   sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue${eWHO}"
 }
 
