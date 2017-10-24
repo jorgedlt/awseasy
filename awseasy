@@ -231,7 +231,7 @@ trailswho ()
 
   eWHO=$1
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${eWHO}  | jq .
-  sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue${eWHO}"
+  sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${eWHO}"
 }
 
 trailswhols ()
@@ -243,7 +243,7 @@ trailswhols ()
 
   eWHO=$1
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${eWHO} | grep EventName | sort | uniq -c
-  sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue${eWHO}"
+  sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${eWHO}"
 }
 
 #.  trailsroot - AWS Cloud Trails -- ls -full dump based by ROOT's actions
@@ -253,24 +253,24 @@ trailsroot ()
   sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root"
 }
 
-#.  trailsscan - AWS Cloud Trails -- Account Wide Scan
-trailsscan ()
-{
-    awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq );
-    for thisregion in $awsREGIONS;
-    do
-        echo ${RESET}$thisregion;
-        export AWS_DEFAULT_REGION=$thisregion;
-        EventsTR=$( aws cloudtrail lookup-events --query Events[].EventName | tr -d '"| |,|[|]' );
-        [ -z "$EventsTR" ] && {
-             :
-         } || {
-             echo "  some Events found this region $thisregion in the last 7 days";
-             aws cloudtrail lookup-events --query Events[].EventName | tr -d '"| |,|[|]' | grep -v '^$' | sort | uniq -c | ccze -A ;
-             echo =====================================================================
-         };
-     done
- }
+# #.  trailsscan - AWS Cloud Trails -- Account Wide Scan
+# trailsscan ()
+# {
+#     awsREGIONS=$( aws ec2 describe-regions | grep RegionName | cut -d':' -f2 | tr -d ' |,|"' | sort -r | uniq );
+#     for thisregion in $awsREGIONS;
+#     do
+#         echo ${RESET}$thisregion;
+#         export AWS_DEFAULT_REGION=$thisregion;
+#         EventsTR=$( aws cloudtrail lookup-events --query Events[].EventName | tr -d '"| |,|[|]' );
+#         [ -z "$EventsTR" ] && {
+#              :
+#          } || {
+#              echo "  some Events found this region $thisregion in the last 7 days";
+#              aws cloudtrail lookup-events --query Events[].EventName | tr -d '"| |,|[|]' | grep -v '^$' | sort | uniq -c | ccze -A ;
+#              echo =====================================================================
+#          };
+#      done
+#  }
 
  # trailslist (long)
  # aws cloudtrail describe-trails | jq .
