@@ -196,7 +196,7 @@ echo Cloud Front $CFid BETA
 #. AWS Cloud Trails Commands
 #.
 
-#.  trailsls - AWS Cloud Trails -- ls -short -summary
+#.  trailsls - AWS Cloud Trails -- Account wide summary of events and uniq counts
 trailsls ()
 {
   aws cloudtrail lookup-events --query Events[].EventName | tr -d '"| |,|[|]' | grep -v '^$' | sort | uniq -c | ccze -A
@@ -208,7 +208,7 @@ trailslong ()
   aws cloudtrail lookup-events --query 'Events[*].[EventId, EventName, Username]' | jq . | tr '\012' ' ' | tr '[' '\012' | tr -s ' ' | tr -d '' | tr -d '"|,|]' | sort -k2,3 | awk '{ print $2 " " $3 " " $1 }' | column -t
 }
 
-#.  trailswhat - AWS Cloud Trails -- ls -full dump based on EventName ( displays WHO also )
+#.  trailswhat - AWS Cloud Trails -- full dump based on EventName ( displays WHO also )
 trailswhat ()
 {
   if (( $# < 1 )); then
@@ -221,7 +221,7 @@ trailswhat ()
 }
 # aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=ConsoleLogin
 
-#.  trailswho - AWS Cloud Trails -- ls -full dump based on Username { Username };
+#.  trailswho - AWS Cloud Trails -- full dump based on Username { Username };
 trailswho ()
 {
   if (( $# < 1 )); then
@@ -234,6 +234,7 @@ trailswho ()
   sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${eWHO}"
 }
 
+#.  trailswhols - AWS Cloud Trails -- brief listing based on Username { Username };
 trailswhols ()
 {
   if (( $# < 1 )); then
@@ -246,7 +247,7 @@ trailswhols ()
   sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=${eWHO}"
 }
 
-#.  trailsroot - AWS Cloud Trails -- ls -full dump based by ROOT's actions
+#.  trailsroot - AWS Cloud Trails -- full dump based by ROOT's actions
 trailsroot ()
 {
   aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=root | jq .
