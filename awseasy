@@ -216,10 +216,10 @@ trailswhat ()
     return;
   fi;
   eWHAT=$1
-  aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventId,AttributeValue=${eWHAT} | jq .
+  aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=${eWHAT} | jq .
   sameAs "aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=${eWHAT}"
 
- aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventId,AttributeValue=${eWHAT} | grep CloudTrailEvent
+ # aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventId,AttributeValue=${eWHAT} | grep CloudTrailEvent
 }
 # aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=ConsoleLogin
 
