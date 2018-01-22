@@ -73,6 +73,31 @@ ec2stat() {
 
 }
 
+#.  ec2ssh - AWS EC2 -- jump EC2 given InstanceID#
+ec2ssh() {
+
+      if (( $# < 1 )); then
+         echo usage: Needs at least one argument {instance ID#}
+       return
+       fi
+
+       AWSdesc=$(aws ec2 describe-instances --instance-ids $1);
+#
+      _InstanceNm=$(_ec2parse "$AWSdesc" Value)
+      _InstanceId=$(_ec2parse "$AWSdesc" InstanceId)
+      _PublicIp=$(_ec2parse "$AWSdesc" PublicIpAddress)
+      _KeyName=$(_ec2parse "$AWSdesc" KeyName)
+      _EC2State=$(_ec2parse "$AWSdesc" running)
+#
+     descDUMP InstanceName $_InstanceNm InstanceID $_InstanceId;
+     descDUMP KEY $_KeyName PublicIP $_PublicIp;
+
+     [ -f ~/.aws/${_KeyName}.pem ] && : || echo "ERROR: ~/.aws/${_KeyName}.pem not found"
+
+     echo "${YELLOW}Executing: ${BLUE} ssh -i ~/.aws/${_KeyName}.pem ubuntu@${_PublicIp} ${RESET}"
+     ssh -i ~/.aws/${_KeyName}.pem ubuntu@${_PublicIp}
+}
+
 #.  ec2dump - AWS EC2 -- dump EC2 JSON
 ec2dump() {
 

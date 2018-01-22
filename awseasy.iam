@@ -28,7 +28,8 @@ usrstat()
 
     divText $u
       aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
-    sideHead "RECENT-ACTIONS-LAST-7-DAYS"
+    #sideHead "RECENT-ACTIONS-LAST-7-DAYS"
+    sideHead "RECENT-ACTIONS"
       aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | column -t
     sideHead "ACCESS-KEYS"
       aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
@@ -639,7 +640,9 @@ iamreport()
     divText $u
       aws iam get-user --user-name $u | grep PasswordLastUsed | tr -d '"|,' | tr -s ' '
 
-    sideHead "RECENT-ACTIONS-LAST-7-DAYS"
+    # sideHead "RECENT-ACTIONS-LAST-7-DAYS"
+    sideHead "RECENT-ACTIONS"
+
       aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=$u | grep EventName | sort | uniq -c | tr -s ' '
     sideHead "ACCESS-KEYS"
       aws iam list-access-keys --user-name $u | egrep "AccessKeyId|Status"
