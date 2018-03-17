@@ -95,7 +95,7 @@ ec2ssh() {
      [ -f ~/.aws/${_KeyName}.pem ] && : || echo "ERROR: ~/.aws/${_KeyName}.pem not found"
 
      echo "${YELLOW}Executing: ${BLUE} ssh -i ~/.aws/${_KeyName}.pem ubuntu@${_PublicIp} ${RESET}"
-     ssh -i ~/.aws/${_KeyName}.pem ubuntu@${_PublicIp}
+     ssh -i ~/.aws/${_KeyName}.pem -i ./$2 ubuntu@${_PublicIp}
 }
 
 #.  ec2dump - AWS EC2 -- dump EC2 JSON
