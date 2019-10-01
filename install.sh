@@ -11,7 +11,7 @@ echo; echo "${GREEN}" ~/.awseasy/awseasy "${YELLOW}"
 ##
 # cd ~/code/awseasy
 /bin/cp -f \
- ~/code/awseasy/* \
+ ~/src/awseasy/* \
  $HOME/.awseasy
 
 # cd ~/.awseasy
@@ -27,7 +27,7 @@ rm -fr ~/.awseasy/.git \
 # this script to ensure that the .bashrc and .bash-func.sh include ${COLORS} and other needed functions
 
 echo; echo "${GREEN}"REPO Files "${YELLOW}"
-ls -la  "$HOME/code/awseasy/"
+ls -la  "$HOME/src/awseasy/"
 
 echo; echo "${GREEN}" In Situ Files "${YELLOW}"
 ls -la  "$HOME/.awseasy/"
